@@ -6,7 +6,7 @@ lossy boson sampling.
 ## Summary
 
   - [Getting Started](#getting-started)
-  - [Runing the tests](#running-the-tests)
+  - [Running the tests](#running-the-tests)
   - [Versioning](#versioning)
   - [Authors](#authors)
   - [License](#license)
@@ -31,11 +31,8 @@ I'll use [SemVer](http://semver.org/) for versioning and try to keep track of th
 
 ## Authors
 
+  - [Tomasz Rybotycki](https://github.com/Tomev)
   - [Billie Thompson](https://github.com/PurpleBooth) - *Provided README Template* 
-
-See also the list of
-[contributors](https://github.com/PurpleBooth/a-good-readme-template/contributors)
-who participated in this project.
 
 ## License
 
@@ -45,7 +42,7 @@ See the [LICENSE.md](LICENSE.md) file for details.
 ## Acknowledgments
 
   - Daniel Brod and Michał Oszmaniec, 
-  - [CTP PAS](http://www.cft.edu.pl/new/public/pl),
+  - [CTP PAS](http://www.cft.edu.pl/new/public/pl).
   
   
 ## References
