@@ -1,6 +1,6 @@
 # (Bo)son (S)ampling (S)imulator
 
-The project is meant to implement the ideas proposed in references [0] and [1] for classically simulating 
+The project is meant to implement the ideas proposed in references [1] and [2] for classically simulating 
 lossy boson sampling.  
 
 ## Summary
@@ -49,6 +49,8 @@ See the [LICENSE.md](LICENSE.md) file for details.
 
 The work will follow the ideas presented in following works:
 
-[0] Oszmaniec M., Brod D. J., [arXiv:1801.06166](https://arxiv.org/abs/1801.06166) [quant-ph].
+[0] Clifford P., Clifford R., [arXiv:1706.01260](https://arxiv.org/abs/1706.01260) [quant-ph].
 
-[1] Brod D. J., Oszmaniec M., [arXiv:1906.06696](https://arxiv.org/abs/1906.06696) [quant-ph].
+[1] Oszmaniec M., Brod D. J., [arXiv:1801.06166](https://arxiv.org/abs/1801.06166) [quant-ph].
+
+[2] Brod D. J., Oszmaniec M., [arXiv:1906.06696](https://arxiv.org/abs/1906.06696) [quant-ph].
