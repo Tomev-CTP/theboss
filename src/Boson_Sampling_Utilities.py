@@ -1,3 +1,5 @@
+__author__ = 'Tomasz Rybotycki'
+
 # TR TODO: Add proper type hints.
 import numpy as np
 
