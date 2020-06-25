@@ -19,7 +19,15 @@ So far, to get the project one only needs to download it from this repository (o
 ### Prerequisites
 
 To run the scripts there will be needed some version of Python. During development I'm using 3.7, but I believe that
-it will also work just fine with some earlier / newer version (at least for now and I cannot guarantee it). 
+it will also work just fine with some earlier / newer version (at least for now and I cannot guarantee it).
+
+### Code style
+
+Throughout this work PEP-8 will be used. There are several cases where this may go south.
+
+* In some versions of the code matrices may be denoted by capital letters (as in standard mathematical notation). In
+order to be more PEP-friendly I'll try to use prefix m_ instead of capital letters, e.g. m_u would be the equivalent of
+U. 
 
 ## Running the tests
 
@@ -54,3 +62,5 @@ The work will follow the ideas presented in following works:
 [1] Oszmaniec M., Brod D. J., [arXiv:1801.06166](https://arxiv.org/abs/1801.06166) [quant-ph].
 
 [2] Brod D. J., Oszmaniec M., [arXiv:1906.06696](https://arxiv.org/abs/1906.06696) [quant-ph].
+
+[3] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
