@@ -26,38 +26,6 @@ class BosonSamplingSimulator:
         self.input_state = np.zeros(self.number_of_observed_modes)
         self.input_state[:self.initial_number_of_photons] = 1
 
-    def __modes_to_particles(self, state_in_modes_basis: list) -> list:
-        """
-            Transforms given Fock state into particle basis.
-            :param state_in_modes_basis: A (Fock) state to transform into particle number basis.
-            :return: Given state in particle number basis.
-        """
-        modes = np.zeros(self.number_of_observed_modes)
-        modes[:] = state_in_modes_basis[:]
-        state_in_particle_basis = np.zeros(self.number_of_photons_left)
-        k = i = 0
-        while i < self.number_of_observed_modes:
-            if modes[i] > 0:
-                modes[i] -= 1
-                state_in_particle_basis[k] = int(i)
-                k += 1
-            else:
-                i += 1
-        return state_in_particle_basis
-
-    def __particles_to_modes(self, state_in_particles_basis: list) -> list:
-        """
-            Transforms given state to modes basis.
-            :param state_in_particles_basis:
-            :return: A Fock state representing given particle basis state in modes basis.
-        """
-        modes = np.zeros(self.number_of_observed_modes)
-
-        for particle in state_in_particles_basis:
-            modes[int(particle)] += 1
-
-        return modes
-
     @staticmethod
     def calculate_distance_from_lossy_bosonic_n_particle_state_to_set_of_symmetric_separable_l_particles_states(n, l):
         """
