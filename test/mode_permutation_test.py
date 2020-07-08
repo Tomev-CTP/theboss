@@ -20,17 +20,14 @@ permutation_matrix[3][4] = 1
 permutation_matrix[4][1] = 1
 
 # Define some constants that will be used through the experiment.
-NUMBER_OF_LOST_PARTICLES = 1
+NUMBER_OF_LOST_PARTICLES = 2
 INITIAL_NUMBER_OF_PARTICLES = initial_state.count(1)
 NUMBER_OF_PARTICLES_LEFT = INITIAL_NUMBER_OF_PARTICLES - NUMBER_OF_LOST_PARTICLES
 NUMBER_OF_MODES = 5
 
 # Define some variables for this scenario, to ease the computations.
-possible_outcomes = [
-    [1, 1, 0, 0, 0],
-    [1, 0, 0, 0, 1],
-    [0, 1, 0, 0, 1]
-]
+#possible_outcomes = [[1, 1, 0, 0, 0], [1, 0, 0, 0, 1], [0, 1, 0, 0, 1]]
+possible_outcomes = [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1]]
 
 
 def main():
@@ -41,7 +38,8 @@ def main():
                                        NUMBER_OF_MODES, strategy)
 
     outcomes_probabilities = [0, 0, 0]
-    for i in range(1000000):
+    samples_number = 1000000
+    for i in range(samples_number):
         result = simulator.get_classical_simulation_results()
 
         for j in range(len(possible_outcomes)):
@@ -50,7 +48,7 @@ def main():
                 break
 
     for i in range(len(outcomes_probabilities)):
-        outcomes_probabilities[i] /= 10000
+        outcomes_probabilities[i] /= samples_number
 
     print(f'Approximate distribution: {outcomes_probabilities}')
 
