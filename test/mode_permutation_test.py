@@ -5,8 +5,9 @@ import math
 import itertools
 from scipy import special
 from src.Boson_Sampling_Utilities import modes_state_to_particle_state, \
-    particle_state_to_modes_state, calculate_permanent
-
+    particle_state_to_modes_state, calculate_permanent, generate_possible_outputs
+from src.BosonSamplingSimulator import BosonSamplingSimulator
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 
 # Generate permutation matrix and define initial state.
 permutation_matrix = np.zeros((5, 5))
@@ -34,6 +35,24 @@ possible_outcomes = [
 
 def main():
     exact_distribution = calculate_exact_distribution()
+    print(f'Exact distribution: {exact_distribution}')
+    strategy = FixedLossSimulationStrategy(permutation_matrix, NUMBER_OF_PARTICLES_LEFT, NUMBER_OF_MODES)
+    simulator = BosonSamplingSimulator(NUMBER_OF_PARTICLES_LEFT, INITIAL_NUMBER_OF_PARTICLES,\
+                                       NUMBER_OF_MODES, strategy)
+
+    outcomes_probabilities = [0, 0, 0]
+    for i in range(1000000):
+        result = simulator.get_classical_simulation_results()
+
+        for j in range(len(possible_outcomes)):
+            if not (result == possible_outcomes[j]).__contains__(False): # Check if obtained result is one of possible outcomes
+                outcomes_probabilities[j] += 1
+                break
+
+    for i in range(len(outcomes_probabilities)):
+        outcomes_probabilities[i] /= 10000
+
+    print(f'Approximate distribution: {outcomes_probabilities}')
 
 
 def calculate_exact_distribution() -> list:
@@ -141,6 +160,37 @@ def calculate_submatrix_for_permanent_calculation(lossy_input, r):
             r_i -= 1
 
     return U_Sr
+
+
+# all the inputs with 'l' particles on 'n' modes
+def generate_n_mode_inputs(m, n, l):
+    # n has to be lower than m !!!
+
+    inputs = []
+
+    n_input = np.zeros(n)
+    n_input[0] = l
+    m_input = np.zeros(m)
+    m_input[0] = l
+    inputs.append(m_input)
+
+    # a loop generating new possible inputs
+    while (n_input[n - 1] != l):
+
+        k = n - 1
+        while (n_input[k - 1] == 0):
+            k -= 1
+
+        n_input[k - 1] -= 1
+        n_input[k:] = 0
+        n_input[k] = l - sum(n_input)
+
+        m_input = np.zeros(m)
+        m_input[:n] = list(n_input[:])
+
+        inputs.append(m_input)
+
+    return inputs
 
 
 if __name__ == '__main__':
