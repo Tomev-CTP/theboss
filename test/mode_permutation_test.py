@@ -1,11 +1,12 @@
 __author__ = 'Tomasz Rybotycki'
 
+# TR TODO: Consider making this an actual test.
+
 import numpy as np
 import math
-import itertools
 from scipy import special
 from src.Boson_Sampling_Utilities import modes_state_to_particle_state, \
-    particle_state_to_modes_state, calculate_permanent, generate_possible_outputs
+    particle_state_to_modes_state, calculate_permanent, generate_lossy_inputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 
@@ -26,31 +27,15 @@ NUMBER_OF_PARTICLES_LEFT = INITIAL_NUMBER_OF_PARTICLES - NUMBER_OF_LOST_PARTICLE
 NUMBER_OF_MODES = 5
 
 # Define some variables for this scenario, to ease the computations.
-#possible_outcomes = [[1, 1, 0, 0, 0], [1, 0, 0, 0, 1], [0, 1, 0, 0, 1]]
 possible_outcomes = [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1]]
 
 
 def main():
     exact_distribution = calculate_exact_distribution()
     print(f'Exact distribution: {exact_distribution}')
-    strategy = FixedLossSimulationStrategy(permutation_matrix, NUMBER_OF_PARTICLES_LEFT, NUMBER_OF_MODES)
-    simulator = BosonSamplingSimulator(NUMBER_OF_PARTICLES_LEFT, INITIAL_NUMBER_OF_PARTICLES,\
-                                       NUMBER_OF_MODES, strategy)
 
-    outcomes_probabilities = [0, 0, 0]
-    samples_number = 1000000
-    for i in range(samples_number):
-        result = simulator.get_classical_simulation_results()
-
-        for j in range(len(possible_outcomes)):
-            if not (result == possible_outcomes[j]).__contains__(False): # Check if obtained result is one of possible outcomes
-                outcomes_probabilities[j] += 1
-                break
-
-    for i in range(len(outcomes_probabilities)):
-        outcomes_probabilities[i] /= samples_number
-
-    print(f'Approximate distribution: {outcomes_probabilities}')
+    approximate_distribution = calculate_approximate_distribution()
+    print(f'Approximate distribution: {approximate_distribution}')
 
 
 def calculate_exact_distribution() -> list:
@@ -72,7 +57,7 @@ def calculate_probability_of_outcome(outcome: list) -> float:
     :param outcome: An outcome which probability of obtaining will be calculated.
     :return: Probability of obtaining given outcome in situation presented by by the
     """
-    outcome_probability = 0
+    outcome_probability = 0  # Initialize with 0 for later debug purposes.
     outcome_state_in_particle_basis = modes_state_to_particle_state(outcome, NUMBER_OF_PARTICLES_LEFT)
 
     outcome_probability = calculate_probability_of_outcome_state_for_indistinguishable_photons(outcome_state_in_particle_basis)
@@ -87,108 +72,98 @@ def calculate_probability_of_outcome(outcome: list) -> float:
 
 def calculate_probability_of_outcome_state_for_indistinguishable_photons(outcome_state_in_particle_basis: list) \
         -> float:
-    # numbers of modes from zero
+    copy_of_outcome_state = list(outcome_state_in_particle_basis[:])
+    outcome_state_in_mode_basis = particle_state_to_modes_state(copy_of_outcome_state, NUMBER_OF_MODES)
 
-    r_new = list(outcome_state_in_particle_basis[:])  # to create a new list
-    T_No = particle_state_to_modes_state(r_new, NUMBER_OF_MODES)  # proposed sample in modes basis
+    probability_of_outcome = 0
 
-    prob = 0.
-    # symmetrization of the input
-    lossy_inputs_list = generate_lossy_inputs()
+    # Symmetrize the input.
+    lossy_inputs_list = generate_lossy_inputs(initial_state, NUMBER_OF_PARTICLES_LEFT)
     for lossy_input in lossy_inputs_list:
-        # probability in modes-basis (read Brod & Oszmaniec 2019)
-        subprob = abs(calculate_permanent(calculate_submatrix_for_permanent_calculation(lossy_input, T_No))) ** 2
-        for S_j in lossy_input:
-            subprob /= math.factorial(S_j)
+        subprobability = abs(calculate_permanent(
+            calculate_submatrix_for_permanent_calculation(lossy_input, outcome_state_in_mode_basis))) ** 2
+        for mode_occupation_number in lossy_input:
+            subprobability /= math.factorial(mode_occupation_number)
 
-        prob += subprob
+        probability_of_outcome += subprobability
 
-    # normalization (read Brod & Oszmaniec 2019)
-    prob /= math.factorial(NUMBER_OF_PARTICLES_LEFT)
-    prob /= special.binom(INITIAL_NUMBER_OF_PARTICLES, NUMBER_OF_PARTICLES_LEFT)
+    # Normalization (read Brod & Oszmaniec 2019).
+    probability_of_outcome /= math.factorial(NUMBER_OF_PARTICLES_LEFT)
+    probability_of_outcome /= special.binom(INITIAL_NUMBER_OF_PARTICLES, NUMBER_OF_PARTICLES_LEFT)
 
-    return prob
-
-
-# All the possible states from initial_state with NUMBER_OF_PARTICLES_LEFT photons
-def generate_lossy_inputs():
-    x0 = []
-    for i in range(NUMBER_OF_MODES):
-        for j in range(int(initial_state[i])):
-            x0.append(i)  # modes numbered from 0
-
-    lossy_inputs_table = []
-
-    # symmetrization
-    for obj in itertools.combinations(list(range(INITIAL_NUMBER_OF_PARTICLES)), NUMBER_OF_PARTICLES_LEFT):
-        x = []  # all possible entries with No of photons from S
-        for el in obj:
-            x.append(x0[el])
-
-        lossy_input = particle_state_to_modes_state(x, NUMBER_OF_MODES)
-        if all(list(lossy_inputs_table[el]) != list(lossy_input) for el in range(len(lossy_inputs_table))):
-            lossy_inputs_table.append(lossy_input)
-
-    return lossy_inputs_table
+    return probability_of_outcome
 
 
-def calculate_submatrix_for_permanent_calculation(lossy_input, r):
-    U_S = 1j * np.zeros((NUMBER_OF_MODES, NUMBER_OF_PARTICLES_LEFT))
-    column = 0
-
-    # copying s_i times the i-th column of U
-    for i in range(NUMBER_OF_MODES):
-
-        s_i = lossy_input[i]
-        while s_i > 0:
-            U_S[:, column] = permutation_matrix[:, i]
-            column += 1
-            s_i -= 1
-
-    U_Sr = 1j * np.zeros((NUMBER_OF_PARTICLES_LEFT, NUMBER_OF_PARTICLES_LEFT))
-    row = 0
-
-    # copying r_i times the i-th row of U_S
-    for i in range(NUMBER_OF_MODES):
-
-        r_i = r[i]
-        while r_i > 0:
-            U_Sr[row, :] = U_S[i, :]
-            row += 1
-            r_i -= 1
-
-    return U_Sr
+def calculate_submatrix_for_permanent_calculation(lossy_input: list, outcome_state_in_mode_basis: list) -> list:
+    """
+    In order to calculate exact distribution of a boson sampling experiment with interferometer denoted as U, a
+    permanent of specific matrix has to be calculated. The matrix has no distinct name, and it's only description
+    is a recipe how to construct it (described in e.g. Brod and Oszmaniec).
+    :param lossy_input:
+    :param outcome_state_in_mode_basis:
+    :return: The submatrix for permanent calculator.
+    """
+    columns_permutation_submatrix = create_column_submatrix_of_interferometer_matrix(lossy_input)
+    return create_rows_submatrix_of_interferometer_column_submatrix(outcome_state_in_mode_basis,
+                                                                    columns_permutation_submatrix)
 
 
-# all the inputs with 'l' particles on 'n' modes
-def generate_n_mode_inputs(m, n, l):
-    # n has to be lower than m !!!
+def create_column_submatrix_of_interferometer_matrix(lossy_input: list):
+    columns_permutation_submatrix = 1j * np.zeros((NUMBER_OF_MODES, NUMBER_OF_PARTICLES_LEFT))
 
-    inputs = []
+    # Copying occupation_number times the i-th column of permutation_matrix (or U in general).
+    column_iterator = 0
+    mode_number = 0
 
-    n_input = np.zeros(n)
-    n_input[0] = l
-    m_input = np.zeros(m)
-    m_input[0] = l
-    inputs.append(m_input)
+    for occupation_number in lossy_input:
+        while occupation_number > 0:
+            columns_permutation_submatrix[:, column_iterator] = permutation_matrix[:, mode_number]
+            column_iterator += 1
+            occupation_number -= 1
+        mode_number += 1
 
-    # a loop generating new possible inputs
-    while (n_input[n - 1] != l):
+    return columns_permutation_submatrix
 
-        k = n - 1
-        while (n_input[k - 1] == 0):
-            k -= 1
 
-        n_input[k - 1] -= 1
-        n_input[k:] = 0
-        n_input[k] = l - sum(n_input)
+def create_rows_submatrix_of_interferometer_column_submatrix(outcome_state_in_mode_basis: list,
+                                                             columns_permutation_submatrix: list) -> list:
+    permutation_submatrix = 1j * np.zeros((NUMBER_OF_PARTICLES_LEFT, NUMBER_OF_PARTICLES_LEFT))
+    submatrix_row = 0
 
-        m_input = np.zeros(m)
-        m_input[:n] = list(n_input[:])
+    # Copying occupation_number times the i-th row of columns_permutation_submatrix.
+    for mode_number in range(NUMBER_OF_MODES):
+        occupation_number = outcome_state_in_mode_basis[mode_number]
+        while occupation_number > 0:
+            permutation_submatrix[submatrix_row, :] = columns_permutation_submatrix[mode_number, :]
+            occupation_number -= 1
+            submatrix_row += 1
 
-        inputs.append(m_input)
+    return permutation_submatrix
 
-    return inputs
+
+def calculate_approximate_distribution(samples_number: int = 1000) -> list:
+    """
+    Prepares the approximate distribution using boson sampling simulation method described by
+    Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
+    :return: Approximate distribution as a list.
+    """
+
+    strategy = FixedLossSimulationStrategy(permutation_matrix, NUMBER_OF_PARTICLES_LEFT, NUMBER_OF_MODES)
+    simulator = BosonSamplingSimulator(NUMBER_OF_PARTICLES_LEFT, INITIAL_NUMBER_OF_PARTICLES, NUMBER_OF_MODES, strategy)
+    outcomes_probabilities = [0, 0, 0]
+    for i in range(samples_number):
+        result = simulator.get_classical_simulation_results()
+
+        for j in range(len(possible_outcomes)):
+            # Check if obtained result is one of possible outcomes.
+            if not (result == possible_outcomes[j]).__contains__(False):
+                outcomes_probabilities[j] += 1
+                break
+
+    for i in range(len(outcomes_probabilities)):
+        outcomes_probabilities[i] /= samples_number
+
+    return outcomes_probabilities
 
 
 if __name__ == '__main__':

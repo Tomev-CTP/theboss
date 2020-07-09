@@ -1,7 +1,9 @@
 __author__ = 'Tomasz Rybotycki'
 
 # TR TODO: Add proper type hints.
+# TR TODO: Consider making this file a package.
 import numpy as np
+import itertools
 
 
 def permanent_recursive_part(mtx, column, selected, prod):
@@ -88,3 +90,35 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int) ->
         outputs.append(output)
 
     return outputs
+
+
+# All the possible states from initial_state with NUMBER_OF_PARTICLES_LEFT photons
+def generate_lossy_inputs(initial_state: list, number_of_particles_left: int) -> list:
+    """
+    From initial state generate all possible input states after losses application.
+    :param initial_state: The state we start with.
+    :param number_of_particles_left: Number of particles after losses application.
+    :return: A list of lists representing initial states after losses.
+    """
+    x0 = []
+    number_of_modes = len(initial_state)
+    initial_number_of_particles = len(initial_state) - initial_state.count(0)
+    for i in range(number_of_modes):
+        for j in range(int(initial_state[i])):
+            x0.append(i)
+
+    lossy_inputs_list = []
+
+    # Symmetrization
+    for combination in itertools.combinations(list(range(initial_number_of_particles)), number_of_particles_left):
+        lossy_input_in_particle_basis = []
+        for el in combination:
+            lossy_input_in_particle_basis.append(x0[el])
+
+        lossy_input = particle_state_to_modes_state(lossy_input_in_particle_basis, number_of_modes)
+
+        # Check if calculated lossy input is already in the list. If not, add it.
+        if all(list(lossy_input_in_list) != list(lossy_input) for lossy_input_in_list in lossy_inputs_list):
+            lossy_inputs_list.append(lossy_input)
+
+    return lossy_inputs_list
