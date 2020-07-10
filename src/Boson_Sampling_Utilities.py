@@ -76,7 +76,7 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int) ->
     output[0] = number_of_particles
     outputs.append(output)
 
-    while outputs[-1][number_of_modes - 1] != number_of_particles:
+    while outputs[-1][number_of_modes - 1] < number_of_particles:
 
         k = number_of_modes - 1
         while outputs[-1][k - 1] == 0:
