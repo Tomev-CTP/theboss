@@ -10,4 +10,4 @@ class SimulationStrategy:
             :param input_state: Input state of the simulation.
             :return:
         """
-        pass
+        raise NotImplementedError
