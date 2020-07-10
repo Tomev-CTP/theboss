@@ -1,8 +1,9 @@
 import unittest
 from numpy import array, std
 
-from src.ExactLossyBosonSamplingDistributionCalculator.ExactLossyBosonSamplingDistributionCalculator import ExactLossyBosonSamplingDistributionCalculator,\
-    BosonSamplingExperimentConfiguration
+from src.ExactLossyBosonSamplingDistributionCalculator.ExactLossyBosonSamplingDistributionCalculator \
+    import ExactLossyBosonSamplingDistributionCalculator, BosonSamplingExperimentConfiguration
+
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
 
@@ -44,7 +45,3 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         standard_deviation = std(exact_distribution)
         self.assertAlmostEqual(standard_deviation, 0, delta=0.0001)
-
-
-if __name__ == '__main__':
-    unittest.main()

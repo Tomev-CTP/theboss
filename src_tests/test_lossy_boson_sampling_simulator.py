@@ -12,7 +12,7 @@ from src.ExactLossyBosonSamplingDistributionCalculator.ExactLossyBosonSamplingDi
 from src.Quantum_Computations_Utilities import calculate_total_variation_distance
 
 
-class TestClassicalBosonSamplingSimulator(unittest.TestCase):
+class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
 
     def setUp(self) -> None:
         # Generate permutation matrix and define initial state.
@@ -79,10 +79,3 @@ class TestClassicalBosonSamplingSimulator(unittest.TestCase):
         n = self.experiment_configuration.initial_number_of_particles
         l = self.experiment_configuration.number_of_particles_lost
         return 1.0 - (factorial(n) / (pow(n, l) * factorial(n - l)))
-
-
-if __name__ == '__main__':
-    unittest.main()
-
-
-
