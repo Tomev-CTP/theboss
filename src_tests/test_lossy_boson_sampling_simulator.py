@@ -7,7 +7,7 @@ from numpy import zeros, array
 from typing import List
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.ExactLossyBosonSamplingDistributionCalculator.ExactLossyBosonSamplingDistributionCalculator import ExactLossyBosonSamplingDistributionCalculator,\
+from src.ExactLossyBosonSamplingDistributionCalculator import ExactLossyBosonSamplingDistributionCalculator,\
     BosonSamplingExperimentConfiguration
 from src.Quantum_Computations_Utilities import calculate_total_variation_distance
 
@@ -45,7 +45,7 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         approximate_distribution = self.__calculate_approximate_distribution()
         distance = calculate_total_variation_distance(exact_distribution, approximate_distribution)
         bound = self.__calculate_distribution_error_bound()
-        self.assertTrue(distance < bound)
+        self.assertLess(distance, bound)
 
     def __calculate_approximate_distribution(self, samples_number: int = 1000) -> List[float]:
         """

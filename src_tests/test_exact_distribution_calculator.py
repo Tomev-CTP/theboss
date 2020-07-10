@@ -1,7 +1,7 @@
 import unittest
 from numpy import array, std
 
-from src.ExactLossyBosonSamplingDistributionCalculator.ExactLossyBosonSamplingDistributionCalculator \
+from src.ExactLossyBosonSamplingDistributionCalculator \
     import ExactLossyBosonSamplingDistributionCalculator, BosonSamplingExperimentConfiguration
 
 
@@ -36,7 +36,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
     def test_probabilities_sum(self) -> None:
         exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
-        self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=0.0001)
+        self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
 
     def test_probabilities_standard_deviation(self) -> None:
         # Given that in this setup we require that probabilities of each outcome are equal, the standard deviation
@@ -44,4 +44,4 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
         exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         standard_deviation = std(exact_distribution)
-        self.assertAlmostEqual(standard_deviation, 0, delta=0.0001)
+        self.assertAlmostEqual(standard_deviation, 0, delta=1e-4)

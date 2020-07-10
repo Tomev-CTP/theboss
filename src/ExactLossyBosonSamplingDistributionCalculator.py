@@ -30,10 +30,10 @@ class ExactLossyBosonSamplingDistributionCalculator:
 
     def calculate_exact_distribution(self):
         """
-            This method will be used to calculate the exact distribution of lossy boson sampling experiment.
-            The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
-            :return: List of probabilities of outcomes.
-            """
+        This method will be used to calculate the exact distribution of lossy boson sampling experiment.
+        The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
+        :return: List of probabilities of outcomes.
+        """
         outcomes_probabilities = []
         for outcome in self.configuration.possible_outcomes:
             outcomes_probabilities.append(self.__calculate_probability_of_outcome(outcome))
