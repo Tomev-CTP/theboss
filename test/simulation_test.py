@@ -14,7 +14,7 @@ from src.Quantum_Computations_Utilities import calculate_total_variation_distanc
 
 class TestClassicalBosonSamplingSimulator(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Generate permutation matrix and define initial state.
         self.initial_state = [1, 1, 1, 0, 0]
         self.permutation_matrix = array([
@@ -39,7 +39,7 @@ class TestClassicalBosonSamplingSimulator(unittest.TestCase):
             number_of_particles_left=sum(self.initial_state) - self.number_of_particles_lost
         )
 
-    def test_approximate_and_exact_distribution_distance(self):
+    def test_approximate_and_exact_distribution_distance(self) -> None:
         exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         approximate_distribution = self.__calculate_approximate_distribution()
