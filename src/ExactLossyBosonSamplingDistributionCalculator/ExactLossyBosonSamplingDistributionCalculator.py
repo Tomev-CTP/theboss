@@ -62,7 +62,7 @@ class ExactLossyBosonSamplingDistributionCalculator:
 
     def __calculate_probability_of_outcome_state_for_indistinguishable_photons(
             self, outcome_state_in_particle_basis: ndarray) -> float:
-        copy_of_outcome_state = list(outcome_state_in_particle_basis[:])
+        copy_of_outcome_state = outcome_state_in_particle_basis.copy()
         outcome_state_in_mode_basis = particle_state_to_modes_state(copy_of_outcome_state,
                                                                     self.configuration.number_of_modes)
         probability_of_outcome = 0
