@@ -31,7 +31,7 @@ U.
 
 ## Running the tests
 
-TBA...
+Just run all test in src_tests folder.
 
 ## Versioning
 
