@@ -7,8 +7,8 @@ from numpy import zeros, array
 from typing import List
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.ExactLossyBosonSamplingDistributionCalculator import ExactLossyBosonSamplingDistributionCalculator,\
-    BosonSamplingExperimentConfiguration
+from src.BosonSamplingWithFixedLossesExactDistributionCalculator \
+    import BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingExperimentConfiguration
 from src.Quantum_Computations_Utilities import calculate_total_variation_distance
 
 
@@ -31,7 +31,6 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         # Create configuration object.
         self.experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self.permutation_matrix,
-            possible_outcomes=[[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1]],
             initial_state=self.initial_state,
             initial_number_of_particles=sum(self.initial_state),
             number_of_modes=len(self.initial_state),
@@ -40,7 +39,8 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         )
 
     def test_approximate_and_exact_distribution_distance(self) -> None:
-        exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
+        exact_distribution_calculator = \
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         approximate_distribution = self.__calculate_approximate_distribution()
         distance = calculate_total_variation_distance(exact_distribution, approximate_distribution)
@@ -53,6 +53,10 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
         :return: Approximate distribution as a list.
         """
+        exact_distribution_calculator = \
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
+
+        possible_outcomes = exact_distribution_calculator.get_outcomes_in_proper_order()
 
         strategy = FixedLossSimulationStrategy(self.permutation_matrix,
                                                self.experiment_configuration.number_of_particles_left,
@@ -60,13 +64,13 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         simulator = BosonSamplingSimulator(self.experiment_configuration.number_of_particles_left,
                                            self.experiment_configuration.initial_number_of_particles,
                                            self.experiment_configuration.number_of_modes, strategy)
-        outcomes_probabilities = zeros(3)
+        outcomes_probabilities = zeros(len(possible_outcomes))
         for i in range(samples_number):
             result = simulator.get_classical_simulation_results()
 
-            for j in range(len(self.experiment_configuration.possible_outcomes)):
+            for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if not (result == self.experiment_configuration.possible_outcomes[j]).__contains__(False):
+                if not (result == possible_outcomes[j]).__contains__(False):
                     outcomes_probabilities[j] += 1
                     break
 

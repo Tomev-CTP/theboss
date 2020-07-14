@@ -1,8 +1,9 @@
 import unittest
-from numpy import array, std
+from numpy import array
 
-from src.ExactLossyBosonSamplingDistributionCalculator \
-    import ExactLossyBosonSamplingDistributionCalculator, BosonSamplingExperimentConfiguration
+from src.BosonSamplingWithFixedLossesExactDistributionCalculator import \
+    BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingWithUniformLossesExactDistributionCalculator,\
+    BosonSamplingExperimentConfiguration
 
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
@@ -25,23 +26,22 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
         # Create configuration object.
         self.experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self.permutation_matrix,
-            possible_outcomes=[[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 0, 0, 1]],
             initial_state=self.initial_state,
             number_of_modes=len(self.initial_state),
             initial_number_of_particles=sum(self.initial_state),
             number_of_particles_lost=self.number_of_particles_lost,
-            number_of_particles_left=sum(self.initial_state) - self.number_of_particles_lost
+            number_of_particles_left=sum(self.initial_state) - self.number_of_particles_lost,
+            probability_of_uniform_loss=0.8
         )
 
-    def test_probabilities_sum(self) -> None:
-        exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
+    def test_probabilities_sum_in_fixed_losses_scenario(self) -> None:
+        exact_distribution_calculator = \
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
 
-    def test_probabilities_standard_deviation(self) -> None:
-        # Given that in this setup we require that probabilities of each outcome are equal, the standard deviation
-        # should be close to 0.
-        exact_distribution_calculator = ExactLossyBosonSamplingDistributionCalculator(self.experiment_configuration)
+    def test_probabilities_sum_in_uniform_losses_scenario(self) -> None:
+        exact_distribution_calculator = \
+            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
-        standard_deviation = std(exact_distribution)
-        self.assertAlmostEqual(standard_deviation, 0, delta=1e-4)
+        self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)

@@ -4,38 +4,45 @@ __author__ = 'Tomasz Rybotycki'
 
 import math
 
-from dataclasses import dataclass
 from typing import List
+from dataclasses import dataclass
 from numpy import ndarray, zeros
 from scipy import special
+from copy import deepcopy
 
-from src.Boson_Sampling_Utilities import modes_state_to_particle_state, particle_state_to_modes_state,\
-    calculate_permanent, generate_lossy_inputs
+from src.Boson_Sampling_Utilities import modes_state_to_particle_state, particle_state_to_modes_state, \
+    calculate_permanent, generate_lossy_inputs, generate_possible_outputs
 
 
 @dataclass
 class BosonSamplingExperimentConfiguration:
     interferometer_matrix: ndarray  # A matrix describing interferometer.
-    possible_outcomes: List[ndarray]  # This may also be calculated basing on the matrix.
     initial_state: ndarray
     initial_number_of_particles: int
     number_of_modes: int
     number_of_particles_lost: int
     number_of_particles_left: int
+    probability_of_uniform_loss: float = 0
 
 
-class ExactLossyBosonSamplingDistributionCalculator:
+class BosonSamplingWithFixedLossesExactDistributionCalculator:
     def __init__(self, configuration: BosonSamplingExperimentConfiguration):
-        self.configuration = configuration
+        self.configuration = deepcopy(configuration)
 
-    def calculate_exact_distribution(self):
+    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+        return generate_possible_outputs(self.configuration.number_of_particles_left,
+                                         self.configuration.number_of_modes)
+
+    def calculate_exact_distribution(self) -> List[List[float]]:
         """
         This method will be used to calculate the exact distribution of lossy boson sampling experiment.
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
         :return: List of probabilities of outcomes.
         """
+        possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
+                                                      self.configuration.number_of_modes)
         outcomes_probabilities = []
-        for outcome in self.configuration.possible_outcomes:
+        for outcome in possible_outcomes:
             outcomes_probabilities.append(self.__calculate_probability_of_outcome(outcome))
         return outcomes_probabilities
 
@@ -132,3 +139,53 @@ class ExactLossyBosonSamplingDistributionCalculator:
                 submatrix_row += 1
 
         return permutation_submatrix
+
+
+# TR TODO: Maybe using strategy pattern would be better in this case?
+class BosonSamplingWithUniformLossesExactDistributionCalculator \
+            (BosonSamplingWithFixedLossesExactDistributionCalculator):
+    def __init__(self, configuration: BosonSamplingExperimentConfiguration):
+        self.configuration = deepcopy(configuration)
+
+    def calculate_exact_distribution(self) -> List[List[float]]:
+        """
+        This method will be used to calculate the exact distribution of lossy boson sampling experiment.
+        The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
+        :return: List of probabilities of outcomes.
+        """
+        possible_outcomes = []
+        exact_distribution = []
+
+        for number_of_particles_left in range(self.configuration.initial_number_of_particles + 1):
+            # +1 is necessary, because it's inclusive in number of particles_left.
+            subconfiguration = deepcopy(self.configuration)
+
+            subconfiguration.number_of_particles_left = number_of_particles_left
+            subconfiguration.number_of_particles_lost = \
+                self.configuration.initial_number_of_particles - number_of_particles_left
+            subdistribution_calculator = \
+                BosonSamplingWithFixedLossesExactDistributionCalculator(subconfiguration)
+            possible_outcomes.extend(subdistribution_calculator.get_outcomes_in_proper_order())
+            subdistribution = subdistribution_calculator.calculate_exact_distribution()
+            subdistribution_weight = pow(self.configuration.probability_of_uniform_loss, number_of_particles_left) * \
+                                     special.binom(self.configuration.initial_number_of_particles,
+                                                   number_of_particles_left) * \
+                                     pow(1.0 - self.configuration.probability_of_uniform_loss,
+                                         self.configuration.initial_number_of_particles - number_of_particles_left)
+            subdistribution = [el * subdistribution_weight for el in subdistribution]
+
+            exact_distribution.extend(subdistribution)
+
+        return exact_distribution
+
+    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+        possible_outcomes = []
+
+        for number_of_particles_left in range(1, self.configuration.initial_number_of_particles + 1):
+            subconfiguration = deepcopy(self.configuration)
+            subconfiguration.number_of_particles_left = number_of_particles_left
+            subdistribution_calculator = \
+                BosonSamplingWithFixedLossesExactDistributionCalculator(subconfiguration)
+            possible_outcomes.extend(subdistribution_calculator.get_outcomes_in_proper_order())
+
+        return possible_outcomes
