@@ -40,6 +40,7 @@ I'll use [SemVer](http://semver.org/) for versioning and try to keep track of th
 ## Authors
 
   - [Tomasz Rybotycki](https://github.com/Tomev)
+  - [Malhavok](https://github.com/Malhavok) - *These precious reviews <3*
   - [Billie Thompson](https://github.com/PurpleBooth) - *Provided README Template* 
 
 ## License
