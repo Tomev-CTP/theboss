@@ -1,8 +1,10 @@
 __author__ = 'Tomasz Rybotycki'
+
 # TODO TR: Consider releasing this file as a separate package.
 
 from typing import List
-from numpy import ndarray, sqrt, dot, diag, abs, linalg
+
+from numpy import abs, diag, dot, linalg, ndarray, sqrt
 from numpy.random import randn
 
 

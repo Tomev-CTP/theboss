@@ -3,15 +3,15 @@ __author__ = 'Tomasz Rybotycki'
 # TR TODO: This could be a part ob Boson_Sampling_Utilities package.
 
 import math
-
-from typing import List
+from copy import deepcopy
 from dataclasses import dataclass
+from typing import List
+
 from numpy import ndarray, zeros
 from scipy import special
-from copy import deepcopy
 
-from src.Boson_Sampling_Utilities import modes_state_to_particle_state, particle_state_to_modes_state, \
-    calculate_permanent, generate_lossy_inputs, generate_possible_outputs
+from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inputs, generate_possible_outputs, \
+    modes_state_to_particle_state, particle_state_to_modes_state
 
 
 @dataclass
@@ -141,7 +141,6 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         return permutation_submatrix
 
 
-# TR TODO: Maybe using strategy pattern would be better in this case?
 class BosonSamplingWithUniformLossesExactDistributionCalculator \
             (BosonSamplingWithFixedLossesExactDistributionCalculator):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
@@ -159,8 +158,8 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
         # Using eta, n and l notation from the paper for readability purposes.
         n = self.configuration.initial_number_of_particles
         eta = self.configuration.probability_of_uniform_loss
-        for number_of_particles_left in range(n + 1):
-            # +1 is necessary, because it's inclusive in number of particles_left.
+        for number_of_particles_left in range(n + 1):  # +1 to include situation with all particles left.
+
             l = number_of_particles_left
 
             subconfiguration = deepcopy(self.configuration)

@@ -1,8 +1,10 @@
 __author__ = 'Tomasz Rybotycki'
 
-from numpy import ndarray, dot, sqrt, pi, exp, zeros, conjugate
-from typing import List
 from random import random
+from typing import List
+
+from numpy import conjugate, dot, exp, ndarray, pi, sqrt, zeros
+
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 

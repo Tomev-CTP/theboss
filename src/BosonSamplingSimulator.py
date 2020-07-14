@@ -1,9 +1,10 @@
 __author__ = 'Tomasz Rybotycki'
 
-from numpy import zeros
-from math import factorial
-from scipy.special import binom
 from typing import List
+
+from numpy import zeros
+from scipy.special import binom
+
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
@@ -26,19 +27,6 @@ class BosonSamplingSimulator:
         """
         self.input_state = zeros(self.number_of_observed_modes)
         self.input_state[:self.initial_number_of_photons] = 1
-
-    @staticmethod
-    def calculate_distance_from_lossy_bosonic_n_particle_state_to_set_of_symmetric_separable_l_particles_states(n, l)\
-            -> float:
-        """
-            Calculates the distance from lossy n-particles bosonic state, to the set of symmetric separable l-particles
-            states. This is theorem 1 from ref. [1].
-
-            :param n: Initial number of particles.
-            :param l: Number of particles left.
-            :return:
-        """
-        return 1. - factorial(n) / (n ** l * factorial(n - l))
 
     @staticmethod
     def calculate_number_of_outcomes_with_l_particles_in_m_modes(m: int, l: int) -> int:

@@ -1,15 +1,16 @@
 __author__ = 'Tomasz Rybotycki'
 
 import unittest
-
 from math import factorial
-from numpy import zeros, array
 from typing import List
+
+from numpy import array, zeros
+
 from src.BosonSamplingSimulator import BosonSamplingSimulator
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.LossyBosonSamplingExactDistributionCalculators \
-    import BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingExperimentConfiguration
+from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
+    BosonSamplingWithFixedLossesExactDistributionCalculator
 from src.Quantum_Computations_Utilities import calculate_total_variation_distance
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 
 
 class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
@@ -84,5 +85,4 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         n = self.experiment_configuration.initial_number_of_particles
         l = self.experiment_configuration.number_of_particles_left
         error_bound = 1.0 - (float(factorial(n)) / (pow(n, l) * factorial(n - l)))
-        # error_bound = pow(l, 2) / (2 * n)  # In limit l = o(n^{1/2})
         return error_bound

@@ -1,7 +1,8 @@
 __author__ = 'Tomasz Rybotycki'
 
-from numpy import ndarray
 from typing import List
+
+from numpy import ndarray
 
 
 class SimulationStrategy:

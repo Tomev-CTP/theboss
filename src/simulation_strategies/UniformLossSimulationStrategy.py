@@ -1,16 +1,19 @@
 __author__ = 'Tomasz Rybotycki'
 
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.BosonSamplingSimulator import BosonSamplingSimulator
-from numpy.random import choice
-from numpy import ndarray, arange
-from scipy import special
 from typing import List
+
+from numpy import arange, ndarray
+from numpy.random import choice
+from scipy import special
+
+from src.BosonSamplingSimulator import BosonSamplingSimulator
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
+from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class UniformLossSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix, number_of_modes, probability_of_uniform_loss) -> None:
+    def __init__(self, interferometer_matrix: ndarray, number_of_modes: int, probability_of_uniform_loss: float) \
+            -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_modes = number_of_modes
         self.probability_of_uniform_loss = probability_of_uniform_loss
@@ -37,4 +40,3 @@ class UniformLossSimulationStrategy(SimulationStrategy):
                                            self.number_of_modes, strategy)
 
         return simulator.get_classical_simulation_results()
-

@@ -4,6 +4,7 @@ __author__ = 'Tomasz Rybotycki'
 
 import itertools
 from typing import List
+
 from numpy import ndarray, zeros
 
 
