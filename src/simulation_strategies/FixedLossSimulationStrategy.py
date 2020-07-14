@@ -8,7 +8,8 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 class FixedLossSimulationStrategy(SimulationStrategy):
 
-    def __init__(self, interferometer_matrix: ndarray, number_of_photons_left: int, number_of_observed_modes: int):
+    def __init__(self, interferometer_matrix: ndarray, number_of_photons_left: int, number_of_observed_modes: int) \
+            -> None:
         self.number_of_photons_left = number_of_photons_left
         self.interferometer_matrix = interferometer_matrix
         self.number_of_observed_modes = number_of_observed_modes
@@ -75,4 +76,3 @@ class FixedLossSimulationStrategy(SimulationStrategy):
                 prob += probabilities[i]
             output[i] += 1
         return output
-

@@ -1,3 +1,5 @@
+__author__ = 'Tomasz Rybotycki'
+
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 from src.BosonSamplingSimulator import BosonSamplingSimulator

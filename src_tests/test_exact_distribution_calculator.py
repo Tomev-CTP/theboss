@@ -1,3 +1,5 @@
+__author__ = 'Tomasz Rybotycki'
+
 import unittest
 from numpy import array
 

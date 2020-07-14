@@ -26,7 +26,7 @@ class BosonSamplingExperimentConfiguration:
 
 
 class BosonSamplingWithFixedLossesExactDistributionCalculator:
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration):
+    def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
         self.configuration = deepcopy(configuration)
 
     def get_outcomes_in_proper_order(self) -> List[List[int]]:
@@ -144,7 +144,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
 # TR TODO: Maybe using strategy pattern would be better in this case?
 class BosonSamplingWithUniformLossesExactDistributionCalculator \
             (BosonSamplingWithFixedLossesExactDistributionCalculator):
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration):
+    def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
         self.configuration = deepcopy(configuration)
 
     def calculate_exact_distribution(self) -> List[List[float]]:

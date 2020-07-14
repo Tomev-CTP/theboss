@@ -1,10 +1,11 @@
 __author__ = 'Tomasz Rybotycki'
 
-import numpy as np
+from numpy import ndarray
+from typing import List
 
 
 class SimulationStrategy:
-    def simulate(self, input_state: np.ndarray):
+    def simulate(self, input_state: ndarray) -> List[int]:
         """
             Simulate the lossy boson sampling experiment.
             :param input_state: Input state of the simulation.
