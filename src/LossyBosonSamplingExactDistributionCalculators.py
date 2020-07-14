@@ -156,22 +156,22 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
         possible_outcomes = []
         exact_distribution = []
 
-        for number_of_particles_left in range(self.configuration.initial_number_of_particles + 1):
+        # Using eta, n and l notation from the paper for readability purposes.
+        n = self.configuration.initial_number_of_particles
+        eta = self.configuration.probability_of_uniform_loss
+        for number_of_particles_left in range(n + 1):
             # +1 is necessary, because it's inclusive in number of particles_left.
+            l = number_of_particles_left
+
             subconfiguration = deepcopy(self.configuration)
 
             subconfiguration.number_of_particles_left = number_of_particles_left
-            subconfiguration.number_of_particles_lost = \
-                self.configuration.initial_number_of_particles - number_of_particles_left
+            subconfiguration.number_of_particles_lost = n - l
             subdistribution_calculator = \
                 BosonSamplingWithFixedLossesExactDistributionCalculator(subconfiguration)
             possible_outcomes.extend(subdistribution_calculator.get_outcomes_in_proper_order())
             subdistribution = subdistribution_calculator.calculate_exact_distribution()
-            subdistribution_weight = pow(self.configuration.probability_of_uniform_loss, number_of_particles_left) * \
-                                     special.binom(self.configuration.initial_number_of_particles,
-                                                   number_of_particles_left) * \
-                                     pow(1.0 - self.configuration.probability_of_uniform_loss,
-                                         self.configuration.initial_number_of_particles - number_of_particles_left)
+            subdistribution_weight = pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)
             subdistribution = [el * subdistribution_weight for el in subdistribution]
 
             exact_distribution.extend(subdistribution)
@@ -181,7 +181,7 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
     def get_outcomes_in_proper_order(self) -> List[List[int]]:
         possible_outcomes = []
 
-        for number_of_particles_left in range(1, self.configuration.initial_number_of_particles + 1):
+        for number_of_particles_left in range(self.configuration.initial_number_of_particles + 1):
             subconfiguration = deepcopy(self.configuration)
             subconfiguration.number_of_particles_left = number_of_particles_left
             subdistribution_calculator = \
