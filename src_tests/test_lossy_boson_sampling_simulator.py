@@ -7,7 +7,7 @@ from numpy import zeros, array
 from typing import List
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.BosonSamplingWithFixedLossesExactDistributionCalculator \
+from src.LossyBosonSamplingExactDistributionCalculators \
     import BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingExperimentConfiguration
 from src.Quantum_Computations_Utilities import calculate_total_variation_distance
 

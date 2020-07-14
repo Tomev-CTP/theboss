@@ -1,7 +1,7 @@
 import unittest
 from numpy import array
 
-from src.BosonSamplingWithFixedLossesExactDistributionCalculator import \
+from src.LossyBosonSamplingExactDistributionCalculators import \
     BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingWithUniformLossesExactDistributionCalculator,\
     BosonSamplingExperimentConfiguration
 
