@@ -4,7 +4,7 @@ __author__ = 'Tomasz Rybotycki'
 
 from typing import List
 
-from numpy import abs, diag, dot, linalg, ndarray, sqrt
+from numpy import abs, diag, dot, linalg, log2, ndarray, sqrt
 from numpy.random import randn
 
 
@@ -52,3 +52,11 @@ def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> f
         :return: Distance between two given matrices.
     """
     return linalg.norm(matrix1 - matrix2)
+
+
+def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
+                                                        error_probability: float):
+    error_bound = log2(2 ** outcomes_number - 2)
+    error_bound -= log2(error_probability)
+    error_bound /= 2 * samples_number
+    return sqrt(error_bound)
