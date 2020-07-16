@@ -64,4 +64,6 @@ The work will follow the ideas presented in following works:
 
 [2] Brod D. J., Oszmaniec M., [arXiv:1906.06696](https://arxiv.org/abs/1906.06696) [quant-ph].
 
-[3] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
+[3] Maciejewski F. B., Zimboras Z., Oszmaniec M., [arXiv:1907.08518](https://arxiv.org/abs/1907.08518) [quant-ph].
+
+[4] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
