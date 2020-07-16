@@ -10,7 +10,7 @@ from scipy import special
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
     BosonSamplingWithUniformLossesExactDistributionCalculator
-from src.Quantum_Computations_Utilities import calculate_total_variation_distance, \
+from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
 
@@ -67,7 +67,7 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         )
 
         approximate_distribution = self.__calculate_approximate_distribution(number_of_samples)
-        distance = calculate_total_variation_distance(exact_distribution, approximate_distribution)
+        distance = count_total_variation_distance(exact_distribution, approximate_distribution)
         bound = self.__calculate_uniform_loss_distribution_error_bound()
 
         self.assertAlmostEqual(distance, bound, delta=experiments_tv_distance_error_bound)

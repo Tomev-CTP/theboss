@@ -27,7 +27,7 @@ def generate_haar_random_unitary_matrix(n: int) -> ndarray:
     return m_u.T @ m_u
 
 
-def calculate_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
+def count_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
@@ -44,7 +44,7 @@ def calculate_total_variation_distance(distribution1: List[float], distribution2
     return total_variation_distance / 2
 
 
-def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
+def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
     """
         Calculates distance between two given matrices. This method assumes, that the matrices have proper sizes.
         :param matrix1: First matrix.
