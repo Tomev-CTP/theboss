@@ -56,7 +56,6 @@ def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> f
 
 def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
                                                         error_probability: float):
-    error_bound = log2(2 ** outcomes_number - 2)
-    error_bound -= log2(error_probability)
+    error_bound = log2(float(2 ** outcomes_number - 2)) - log2(error_probability)
     error_bound /= 2 * samples_number
     return sqrt(error_bound)

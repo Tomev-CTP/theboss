@@ -10,7 +10,8 @@ from scipy import special
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
     BosonSamplingWithUniformLossesExactDistributionCalculator
-from src.Quantum_Computations_Utilities import calculate_total_variation_distance
+from src.Quantum_Computations_Utilities import calculate_total_variation_distance, \
+    count_tv_distance_error_bound_of_experiment_results
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
 
 
@@ -55,11 +56,21 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         exact_distribution_calculator = \
             BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
-        # TR TODO: Delta in assertion should depend on samples number!
-        approximate_distribution = self.__calculate_approximate_distribution()
+
+        number_of_samples = 1000
+        number_of_outcomes = len(exact_distribution_calculator.get_outcomes_in_proper_order())
+        error_probability_of_distance_bound = 0.001
+        # Note, that this makes the test probabilistic in nature, but there's nothing one can do about that.
+        experiments_tv_distance_error_bound = count_tv_distance_error_bound_of_experiment_results(
+            outcomes_number=number_of_outcomes, samples_number=number_of_samples,
+            error_probability=error_probability_of_distance_bound
+        )
+
+        approximate_distribution = self.__calculate_approximate_distribution(number_of_samples)
         distance = calculate_total_variation_distance(exact_distribution, approximate_distribution)
         bound = self.__calculate_uniform_loss_distribution_error_bound()
-        self.assertAlmostEqual(distance, bound, delta=1e-2)
+
+        self.assertAlmostEqual(distance, bound, delta=experiments_tv_distance_error_bound)
 
     def __calculate_approximate_distribution(self, samples_number: int = 10000) -> List[float]:
         """
