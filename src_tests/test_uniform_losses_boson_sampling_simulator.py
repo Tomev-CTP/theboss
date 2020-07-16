@@ -79,7 +79,7 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
 
             for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if not (result == possible_outcomes[j]).__contains__(False):
+                if all(result == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
                     outcomes_probabilities[j] += 1
                     break
 
