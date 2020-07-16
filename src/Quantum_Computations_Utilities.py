@@ -1,29 +1,33 @@
 __author__ = 'Tomasz Rybotycki'
+
 # TODO TR: Consider releasing this file as a separate package.
 
-import numpy as np
+from typing import List
+
+from numpy import abs, diag, dot, linalg, ndarray, sqrt
+from numpy.random import randn
 
 
-def generate_haar_random_unitary_matrix(n: int) -> np.ndarray:
+def generate_haar_random_unitary_matrix(n: int) -> ndarray:
     """
         This method generates Haar random unitary n x n matrix. Using ideas from [3].
         :param n: Dimension of returned matrix.
         :return: Haar random unitary matrix m_u.
     """
 
-    z = (np.random.randn(n, n) + 1j * np.random.randn(n, n))
-    z /= np.sqrt(2.)
-    q, r = np.linalg.qr(z)
+    z = (randn(n, n) + 1j * randn(n, n))
+    z /= sqrt(2.)
+    q, r = linalg.qr(z)
 
-    r = np.diag(r)
-    lamb = np.diag(r / np.abs(r))
+    r = diag(r)
+    lamb = diag(r / abs(r))
 
-    m_u = np.dot(q, lamb)
+    m_u = dot(q, lamb)
 
     return m_u.T @ m_u
 
 
-def calculate_total_variation_distance(distribution1: list, distribution2: list) -> float:
+def calculate_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
@@ -40,11 +44,11 @@ def calculate_total_variation_distance(distribution1: list, distribution2: list)
     return total_variation_distance / 2
 
 
-def calculate_distance_between_matrices(matrix1: np.ndarray, matrix2: np.ndarray) -> float:
+def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
     """
         Calculates distance between two given matrices. This method assumes, that the matrices have proper sizes.
         :param matrix1: First matrix.
         :param matrix2: Second matrix.
         :return: Distance between two given matrices.
     """
-    return np.linalg.norm(matrix1 - matrix2)
+    return linalg.norm(matrix1 - matrix2)
