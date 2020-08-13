@@ -4,8 +4,22 @@ __author__ = 'Tomasz Rybotycki'
 
 from typing import List
 
+from scipy import diagonal, absolute, multiply
 from numpy import abs, diag, dot, linalg, log2, ndarray, sqrt
 from numpy.random import randn
+
+
+def generate_haar_random_unitary_matrix(n: int) -> ndarray:
+    """
+        This method generates a Haar random unitary and is a 1:1 code from Mezzardis 2007 work.
+    :param n: Dimension of nxn unitary matrix to be generated.
+    :return: Haar random unitary matrix.
+    """
+    z = (randn(n, n) + 1j * randn(n, n)) / sqrt(2)
+    q, r = linalg.qr(z)
+    d = diagonal(r)
+    ph = d / absolute(d)
+    return multiply(q, ph, q)
 
 
 def generate_haar_random_unitary_matrix(n: int) -> ndarray:
