@@ -4,41 +4,12 @@ __author__ = 'Tomasz Rybotycki'
 
 from typing import List
 
-from scipy import diagonal, absolute, multiply
-from numpy import abs, diag, dot, linalg, log2, ndarray, sqrt
-from numpy.random import randn
+from numpy import abs, linalg, log2, ndarray, sqrt
+import qutip
 
 
-def generate_haar_random_unitary_matrix(n: int) -> ndarray:
-    """
-        This method generates a Haar random unitary and is a 1:1 code from Mezzardis 2007 work.
-    :param n: Dimension of nxn unitary matrix to be generated.
-    :return: Haar random unitary matrix.
-    """
-    z = (randn(n, n) + 1j * randn(n, n)) / sqrt(2)
-    q, r = linalg.qr(z)
-    d = diagonal(r)
-    ph = d / absolute(d)
-    return multiply(q, ph, q)
-
-
-def generate_haar_random_unitary_matrix(n: int) -> ndarray:
-    """
-        This method generates Haar random unitary n x n matrix. Using ideas from [3].
-        :param n: Dimension of returned matrix.
-        :return: Haar random unitary matrix m_u.
-    """
-
-    z = (randn(n, n) + 1j * randn(n, n))
-    z /= sqrt(2.)
-    q, r = linalg.qr(z)
-
-    r = diag(r)
-    lamb = diag(r / abs(r))
-
-    m_u = dot(q, lamb)
-
-    return m_u.T @ m_u
+def generate_haar_random_unitary_matrix(d: int) -> ndarray:
+    return qutip.rand_unitary_haar(d).full()
 
 
 def count_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
