@@ -39,3 +39,6 @@ class CliffordsRSimulationStrategy(SimulationStrategy):
             python_result.append(result[i] - 1)  # -1 here is to 'fix' R indexation.
 
         return particle_state_to_modes_state(python_result, len(self.interferometer_matrix))
+
+    def get_raw_cliffords_simulation_results(self):
+        return self.cliffords_r_sampler(self.boson_sampler_input_matrix, 1, True)
