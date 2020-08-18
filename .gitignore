@@ -214,4 +214,3 @@ dmypy.json
 cython_debug/
 
 quick_tests/*.py
-/quick_tests/clifford_simulation_speed_test.py
