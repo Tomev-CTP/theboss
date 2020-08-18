@@ -213,4 +213,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-/quick_tests/*
+quick_tests/*.py
+/quick_tests/clifford_simulation_speed_test.py
