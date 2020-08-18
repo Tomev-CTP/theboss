@@ -41,6 +41,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         """
         possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                       self.configuration.number_of_modes)
+
         outcomes_probabilities = []
         for outcome in possible_outcomes:
             outcomes_probabilities.append(self.__calculate_probability_of_outcome(outcome))
