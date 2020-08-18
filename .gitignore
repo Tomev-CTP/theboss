@@ -212,3 +212,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+/quick_tests/*
