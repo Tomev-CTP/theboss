@@ -1,5 +1,6 @@
 __author__ = 'Tomasz Rybotycki'
 
+import projectFolderPathUpdater  # This is for adding main project folder to the path.
 import unittest
 from numpy import std, average
 from math import factorial
@@ -164,13 +165,23 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
             for j in range(len(current_probabilities)):
                 probabilities_list[j].append(current_probabilities[j])
 
+            stDev = 0
+
             if len(probabilities_list[0]) > 2:
                 first_means.append(average(probabilities_list[0]))
             if len(first_means) > 2:
-                first_stdevs.append(std(first_means))
+                stDev = std(first_means)
 
-        print(first_means)
-        print(first_stdevs)
+            first_stdevs.append(stDev)
+
+            f = open("1kk_haar_random_stdevs.txt", "a")
+            f.write(str(stDev) + '\n')
+            f.close()
 
         self.assertTrue(True)
         # self.assertAlmostEqual(distance, bound, delta=experiments_tv_distance_error_bound)
+
+
+s = TestClassicalLossyBosonSamplingSimulator();
+s.setUp()
+s.test_approximate_and_exact_distribution_distance_for_haar_random_matrix()
