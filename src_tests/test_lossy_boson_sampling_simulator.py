@@ -5,7 +5,7 @@ from numpy import std, average
 from math import factorial
 from typing import List
 
-from numpy import zeros, log2, sqrt
+from numpy import zeros, log2, sqrt, array
 from scipy.special import binom
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
@@ -22,7 +22,6 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         # Generate permutation matrix and define initial state.
         self.initial_state = [1, 1, 1, 1, 0]
 
-        '''
         self.permutation_matrix = array([
             [0, 0, 1, 0, 0],
             [1, 0, 0, 0, 0],
@@ -30,7 +29,6 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
             [0, 0, 0, 0, 1],
             [0, 1, 0, 0, 0],
         ])
-        '''
 
         # Define some additional variables for more clear experiment configuration assignment.
         self.number_of_particles_lost = 2

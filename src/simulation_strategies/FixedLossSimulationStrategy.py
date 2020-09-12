@@ -3,7 +3,8 @@ __author__ = 'Tomasz Rybotycki'
 from random import random
 from typing import List
 
-from numpy import conjugate, dot, exp, ndarray, pi, sqrt, zeros
+from numpy import conjugate, dot, exp, ndarray, pi, sqrt, zeros, cumsum, histogram
+from numpy.random import rand
 
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
@@ -34,7 +35,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             :return:
         """
         initial_number_of_photons = sum(input_state)
-        prepared_state = input_state[:]
+        prepared_state = input_state
         prepared_state /= sqrt(initial_number_of_photons)
         prepared_state = self.__randomize_modes_phases(prepared_state)
         return prepared_state
@@ -46,19 +47,12 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             :param state_in_modes_basis: A given state in modes basis.
             :return: Given mode state with randomized phases.
         """
-        randomized_phases_state = []
-
-        for mode in state_in_modes_basis:
-            phi = random() * 2 * pi
-            randomized_phases_state.append(exp(1j * phi) * mode)
-
+        randomized_phases_state = exp(1j * rand(len(state_in_modes_basis))) * state_in_modes_basis
         return randomized_phases_state
 
     @staticmethod
     def __calculate_probabilities(state: ndarray) -> ndarray:
-        probabilities = []
-        for detector in state:
-            probabilities.append(conjugate(detector) * detector)
+        probabilities = [conjugate(detector) * detector for detector in state]
         return probabilities
 
     def __calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
@@ -66,15 +60,11 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             This method applies evolution to every photon. Note, that evolution of each particle is independent of
             each other.
             :param probabilities:
-            :return:
+            :return: An output array that contains the number of observations for each photon left (histogram)
         """
-        output = zeros(self.number_of_observed_modes)
-        for photon in range(self.number_of_photons_left):
-            x = random()
-            i = 0
-            prob = probabilities[i]
-            while x > prob:
-                i += 1
-                prob += probabilities[i]
-            output[i] += 1
+        accum_probabilities = zeros(len(probabilities)+1)
+        cumsum(probabilities, out=accum_probabilities[1:])
+        photons_left_observations = rand(self.number_of_photons_left)
+        output, _ = histogram(photons_left_observations, accum_probabilities)
+        print(output)
         return output
