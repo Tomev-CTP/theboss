@@ -3,7 +3,7 @@ __author__ = 'Tomasz Rybotycki'
 from random import random
 from typing import List
 
-from numpy import conjugate, dot, exp, ndarray, pi, sqrt, zeros
+from numpy import conjugate, dot, exp, ndarray, sqrt, zeros
 from numpy.random import rand
 
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
@@ -21,7 +21,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         """
         Returns an sample from the approximate distribution in fixed losses regime.
         :param input_state: Usually n-particle Fock state in m modes.
-        :return: A sample from approximate.
+        :return: A sample from the approximation.
         """
         phi_0 = self.__prepare_initial_state(input_state)
         evolved_state = dot(self.interferometer_matrix, phi_0)
@@ -32,7 +32,8 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         """
             This method is used to prepare psi_0 state (formula 23 from ref. [1]).
             :param input_state: Initial lossy bosonic state.
-            :return:
+            :return: Returns initial state of the formula (being an equal superposition
+            on n photons 'smeared' on first n modes).
         """
         initial_number_of_photons = sum(input_state)
         prepared_state = [1 for _ in range(initial_number_of_photons)]
