@@ -4,6 +4,7 @@ from random import random
 from typing import List
 
 from numpy import conjugate, dot, exp, ndarray, pi, sqrt, zeros
+from numpy.random import rand
 
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
@@ -19,7 +20,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
     def simulate(self, input_state: ndarray) -> List[int]:
         """
         Returns an sample from the approximate distribution in fixed losses regime.
-        :param input_state: Usually n-particle Fock state.
+        :param input_state: Usually n-particle Fock state in m modes.
         :return: A sample from approximate.
         """
         phi_0 = self.__prepare_initial_state(input_state)
@@ -34,7 +35,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             :return:
         """
         initial_number_of_photons = sum(input_state)
-        prepared_state = input_state[:]
+        prepared_state = [1 for _ in range(initial_number_of_photons)]
         prepared_state /= sqrt(initial_number_of_photons)
         prepared_state = self.__randomize_modes_phases(prepared_state)
         return prepared_state
@@ -46,27 +47,19 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             :param state_in_modes_basis: A given state in modes basis.
             :return: Given mode state with randomized phases.
         """
-        randomized_phases_state = []
-
-        for mode in state_in_modes_basis:
-            phi = random() * 2 * pi
-            randomized_phases_state.append(exp(1j * phi) * mode)
-
-        return randomized_phases_state
+        return exp(1j * rand(len(state_in_modes_basis))) * state_in_modes_basis
 
     @staticmethod
     def __calculate_probabilities(state: ndarray) -> ndarray:
-        probabilities = []
-        for detector in state:
-            probabilities.append(conjugate(detector) * detector)
-        return probabilities
+        return [conjugate(detector) * detector for detector in state]
 
     def __calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
         """
             This method applies evolution to every photon. Note, that evolution of each particle is independent of
             each other.
             :param probabilities:
-            :return:
+            :return: A lossy boson state after traversing through interferometer. The state is described in first
+            quantization (mode assignment basis).
         """
         output = zeros(self.number_of_observed_modes)
         for photon in range(self.number_of_photons_left):
