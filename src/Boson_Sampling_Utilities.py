@@ -95,10 +95,10 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int) ->
 
 def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[List[int]]:
     """
-    From initial state generate all possible input states after losses application.
-    :param initial_state: The state we start with.
-    :param number_of_particles_left: Number of particles after losses application.
-    :return: A list of lists representing initial states after losses.
+        From initial state generate all possible input states after losses application.
+        :param initial_state: The state we start with.
+        :param number_of_particles_left: Number of particles after losses application.
+        :return: A list of lists representing initial states after losses.
     """
     x0 = []
     number_of_modes = len(initial_state)
