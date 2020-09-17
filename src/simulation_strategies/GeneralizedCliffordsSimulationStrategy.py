@@ -30,7 +30,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self.number_of_input_photons = sum(input_state)
         self.__get_sorted_possible_states()
         self.__fill_r_sample()
-        #print(self.r_sample)
         return self.r_sample
 
     def __get_sorted_possible_states(self) -> None:
@@ -46,7 +45,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self._labeled_states = dict()
         particles_number = sum(self.input_state)
 
-        for i in range(particles_number + 1):
+        for i in range(int(particles_number + 1)):
             self._labeled_states[i] = []
 
         for state in possible_input_states:
@@ -61,10 +60,14 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         """
         if len(state_part_left) < 1:
             return [[]]
-        n = state_part_left.pop(0)
-        smaller_substates = self.__calculate_all_input_substates(state_part_left)
+        if not isinstance(state_part_left, list):
+            state_as_list = state_part_left.tolist()
+        else:
+            state_as_list = state_part_left
+        n = state_as_list.pop(0)
+        smaller_substates = self.__calculate_all_input_substates(state_as_list)
         substates = []
-        for i in range(n + 1):
+        for i in range(int(n + 1)):
             for substate in smaller_substates:
                 new_substate = substate[:]
                 new_substate.insert(0, i)
@@ -91,16 +94,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
         pmf = []
 
-        '''
-        print(f'r = {self.r_sample}')
-        print('Outputs:')
-        for output in self.current_outputs:
-            print(f'\t {output}')
-        print('Inputs: ')
-        for input in possible_input_states:
-            print(f'\t {input}')
-        '''
-
         for output in self.current_outputs:
             pmf.append(0)
             for i in range(len(possible_input_states)):
@@ -109,14 +102,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
                 pmf[-1] += probability
 
         pmf = pmf / sum(pmf)
-        '''
-        print(pmf)
-        print(sum(pmf))
-        '''
         self.pmfs.append(pmf)
-
-        # for output_state in possible_output_states:
-        #    output_probability = self._calculate_outputs_probability(output_state)
 
     def _calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
         return [self._calculate_multinomial_coefficient(vector) for vector in corresponding_k_vectors]
