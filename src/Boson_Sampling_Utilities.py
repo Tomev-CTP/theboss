@@ -102,7 +102,7 @@ def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int)
     """
     x0 = []
     number_of_modes = len(initial_state)
-    initial_number_of_particles = len(initial_state) - initial_state.count(0)
+    initial_number_of_particles = sum(initial_state)
     for i in range(number_of_modes):
         x0.extend([i] * int(initial_state[i]))
 

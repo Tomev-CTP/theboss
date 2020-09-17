@@ -1,18 +1,16 @@
 __author__ = 'Tomasz Rybotycki'
 
-import projectFolderPathUpdater  # This is for adding main project folder to the path.
 import unittest
-from numpy import std, average, array
-from numpy.random import randint
 from math import factorial
 from typing import List
 
-from numpy import zeros, log2, sqrt
+from numpy import array, average, log2, sqrt, zeros
+from numpy.random import randint
 from scipy.special import binom
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
-    BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingWithUniformLossesExactDistributionCalculator
+    BosonSamplingWithFixedLossesExactDistributionCalculator
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
@@ -71,7 +69,6 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         exact_distribution_calculator = \
             BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
         number_of_outcomes = len(exact_distribution_calculator.get_outcomes_in_proper_order())
-        # print([list(i) for i in exact_distribution_calculator.get_outcomes_in_proper_order()])
 
         experiments_tv_distance_error_bound = count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=number_of_outcomes, samples_number=self.number_of_samples_for_distribution_approximation,
@@ -128,9 +125,9 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         number_of_particles_left = initial_number_of_particles - number_of_particles_lost
         number_of_outcomes = binom(number_of_modes + number_of_particles_left - 1, number_of_particles_left)
 
-        haar_random_matrices_number = 10**2
+        haar_random_matrices_number = 10 ** 2
 
-        error_bound = log2(2**number_of_outcomes - 2) - log2(self.error_probability_of_distance_bound)
+        error_bound = log2(2 ** number_of_outcomes - 2) - log2(self.error_probability_of_distance_bound)
         error_bound = sqrt(error_bound / (2 * haar_random_matrices_number))
 
         probabilities_list = []
@@ -162,5 +159,5 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         # Every probability should have probability 1 over outcomes number, if number of haar random matrices
         # goes to infinity. In that case I can select any probability.
         random_outcome_index = randint(0, len(current_probabilities))
-        self.assertAlmostEqual(number_of_outcomes**(-1), average(probabilities_list[random_outcome_index]),
+        self.assertAlmostEqual(number_of_outcomes ** (-1), average(probabilities_list[random_outcome_index]),
                                delta=error_bound)

@@ -78,6 +78,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         # Symmetrize the input.
         lossy_inputs_list = generate_lossy_inputs(self.configuration.initial_state,
                                                   self.configuration.number_of_particles_left)
+
         for lossy_input in lossy_inputs_list:
             subprobability = abs(calculate_permanent(
                 self.__count_effective_boson_scattering_matrix(lossy_input, outcome_state_in_mode_basis))) ** 2

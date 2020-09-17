@@ -4,20 +4,26 @@ import unittest
 from math import factorial
 from typing import List
 
-from numpy import array, zeros
+from numpy import array, average, log2, sqrt, zeros
+from numpy.random import randint
 from scipy import special
+from scipy.special import binom
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
-    BosonSamplingWithUniformLossesExactDistributionCalculator
+    BosonSamplingWithFixedLossesExactDistributionCalculator
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
-    count_tv_distance_error_bound_of_experiment_results
+    count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 
 
 class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
 
     def setUp(self) -> None:
+        # Define variables for bound calculation.
+        self.number_of_samples_for_distribution_approximation = 1000
+        self.error_probability_of_distance_bound = 0.001
+
         # Generate permutation matrix and define initial state.
         self.permutation_matrix = array([
             [1, 0, 0, 0, 0],
@@ -48,7 +54,7 @@ class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
 
     def test_approximate_and_exact_distribution_distance(self) -> None:
         exact_distribution_calculator = \
-            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
 
         number_of_samples = 1000
@@ -66,21 +72,26 @@ class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
 
         self.assertAlmostEqual(distance, bound, delta=experiments_tv_distance_error_bound)
 
-    def __calculate_approximate_distribution(self, samples_number: int = 10000) -> List[float]:
+    def __calculate_approximate_distribution(self, samples_number: int = 5000) -> List[float]:
         """
         Prepares the approximate distribution using boson sampling simulation method described by
         Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
         :return: Approximate distribution as a list.
         """
         exact_distribution_calculator = \
-            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
 
         possible_outcomes = exact_distribution_calculator.get_outcomes_in_proper_order()
 
-        outcomes_probabilities = zeros(len(possible_outcomes))
+        strategy = GeneralizedCliffordsSimulationStrategy(self.experiment_configuration.interferometer_matrix)
 
+        simulator = BosonSamplingSimulator(self.experiment_configuration.number_of_particles_left,
+                                           self.experiment_configuration.initial_number_of_particles,
+                                           self.experiment_configuration.number_of_modes, strategy)
+
+        outcomes_probabilities = zeros(len(possible_outcomes))
         for i in range(samples_number):
-            result = self.simulator.get_classical_simulation_results()
+            result = simulator.get_classical_simulation_results()
 
             for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
@@ -112,3 +123,48 @@ class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
         l = number_of_particles_left
         error_bound = 1.0 - (factorial(n) / (pow(n, l) * factorial(n - l)))
         return error_bound
+
+    def test_approximate_and_exact_distribution_distance_for_haar_random_matrix(self) -> None:
+        number_of_modes = 8
+        initial_state = [1, 1, 1, 1, 0, 0, 0, 0]
+        initial_number_of_particles = sum(initial_state)
+        number_of_particles_lost = 0
+        number_of_particles_left = initial_number_of_particles - number_of_particles_lost
+        number_of_outcomes = binom(number_of_modes + number_of_particles_left - 1, number_of_particles_left)
+
+        haar_random_matrices_number = 10 ** 2
+
+        error_bound = log2(2 ** number_of_outcomes - 2) - log2(self.error_probability_of_distance_bound)
+        error_bound = sqrt(error_bound / (2 * haar_random_matrices_number))
+
+        probabilities_list = []
+
+        for i in range(haar_random_matrices_number):
+
+            print(f'Current Haar random matrix index: {i} out of {haar_random_matrices_number}.')
+
+            haar_random_matrix = generate_haar_random_unitary_matrix(number_of_modes)
+
+            self.experiment_configuration = BosonSamplingExperimentConfiguration(
+                interferometer_matrix=haar_random_matrix,
+                initial_state=initial_state,
+                initial_number_of_particles=initial_number_of_particles,
+                number_of_modes=number_of_modes,
+                number_of_particles_lost=number_of_particles_lost,
+                number_of_particles_left=number_of_particles_left,
+                probability_of_uniform_loss=0.2
+            )
+
+            current_probabilities = self.__calculate_approximate_distribution()
+
+            if len(probabilities_list) == 0:
+                probabilities_list = [[] for _ in range(len(current_probabilities))]
+
+            for j in range(len(current_probabilities)):
+                probabilities_list[j].append(current_probabilities[j])
+
+        # Every probability should have probability 1 over outcomes number, if number of haar random matrices
+        # goes to infinity. In that case I can select any probability.
+        random_outcome_index = randint(0, len(current_probabilities))
+        self.assertAlmostEqual(number_of_outcomes ** (-1), average(probabilities_list[random_outcome_index]),
+                               delta=error_bound)
