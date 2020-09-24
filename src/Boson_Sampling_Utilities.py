@@ -6,6 +6,7 @@ import itertools
 from typing import List
 
 from numpy import ndarray, zeros
+from scipy.special import binom
 
 
 def calculate_permanent(matrix: ndarray) -> float:
@@ -121,3 +122,12 @@ def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int)
             lossy_inputs_list.append(lossy_input)
 
     return lossy_inputs_list
+
+
+def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int) -> int:
+    """
+        Calculates the number of possible output states with n particles placed around m modes. This is basically
+        the same answer as to in how many possible combinations can we put n objects in m bins. It's also a dimension
+        of n-particle m-mode bosonic space. Stars-and-bars argument applies here.
+    """
+    return binom(n + m - 1, n)

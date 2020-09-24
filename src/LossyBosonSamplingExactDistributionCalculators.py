@@ -50,6 +50,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
         :return: List of probabilities of outcomes.
         """
+
         possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                       self.configuration.number_of_modes)
 
