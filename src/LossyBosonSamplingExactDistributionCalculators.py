@@ -25,7 +25,18 @@ class BosonSamplingExperimentConfiguration:
     probability_of_uniform_loss: float = 0
 
 
-class BosonSamplingWithFixedLossesExactDistributionCalculator:
+class BosonSamplingExactDistributionCalculator:
+    """ Interface for boson sampling exact distribution calculators """
+    def calculate_exact_distribution(self) -> List[List[float]]:
+        """ One has to be able to calculate exact distribution with it """
+        pass
+
+    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+        """ One also has to know the order of objects that returned probabilities correspond to """
+        pass
+
+
+class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExactDistributionCalculator):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
         self.configuration = deepcopy(configuration)
 
