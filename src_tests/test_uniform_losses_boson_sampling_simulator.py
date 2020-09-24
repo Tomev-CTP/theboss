@@ -61,46 +61,25 @@ class TestClassicalLossyBosonSamplingSimulator(unittest.TestCase):
         number_of_outcomes = len(exact_distribution_calculator.get_outcomes_in_proper_order())
         error_probability_of_distance_bound = 0.001
         # Note, that this makes the test probabilistic in nature, but there's nothing one can do about that.
-        experiments_tv_distance_error_bound = count_tv_distance_error_bound_of_experiment_results(
+        error_bound_between_experiments_and_estimation = count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=number_of_outcomes, samples_number=number_of_samples,
             error_probability=error_probability_of_distance_bound
         )
 
         approximate_distribution = self.__calculate_approximate_distribution(number_of_samples)
-        distance = count_total_variation_distance(exact_distribution, approximate_distribution)
-        bound = self.__calculate_uniform_loss_distribution_error_bound()
-
-        self.assertAlmostEqual(distance, bound, delta=experiments_tv_distance_error_bound)
-
-    def __calculate_approximate_distribution(self, samples_number: int = 10000) -> List[float]:
-        """
-        Prepares the approximate distribution using boson sampling simulation method described by
-        Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
-        :return: Approximate distribution as a list.
-        """
-        exact_distribution_calculator = \
-            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
-
-        possible_outcomes = exact_distribution_calculator.get_outcomes_in_proper_order()
-
-        outcomes_probabilities = zeros(len(possible_outcomes))
-
-        for i in range(samples_number):
-            result = self.simulator.get_classical_simulation_results()
-
-            for j in range(len(possible_outcomes)):
-                # Check if obtained result is one of possible outcomes.
-                if all(result == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
-                    outcomes_probabilities[j] += 1
-                    break
-
-        for i in range(len(outcomes_probabilities)):
-            outcomes_probabilities[i] /= samples_number
-
-        return outcomes_probabilities
+        distance_between_estimation_and_ideal = count_total_variation_distance(exact_distribution, approximate_distribution)
+        error_bound_on_ideal_and_experiment = self.__calculate_uniform_loss_distribution_error_bound()
+        self.assertLessEqual(distance_between_estimation_and_ideal, error_bound_on_ideal_and_experiment
+                             + error_bound_between_experiments_and_estimation)
 
     def __calculate_uniform_loss_distribution_error_bound(self) -> float:
-        # Using eta, n and l notation from the paper [1] for readability purposes.
+        """
+            This is the distance bound between experimental and ideal results for uniform losses boson sampling.
+            Basically this is capital Delta from [1]. Using eta, n and l notation from the paper [1] for readability
+            purposes.
+        :return: Distance bound between experimental and ideal results for uniform losses.
+        """
+        #
         error_bound = 0
         n = self.experiment_configuration.initial_number_of_particles
         eta = self.experiment_configuration.probability_of_uniform_loss

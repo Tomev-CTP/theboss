@@ -3,7 +3,7 @@ __author__ = 'Tomasz Rybotycki'
 import unittest
 from math import factorial
 
-from numpy import array, average, log2, sqrt
+from numpy import array, average
 from numpy.random import randint
 from scipy.special import binom
 
