@@ -70,9 +70,6 @@ class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
 
         distance = count_total_variation_distance(exact_distribution, approximate_distribution)
 
-        print(f'Distance {distance}')
-        print(f'Bound {experiments_tv_distance_error_bound}')
-
         self.assertLessEqual(distance, experiments_tv_distance_error_bound)
 
     def test_approximate_and_exact_distribution_distance_for_haar_random_matrix(self) -> None:
@@ -85,8 +82,10 @@ class TestGeneralizedCliffordsBosonSamplingSimulator(unittest.TestCase):
 
         haar_random_matrices_number = 10
 
-        error_bound = log2(2 ** number_of_outcomes - 2) - log2(self.error_probability_of_distance_bound)
-        error_bound = sqrt(error_bound / (2 * haar_random_matrices_number))
+        error_bound = count_tv_distance_error_bound_of_experiment_results(
+            outcomes_number=number_of_outcomes, samples_number=haar_random_matrices_number,
+            error_probability=self.error_probability_of_distance_bound
+        )
 
         probabilities_list = []
 

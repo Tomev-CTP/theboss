@@ -41,6 +41,13 @@ def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float
 
 def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
                                                         error_probability: float):
+    """
+        Calculates the distance bound between the experimental results and the n-sample estimation of these results.
+        :param outcomes_number:
+        :param samples_number: Number of samples used for estimation.
+        :param error_probability: Desired probability of error.
+        :return: Bound on the tv distance between the estimate and the experimental results.
+    """
     error_bound = log2(float(2 ** outcomes_number - 2)) - log2(error_probability)
     error_bound /= 2 * samples_number
     return sqrt(error_bound)
