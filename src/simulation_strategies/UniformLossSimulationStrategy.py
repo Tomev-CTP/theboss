@@ -12,7 +12,8 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class UniformLossSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray, number_of_modes: int, probability_of_uniform_loss: float) \
+    def __init__(self, interferometer_matrix: ndarray,
+                 number_of_modes: int, probability_of_uniform_loss: float) \
             -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_modes = number_of_modes

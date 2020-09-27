@@ -11,7 +11,8 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 class FixedLossSimulationStrategy(SimulationStrategy):
 
-    def __init__(self, interferometer_matrix: ndarray, number_of_photons_left: int, number_of_observed_modes: int) \
+    def __init__(self, interferometer_matrix: ndarray,
+                 number_of_photons_left: int, number_of_observed_modes: int) \
             -> None:
         self.number_of_photons_left = number_of_photons_left
         self.interferometer_matrix = interferometer_matrix
@@ -19,9 +20,9 @@ class FixedLossSimulationStrategy(SimulationStrategy):
 
     def simulate(self, input_state: ndarray) -> List[int]:
         """
-        Returns an sample from the approximate distribution in fixed losses regime.
-        :param input_state: Usually n-particle Fock state in m modes.
-        :return: A sample from the approximation.
+            Returns an sample from the approximate distribution in fixed losses regime.
+            :param input_state: Usually n-particle Fock state in m modes.
+            :return: A sample from the approximation.
         """
         phi_0 = self.__prepare_initial_state(input_state)
         evolved_state = dot(self.interferometer_matrix, phi_0)
