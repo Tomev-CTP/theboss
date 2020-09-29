@@ -14,6 +14,7 @@ from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inp
     modes_state_to_particle_state, particle_state_to_modes_state
 
 
+# TODO TR: This class should be placed in separate folder
 @dataclass
 class BosonSamplingExperimentConfiguration:
     interferometer_matrix: ndarray  # A matrix describing interferometer.

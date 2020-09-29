@@ -20,6 +20,12 @@ class SimulationStrategyFactory:
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
 
+    def set_strategy_type(self, strategy_type: StrategyTypes) -> None:
+        self._strategy_type = strategy_type
+
+    def set_experiment_configuration(self, experiment_configuration: BosonSamplingExperimentConfiguration) -> None:
+        self._experiment_configuration = experiment_configuration
+
     def generate_strategy(self) -> SimulationStrategy:
         """
             Generates simulation strategy of desired type. The type is selected in the constructor.

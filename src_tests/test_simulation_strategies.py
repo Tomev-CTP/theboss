@@ -8,15 +8,19 @@ stuff with only minor differences (mostly in experiments setup).
 
 import unittest
 from math import factorial
-from numpy import array, ndarray, asarray
+from numpy import array, ndarray, asarray, average
+from numpy.random import randint
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
 from src.Quantum_Computations_Utilities import count_tv_distance_error_bound_of_experiment_results, \
-    count_total_variation_distance
+    count_total_variation_distance, generate_haar_random_unitary_matrix
 from src.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWithFixedLossesExactDistributionCalculator, \
     BosonSamplingWithUniformLossesExactDistributionCalculator, BosonSamplingExactDistributionCalculator
 from src_tests.common_code_for_tests import ApproximateDistributionCalculator
+from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
+from copy import deepcopy
+
 
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
@@ -47,17 +51,20 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         )
 
         self._haar_random_matrices_number = 100
-        haar_random_experiment_input_state = [1, 1, 1, 1, 0, 0, 0, 0]
-        haar_random_initial_number_of_particles = sum(haar_random_experiment_input_state)
+        self._haar_random_experiment_input_state = [1, 1, 1, 1, 0, 0, 0, 0]
+        haar_random_initial_number_of_particles = sum(self._haar_random_experiment_input_state)
         haar_random_number_of_particles_lost = 2
         self._haar_random_experiment_configuration = BosonSamplingExperimentConfiguration(
-            interferometer_matrix=[],
-            initial_state=asarray(haar_random_experiment_input_state),
+            interferometer_matrix=asarray([]),
+            initial_state=asarray(self._haar_random_experiment_input_state),
             initial_number_of_particles=haar_random_number_of_particles_lost,
-            number_of_modes=len(haar_random_initial_number_of_particles),
+            number_of_modes=len(self._haar_random_experiment_input_state),
             number_of_particles_lost=haar_random_number_of_particles_lost,
-            number_of_particles_left=haar_random_experiment_input_state - haar_random_number_of_particles_lost
+            number_of_particles_left=haar_random_initial_number_of_particles - haar_random_number_of_particles_lost
         )
+        self._haar_random_binned_experiment_input_state = [3, 2, 1, 1, 0, 0, 0, 0]
+
+
 
     def test_distribution_accuracy_for_fixed_losses_strategy(self) -> None:
         # Using triangle inequality of (TV) distance.
@@ -146,46 +153,67 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self.assertLessEqual(distance, max_allowed_distance, f'Distance from exact distribution ({distance}) is '
                                                              f'greater than maximum distance allowed ({max_allowed_distance}).')
 
-    def test_approximate_and_exact_distribution_distance_for_haar_random_matrix(self) -> None:
-        number_of_modes = 8
-        initial_state = [1, 1, 1, 1, 0, 0, 0, 0]
-        initial_number_of_particles = sum(initial_state)
-        number_of_particles_lost = 2
-        number_of_particles_left = initial_number_of_particles - number_of_particles_lost
-        number_of_outcomes = calculate_number_of_possible_n_particle_m_mode_output_states(number_of_particles_left,
-                                                                                          number_of_modes)
+    def test_haar_random_interferometers_distance_for_fixed_losses_strategy(self):
+        self.__set_experiment_configuration_for_standard_haar_random()
+        strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
+                                                     StrategyTypes.FIXED_LOSS)
+        self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
-        haar_random_matrices_number = 10 ** 2
+    def test_haar_random_interferometers_distance_for_cliffords_r_strategy(self):
+        self.__set_experiment_configuration_for_standard_haar_random()
+        strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
+                                                     StrategyTypes.CLIFFORD_R)
+        self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
+
+    def test_haar_random_interferometers_distance_for_generalized_cliffords_strategy(self):
+        self.__set_experiment_configuration_for_standard_haar_random()
+        strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
+                                                     StrategyTypes.GENERALIZED_CLIFFORD)
+        self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
+
+    def test_haar_random_interferometers_distance_for_generalized_cliffords_strategy_with_binned_input(self):
+        self.__set_experiment_configuration_for_binned_haar_random()
+        strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
+                                                     StrategyTypes.GENERALIZED_CLIFFORD)
+        self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
+
+    def __set_experiment_configuration_for_binned_haar_random(self):
+        self._haar_random_experiment_configuration.initial_state = self._haar_random_binned_experiment_input_state
+        number_of_particles_in_the_experiment = len(self._haar_random_binned_experiment_input_state)
+        self._haar_random_experiment_configuration.initial_number_of_particles = number_of_particles_in_the_experiment
+        self._haar_random_experiment_configuration.number_of_particles_left = number_of_particles_in_the_experiment
+
+    def __set_experiment_configuration_for_standard_haar_random(self):
+        self._haar_random_experiment_configuration.initial_state = self._haar_random_experiment_input_state
+        number_of_particles_in_the_experiment = len(self._haar_random_experiment_input_state)
+        self._haar_random_experiment_configuration.initial_number_of_particles = number_of_particles_in_the_experiment
+        self._haar_random_experiment_configuration.number_of_particles_left = number_of_particles_in_the_experiment - self._haar_random_experiment_configuration.number_of_particles_lost
+
+    def __test_haar_random_interferometers_approximation_distance_from_ideal(self,
+                                                                             strategy_factory: SimulationStrategyFactory):
+        number_of_outcomes = calculate_number_of_possible_n_particle_m_mode_output_states(
+            n=self._haar_random_experiment_configuration.number_of_particles_left,
+            m=self._haar_random_experiment_configuration.number_of_modes
+        )
 
         error_bound = count_tv_distance_error_bound_of_experiment_results(
-            outcomes_number=number_of_outcomes, samples_number=haar_random_matrices_number,
-            error_probability=self.error_probability_of_distance_bound
+            outcomes_number=number_of_outcomes, samples_number=self._haar_random_matrices_number,
+            error_probability=self._probability_of_error_in_distribution_calculation
         )
 
         probabilities_list = []
 
-        for i in range(haar_random_matrices_number):
+        for i in range(self._haar_random_matrices_number):
 
-            print(f'Current Haar random matrix index: {i} out of {haar_random_matrices_number}.')
+            print(f'Current Haar random matrix index: {i} out of {self._haar_random_matrices_number}.')
 
-            haar_random_matrix = generate_haar_random_unitary_matrix(number_of_modes)
+            experiment_configuration = deepcopy(self._haar_random_experiment_configuration)
+            experiment_configuration.interferometer_matrix = generate_haar_random_unitary_matrix(self._haar_random_experiment_configuration.number_of_modes)
+            strategy_factory.set_experiment_configuration(experiment_configuration)
+            distribution_calculator = ApproximateDistributionCalculator(experiment_configuration,
+                                                                        strategy_factory.generate_strategy())
 
-            self.experiment_configuration = BosonSamplingExperimentConfiguration(
-                interferometer_matrix=haar_random_matrix,
-                initial_state=initial_state,
-                initial_number_of_particles=initial_number_of_particles,
-                number_of_modes=number_of_modes,
-                number_of_particles_lost=number_of_particles_lost,
-                number_of_particles_left=number_of_particles_left,
-                probability_of_uniform_loss=0.2
-            )
-
-            strategy = FixedLossSimulationStrategy(self.experiment_configuration.interferometer_matrix,
-                                                   self.experiment_configuration.number_of_particles_left,
-                                                   self.experiment_configuration.number_of_modes)
-
-            distribution_calculator = ApproximateDistributionCalculator(self.experiment_configuration, strategy)
-            current_probabilities = distribution_calculator.calculate_approximate_distribution()
+            current_probabilities = distribution_calculator.calculate_approximate_distribution(samples_number=self._number_of_samples_for_estimated_distribution_calculation)
 
             if len(probabilities_list) == 0:
                 probabilities_list = [[] for _ in range(len(current_probabilities))]
@@ -193,8 +221,6 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             for j in range(len(current_probabilities)):
                 probabilities_list[j].append(current_probabilities[j])
 
-        # Every probability should have probability 1 over outcomes number, if number of haar random matrices
-        # goes to infinity. In that case I can select any probability.
         random_outcome_index = randint(0, len(current_probabilities))
         self.assertAlmostEqual(number_of_outcomes ** (-1), average(probabilities_list[random_outcome_index]),
                                delta=error_bound)

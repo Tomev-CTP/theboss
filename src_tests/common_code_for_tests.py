@@ -32,7 +32,8 @@ class ApproximateDistributionCalculator:
 
         for i in range(samples_number):
 
-            # print(f'Sample number {i} of {samples_number}.')
+
+            print(f'Sample number {i} of {samples_number}.')
 
             result = simulator.get_classical_simulation_results(self.configuration.initial_state)
 
