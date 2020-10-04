@@ -7,20 +7,20 @@ stuff with only minor differences (mostly in experiments setup).
 """
 
 import unittest
-from math import factorial
-from numpy import array, ndarray, asarray, average
-from numpy.random import randint
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
-from src.Quantum_Computations_Utilities import count_tv_distance_error_bound_of_experiment_results, \
-    count_total_variation_distance, generate_haar_random_unitary_matrix
-from src.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWithFixedLossesExactDistributionCalculator, \
-    BosonSamplingWithUniformLossesExactDistributionCalculator, BosonSamplingExactDistributionCalculator
-from src_tests.common_code_for_tests import ApproximateDistributionCalculator
-from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
 from copy import deepcopy
+from math import factorial
 
+from numpy import array, asarray, average
+from numpy.random import randint
+
+from src.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
+from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExactDistributionCalculator, \
+    BosonSamplingExperimentConfiguration, BosonSamplingWithFixedLossesExactDistributionCalculator
+from src.Quantum_Computations_Utilities import count_total_variation_distance, \
+    count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
+from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
+from src_tests.common_code_for_tests import ApproximateDistributionCalculator
 
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
@@ -63,8 +63,6 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             number_of_particles_left=haar_random_initial_number_of_particles - haar_random_number_of_particles_lost
         )
         self._haar_random_binned_experiment_input_state = [3, 2, 1, 1, 0, 0, 0, 0]
-
-
 
     def test_distribution_accuracy_for_fixed_losses_strategy(self) -> None:
         # Using triangle inequality of (TV) distance.

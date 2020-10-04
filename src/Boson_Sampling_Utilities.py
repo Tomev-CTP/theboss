@@ -131,3 +131,99 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
         of n-particle m-mode bosonic space. Stars-and-bars argument applies here.
     """
     return binom(n + m - 1, n)
+
+
+class ChinHuhPermanentCalculator:
+
+    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+        self.__matrix = matrix
+        self.__input_state = input_state
+        self.__output_state = output_state
+
+    @property
+    def matrix(self) -> ndarray:
+        return self.__matrix
+
+    @matrix.setter
+    def matrix(self, matrix) -> None:
+        self.__matrix = matrix
+
+    @property
+    def input_state(self) -> List[int]:
+        return self.__input_state
+
+    @input_state.setter
+    def input_state(self, input_state) -> None:
+        self.__input_state = input_state
+
+    @property
+    def output_state(self) -> List[int]:
+        return self.__output_state
+
+    @output_state.setter
+    def output_state(self, output_state) -> None:
+        self.__output_state = output_state
+
+    def calculate_permanent_of_effective_scattering_matrix(self) -> float:
+        """
+            This is the main method of the calculator. Assuming that input state, output state and the matrix are
+            defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
+            permanent of an effective scattering matrix related to probability of obtaining output state from given
+            input state.
+            :return: Permanent of effective scattering matrix.
+        """
+        if not self.__can_calculation_be_performed():
+            raise AttributeError
+
+        v_vectors = self.__calculate_v_vectors()
+        permanent = 0
+        for v_vector in v_vectors:
+            v_sum = sum(v_vector)
+            addend = pow(-1, v_sum)
+            # Binoms calculation
+            for i in range(len(v_vector)):
+                addend *= binom(self.__input_state[i], v_vector[i])
+            # Product calculation
+            product = 1
+            for i in range(len(self.__input_state)):
+                if self.__output_state[i] == 0:  # There's no reason to calculate the sum if t_i = 0
+                    continue
+                # Otherwise we calculate the sum
+                product_part = 0
+                for j in range(len(self.__input_state)):
+                    product_part += (self.__input_state[j] + v_vector[j]) * self.__matrix[j][i]
+                product_part = pow(product_part, self.__output_state[i])
+                product *= product_part
+            addend *= product
+            permanent *= addend
+        permanent /= pow(2, sum(self.__input_state))
+        return permanent
+
+    def __can_calculation_be_performed(self) -> bool:
+        """
+            Checks if calculation can be performed. For this to happen sizes of given matrix and states have
+            to match.
+            :return: Information if the calculation can be performed.
+        """
+        can_calculation_be_performed = True
+        can_calculation_be_performed = \
+            can_calculation_be_performed and self.__matrix.shape[0] == self.__matrix.shape[1]
+        can_calculation_be_performed = \
+            can_calculation_be_performed and len(self.__output_state) == len(self.__input_state)
+        can_calculation_be_performed = \
+            can_calculation_be_performed and len(self.__output_state) == self.__matrix.shape[0]
+
+        return can_calculation_be_performed
+
+    def __calculate_v_vectors(self):
+        v_vectors = []
+        for i in range(self.__input_state[len(self.__input_state)] + 1):
+            input_vector = self.__input_state.copy()
+            input_vector.append(i)
+
+            if len(input_vector) == len(self.__input_state):
+                v_vectors.append(input_vector)
+            else:
+                v_vectors.extend(self.__calculate_v_vectors(input_vector))
+
+        return v_vectors
