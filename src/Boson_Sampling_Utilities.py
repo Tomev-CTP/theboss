@@ -281,7 +281,7 @@ class ChinHuhPermanentCalculator:
         for v_vector in v_vectors:
             v_sum = sum(v_vector)
             addend = pow(-1, v_sum)
-            # Binoms calculation
+            # Binomials calculation
             for i in range(len(v_vector)):
                 addend *= binom(self.__input_state[i], v_vector[i])
             # Product calculation
