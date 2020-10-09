@@ -1,12 +1,13 @@
 __author__ = 'Tomasz Rybotycki'
 
-from numpy import zeros
 from typing import List
 
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
-from src.BosonSamplingSimulator import BosonSamplingSimulator
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from numpy import zeros
+
 from src.Boson_Sampling_Utilities import generate_possible_outputs
+from src.BosonSamplingSimulator import BosonSamplingSimulator
+from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
+from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class ApproximateDistributionCalculator:
@@ -21,6 +22,7 @@ class ApproximateDistributionCalculator:
             Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
             :return: Approximate distribution as a list.
         """
+
         possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                       self.configuration.number_of_modes)
 
@@ -31,9 +33,6 @@ class ApproximateDistributionCalculator:
         outcomes_probabilities = zeros(len(possible_outcomes))
 
         for i in range(samples_number):
-
-
-            # print(f'Sample number {i} of {samples_number}.')
 
             result = simulator.get_classical_simulation_results(self.configuration.initial_state)
 
@@ -47,4 +46,3 @@ class ApproximateDistributionCalculator:
             outcomes_probabilities[i] /= samples_number
 
         return outcomes_probabilities
-
