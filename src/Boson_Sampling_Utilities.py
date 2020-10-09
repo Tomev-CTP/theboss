@@ -5,18 +5,18 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List
 
-from numpy import ndarray, zeros, complex128
+from numpy import complex128, ndarray, zeros
 from scipy.special import binom
 
 
-def calculate_permanent(matrix: ndarray) -> complex:
+def calculate_permanent(matrix: ndarray) -> complex128:
     """
     Returns the permanent of the matrix mat.
     """
-    return permanent_recursive_part(matrix, 0, [], 1)
+    return permanent_recursive_part(matrix, 0, [], complex128(1))
 
 
-def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: int) -> complex:
+def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: complex128) -> complex128:
     """
     Row expansion for the permanent of matrix mtx.
     The counter column is the current column,
@@ -222,7 +222,7 @@ class EffectiveScatteringMatrixPermanentCalculator:
     def output_state(self, output_state) -> None:
         self.__output_state = output_state
 
-    def calculate(self) -> ndarray:
+    def calculate(self) -> complex128:
         scattering_matrix_calculator = \
             EffectiveScatteringMatrixCalculator(self.__matrix, self.__input_state, self.__output_state)
         scattering_matrix = scattering_matrix_calculator.calculate()
@@ -264,7 +264,7 @@ class ChinHuhPermanentCalculator:
     def output_state(self, output_state) -> None:
         self.__output_state = output_state
 
-    def calculate(self) -> complex:
+    def calculate(self) -> complex128:
         """
             This is the main method of the calculator. Assuming that input state, output state and the matrix are
             defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
