@@ -9,14 +9,14 @@ from numpy import ndarray, zeros, complex128
 from scipy.special import binom
 
 
-def calculate_permanent(matrix: ndarray) -> float:
+def calculate_permanent(matrix: ndarray) -> complex:
     """
     Returns the permanent of the matrix mat.
     """
     return permanent_recursive_part(matrix, 0, [], 1)
 
 
-def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: int) -> float:
+def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: int) -> complex:
     """
     Row expansion for the permanent of matrix mtx.
     The counter column is the current column,
@@ -188,6 +188,47 @@ class EffectiveScatteringMatrixCalculator:
         return effective_scattering_matrix
 
 
+class EffectiveScatteringMatrixPermanentCalculator:
+    """
+        This class is used to calculate permanent of effective scattering matrix. It first
+        generates the matrix, and then calculates the permanent via standard means.
+    """
+    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+        self.__matrix = matrix
+        self.__input_state = input_state
+        self.__output_state = output_state
+
+    @property
+    def matrix(self) -> ndarray:
+        return self.__matrix
+
+    @matrix.setter
+    def matrix(self, matrix) -> None:
+        self.__matrix = matrix
+
+    @property
+    def input_state(self) -> List[int]:
+        return self.__input_state
+
+    @input_state.setter
+    def input_state(self, input_state) -> None:
+        self.__input_state = input_state
+
+    @property
+    def output_state(self) -> List[int]:
+        return self.__output_state
+
+    @output_state.setter
+    def output_state(self, output_state) -> None:
+        self.__output_state = output_state
+
+    def calculate(self) -> ndarray:
+        scattering_matrix_calculator = \
+            EffectiveScatteringMatrixCalculator(self.__matrix, self.__input_state, self.__output_state)
+        scattering_matrix = scattering_matrix_calculator.calculate()
+        return calculate_permanent(scattering_matrix)
+
+
 class ChinHuhPermanentCalculator:
     """
         This class is designed to calculate permanent of effective scattering matrix of a boson sampling instance.
@@ -223,7 +264,7 @@ class ChinHuhPermanentCalculator:
     def output_state(self, output_state) -> None:
         self.__output_state = output_state
 
-    def calculate_permanent_of_effective_scattering_matrix(self) -> float:
+    def calculate_permanent_of_effective_scattering_matrix(self) -> complex:
         """
             This is the main method of the calculator. Assuming that input state, output state and the matrix are
             defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
