@@ -5,7 +5,7 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List
 
-from numpy import ndarray, zeros
+from numpy import ndarray, zeros, complex128
 from scipy.special import binom
 
 
@@ -133,8 +133,67 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
     return binom(n + m - 1, n)
 
 
-class ChinHuhPermanentCalculator:
+class EffectiveScatteringMatrixCalculator:
+    """
+        In many methods of Boson Sampling simulations an effective scattering matrix has to be calculated. Therefore
+        I decided to implement an calculator that'd be used if every single one of these methods.
+    """
+    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+        self.__matrix = matrix
+        self.__input_state = input_state
+        self.__output_state = output_state
 
+    @property
+    def matrix(self) -> ndarray:
+        return self.__matrix
+
+    @matrix.setter
+    def matrix(self, matrix) -> None:
+        self.__matrix = matrix
+
+    @property
+    def input_state(self) -> List[int]:
+        return self.__input_state
+
+    @input_state.setter
+    def input_state(self, input_state) -> None:
+        self.__input_state = input_state
+
+    @property
+    def output_state(self) -> List[int]:
+        return self.__output_state
+
+    @output_state.setter
+    def output_state(self, output_state) -> None:
+        self.__output_state = output_state
+
+    def calculate(self) -> ndarray:
+        number_of_columns = sum(self.input_state)
+        effective_scattering_matrix = zeros(shape=(number_of_columns, number_of_columns), dtype=complex128)
+        helper_matrix = zeros(shape=(len(self.__matrix), number_of_columns), dtype=complex128)
+        next_column_index = 0
+
+        for j in range(len(self.input_state)):
+            for i in range(self.input_state[j]):
+                helper_matrix[:, [next_column_index]] = self.__matrix[:, [j]]
+                next_column_index += 1
+        next_row_index = 0
+
+        for j in range(len(self.output_state)):
+            for i in range(int(self.output_state[j])):
+                effective_scattering_matrix[[next_row_index], :] = helper_matrix[[j], :]
+
+                next_row_index += 1
+
+        return effective_scattering_matrix
+
+
+class ChinHuhPermanentCalculator:
+    """
+        This class is designed to calculate permanent of effective scattering matrix of a boson sampling instance.
+        Note, that it can be used to calculate permanent of given matrix. All that is required that input and output
+        states are set to [1, 1, ..., 1] with proper dimensions.
+    """
     def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
         self.__matrix = matrix
         self.__input_state = input_state
@@ -176,6 +235,7 @@ class ChinHuhPermanentCalculator:
             raise AttributeError
 
         v_vectors = self.__calculate_v_vectors()
+
         permanent = 0
         for v_vector in v_vectors:
             v_sum = sum(v_vector)
@@ -185,17 +245,17 @@ class ChinHuhPermanentCalculator:
                 addend *= binom(self.__input_state[i], v_vector[i])
             # Product calculation
             product = 1
-            for i in range(len(self.__input_state)):
-                if self.__output_state[i] == 0:  # There's no reason to calculate the sum if t_i = 0
+            for j in range(len(self.__input_state)):
+                if self.__output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
                     continue
                 # Otherwise we calculate the sum
                 product_part = 0
-                for j in range(len(self.__input_state)):
-                    product_part += (self.__input_state[j] + v_vector[j]) * self.__matrix[j][i]
-                product_part = pow(product_part, self.__output_state[i])
+                for i in range(len(self.__input_state)):
+                    product_part += (self.__input_state[i] - 2 * v_vector[i]) * self.__matrix[j][i]
+                product_part = pow(product_part, self.__output_state[j])
                 product *= product_part
             addend *= product
-            permanent *= addend
+            permanent += addend
         permanent /= pow(2, sum(self.__input_state))
         return permanent
 
@@ -215,15 +275,15 @@ class ChinHuhPermanentCalculator:
 
         return can_calculation_be_performed
 
-    def __calculate_v_vectors(self):
+    def __calculate_v_vectors(self, input_vector: ndarray = []):
         v_vectors = []
-        for i in range(self.__input_state[len(self.__input_state)] + 1):
-            input_vector = self.__input_state.copy()
-            input_vector.append(i)
+        for i in range(self.__input_state[len(input_vector)] + 1):
+            input_state = input_vector.copy()
+            input_state.append(i)
 
-            if len(input_vector) == len(self.__input_state):
-                v_vectors.append(input_vector)
+            if len(input_state) == len(self.__input_state):
+                v_vectors.append(input_state)
             else:
-                v_vectors.extend(self.__calculate_v_vectors(input_vector))
+                v_vectors.extend(self.__calculate_v_vectors(input_state))
 
         return v_vectors
