@@ -135,7 +135,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
     def __calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray):
         permanent_calculator = ChinHuhPermanentCalculator(self.interferometer_matrix, input_state=input_state,
                                                           output_state=output_state)
-        probability = abs(permanent_calculator.calculate_permanent_of_effective_scattering_matrix()) ** 2
+        probability = abs(permanent_calculator.calculate()) ** 2
         for mode_occupation_number in input_state:
             probability /= factorial(mode_occupation_number)
         for mode_occupation_number in output_state:

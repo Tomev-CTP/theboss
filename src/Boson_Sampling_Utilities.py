@@ -264,7 +264,7 @@ class ChinHuhPermanentCalculator:
     def output_state(self, output_state) -> None:
         self.__output_state = output_state
 
-    def calculate_permanent_of_effective_scattering_matrix(self) -> complex:
+    def calculate(self) -> complex:
         """
             This is the main method of the calculator. Assuming that input state, output state and the matrix are
             defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
