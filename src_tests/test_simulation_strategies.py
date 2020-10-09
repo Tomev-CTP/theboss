@@ -158,13 +158,13 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def test_haar_random_interferometers_distance_for_cliffords_r_strategy(self):
-        self.__set_experiment_configuration_for_standard_haar_random()
+        self.__set_experiment_configuration_for_lossless_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
                                                      StrategyTypes.CLIFFORD_R)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def test_haar_random_interferometers_distance_for_generalized_cliffords_strategy(self):
-        self.__set_experiment_configuration_for_standard_haar_random()
+        self.__set_experiment_configuration_for_lossless_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
                                                      StrategyTypes.GENERALIZED_CLIFFORD)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
@@ -176,6 +176,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def __set_experiment_configuration_for_binned_haar_random(self):
+        # Note that binned configuration is also for lossless case (for now)
         self._haar_random_experiment_configuration.initial_state = self._haar_random_binned_experiment_input_state
         number_of_particles_in_the_experiment = len(self._haar_random_binned_experiment_input_state)
         self._haar_random_experiment_configuration.initial_number_of_particles = number_of_particles_in_the_experiment
@@ -183,9 +184,15 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def __set_experiment_configuration_for_standard_haar_random(self):
         self._haar_random_experiment_configuration.initial_state = self._haar_random_experiment_input_state
-        number_of_particles_in_the_experiment = len(self._haar_random_experiment_input_state)
+        number_of_particles_in_the_experiment = sum(self._haar_random_experiment_input_state)
         self._haar_random_experiment_configuration.initial_number_of_particles = number_of_particles_in_the_experiment
         self._haar_random_experiment_configuration.number_of_particles_left = number_of_particles_in_the_experiment - self._haar_random_experiment_configuration.number_of_particles_lost
+
+    def __set_experiment_configuration_for_lossless_haar_random(self):
+        self._haar_random_experiment_configuration.initial_state = self._haar_random_experiment_input_state
+        number_of_particles_in_the_experiment = len(self._haar_random_binned_experiment_input_state)
+        self._haar_random_experiment_configuration.initial_number_of_particles = number_of_particles_in_the_experiment
+        self._haar_random_experiment_configuration.number_of_particles_left = number_of_particles_in_the_experiment
 
     def __test_haar_random_interferometers_approximation_distance_from_ideal(self,
                                                                              strategy_factory: SimulationStrategyFactory):
