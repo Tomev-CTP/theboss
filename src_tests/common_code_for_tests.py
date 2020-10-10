@@ -12,9 +12,10 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 class ApproximateDistributionCalculator:
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
-                 strategy: SimulationStrategy):
+                 strategy: SimulationStrategy, outcomes=None):
         self.configuration = experiment_configuration
         self.strategy = strategy
+        self.outcomes = outcomes
 
     def calculate_approximate_distribution(self, samples_number: int = 5000) -> List[float]:
         """
@@ -23,8 +24,11 @@ class ApproximateDistributionCalculator:
             :return: Approximate distribution as a list.
         """
 
-        possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
-                                                      self.configuration.number_of_modes)
+        if self.outcomes is not None:
+            possible_outcomes = self.outcomes
+        else:
+            possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
+                                                          self.configuration.number_of_modes)
 
         simulator = BosonSamplingSimulator(self.configuration.number_of_particles_left,
                                            self.configuration.initial_number_of_particles,

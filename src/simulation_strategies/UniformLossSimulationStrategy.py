@@ -40,4 +40,4 @@ class UniformLossSimulationStrategy(SimulationStrategy):
         simulator = BosonSamplingSimulator(number_of_particles_left_in_selected_separable_state, n,
                                            self.number_of_modes, strategy)
 
-        return simulator.get_classical_simulation_results()
+        return simulator.get_classical_simulation_results(input_state)
