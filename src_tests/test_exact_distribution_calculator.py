@@ -4,8 +4,10 @@ import unittest
 
 from numpy import array
 
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
-    BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingWithUniformLossesExactDistributionCalculator
+from src.LossyBosonSamplingExactDistributionCalculators import (
+    BosonSamplingExperimentConfiguration,
+    BosonSamplingWithFixedLossesExactDistributionCalculator,
+    BosonSamplingWithUniformLossesExactDistributionCalculator)
 
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):

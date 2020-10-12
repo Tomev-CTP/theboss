@@ -1,9 +1,12 @@
 __author__ = 'Tomasz Rybotycki'
 
 import unittest
-from src.Quantum_Computations_Utilities import generate_haar_random_unitary_matrix
-from numpy import conjugate, transpose, identity, ndarray
 from math import isclose
+
+from numpy import conjugate, identity, ndarray, transpose, complex128
+from sys import float_info
+
+from src.Quantum_Computations_Utilities import generate_haar_random_unitary_matrix
 
 
 class TestQuantumComputationsUtilities(unittest.TestCase):
@@ -23,7 +26,11 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         self.assertTrue(self.__are_matrices_elementwise_close(identity_matrix, product_of_matrix_and_hermitian_adjoint))
 
     @staticmethod
-    def __are_matrices_elementwise_close(matrix1: ndarray, matrix2: ndarray):
+    def __complex_almost_equal(a: complex128, b: complex128) -> bool:
+        difference = a - b
+        return abs(difference) < float_info.epsilon
+
+    def __are_matrices_elementwise_close(self, matrix1: ndarray, matrix2: ndarray):
         #  I assume that there are only rectangular matrices
         if len(matrix2) != len(matrix1):
             return False
@@ -34,9 +41,8 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
 
         for i in range(len(matrix1)):
             for j in range(len(matrix1[i])):
-                are_matrices_elementwise_close = are_matrices_elementwise_close and isclose(matrix1[i][j],
-                                                                                            matrix2[i][j],
-                                                                                            abs_tol=1e-10)
+                if not self.__complex_almost_equal(matrix1[i][j],  matrix2[i][j]):
+                    return False
         return are_matrices_elementwise_close
 
     def test_haar_random_unitary_matrices_generation_differences(self):
