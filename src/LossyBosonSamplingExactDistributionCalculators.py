@@ -30,11 +30,11 @@ class BosonSamplingExactDistributionCalculator:
     """ Interface for boson sampling exact distribution calculators """
     def calculate_exact_distribution(self) -> List[List[float]]:
         """ One has to be able to calculate exact distribution with it """
-        pass
+        raise NotImplementedError
 
     def get_outcomes_in_proper_order(self) -> List[List[int]]:
         """ One also has to know the order of objects that returned probabilities correspond to """
-        pass
+        raise NotImplementedError
 
 
 class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExactDistributionCalculator):

@@ -3,7 +3,7 @@ __author__ = 'Tomasz Rybotycki'
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
-from typing import List
+from typing import List, Optional
 
 from numpy import complex128, ndarray, zeros
 from scipy.special import binom
@@ -11,9 +11,9 @@ from scipy.special import binom
 
 def calculate_permanent(matrix: ndarray) -> complex128:
     """
-    Returns the permanent of the matrix mat.
+    Returns the permanent of the matrix.
     """
-    return permanent_recursive_part(matrix, 0, [], complex128(1))
+    return permanent_recursive_part(matrix, column=0, selected=[], prod=complex128(1))
 
 
 def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: complex128) -> complex128:
@@ -34,7 +34,7 @@ def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], pro
     return result
 
 
-def particle_state_to_modes_state(particle_state: ndarray, observed_modes_number: int) -> ndarray:
+def particle_state_to_modes_state(particle_state: List[int], observed_modes_number: int) -> List[int]:
     modes_state = zeros(observed_modes_number)
 
     # Adding the particle to it's mode.
@@ -138,7 +138,13 @@ class EffectiveScatteringMatrixCalculator:
         In many methods of Boson Sampling simulations an effective scattering matrix has to be calculated. Therefore
         I decided to implement an calculator that'd be used if every single one of these methods.
     """
-    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+
+    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
+                 output_state: Optional[List[int]] = None):
+        if output_state is None:
+            output_state = []
+        if input_state is None:
+            input_state = []
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -193,7 +199,13 @@ class EffectiveScatteringMatrixPermanentCalculator:
         This class is used to calculate permanent of effective scattering matrix. It first
         generates the matrix, and then calculates the permanent via standard means.
     """
-    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+
+    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
+                 output_state: Optional[List[int]] = None):
+        if output_state is None:
+            output_state = []
+        if input_state is None:
+            input_state = []
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -235,7 +247,13 @@ class ChinHuhPermanentCalculator:
         Note, that it can be used to calculate permanent of given matrix. All that is required that input and output
         states are set to [1, 1, ..., 1] with proper dimensions.
     """
-    def __init__(self, matrix: ndarray, input_state: List[int] = [], output_state: List[int] = []):
+
+    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
+                 output_state: Optional[List[int]] = None):
+        if output_state is None:
+            output_state = []
+        if input_state is None:
+            input_state = []
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -306,17 +324,13 @@ class ChinHuhPermanentCalculator:
             to match.
             :return: Information if the calculation can be performed.
         """
-        can_calculation_be_performed = True
-        can_calculation_be_performed = \
-            can_calculation_be_performed and self.__matrix.shape[0] == self.__matrix.shape[1]
-        can_calculation_be_performed = \
-            can_calculation_be_performed and len(self.__output_state) == len(self.__input_state)
-        can_calculation_be_performed = \
-            can_calculation_be_performed and len(self.__output_state) == self.__matrix.shape[0]
+        return self.__matrix.shape[0] == self.__matrix.shape[1] \
+               and len(self.__output_state) == len(self.__input_state) \
+               and len(self.__output_state) == self.__matrix.shape[0]
 
-        return can_calculation_be_performed
-
-    def __calculate_v_vectors(self, input_vector: ndarray = []):
+    def __calculate_v_vectors(self, input_vector: Optional[list] = None) -> List[List[int]]:
+        if input_vector is None:
+            input_vector = []
         v_vectors = []
         for i in range(self.__input_state[len(input_vector)] + 1):
             input_state = input_vector.copy()

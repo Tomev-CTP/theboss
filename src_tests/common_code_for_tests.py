@@ -12,7 +12,7 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 class ApproximateDistributionCalculator:
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
-                 strategy: SimulationStrategy, outcomes=None):
+                 strategy: SimulationStrategy, outcomes=None) -> None:
         self.configuration = experiment_configuration
         self.strategy = strategy
         self.outcomes = outcomes

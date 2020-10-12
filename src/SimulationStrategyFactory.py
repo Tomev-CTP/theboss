@@ -1,4 +1,4 @@
-from enum import IntEnum
+import enum
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
@@ -7,11 +7,11 @@ from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import Gen
 from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategy
 
 
-class StrategyTypes(IntEnum):
-    FIXED_LOSS = 1
-    UNIFORM_LOSS = 2
-    CLIFFORD_R = 3
-    GENERALIZED_CLIFFORD = 4
+class StrategyTypes(enum.IntEnum):
+    FIXED_LOSS = enum.auto()
+    UNIFORM_LOSS = enum.auto()
+    CLIFFORD_R = enum.auto()
+    GENERALIZED_CLIFFORD = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -19,6 +19,12 @@ class SimulationStrategyFactory:
                  strategy_type: StrategyTypes = StrategyTypes.FIXED_LOSS):
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
+        self._strategy_mapping = {
+            StrategyTypes.FIXED_LOSS: self.__generate_fixed_losses_strategy,
+            StrategyTypes.UNIFORM_LOSS: self.__generate_uniform_losses_strategy,
+            StrategyTypes.CLIFFORD_R: self.__generate_r_cliffords_strategy,
+            StrategyTypes.GENERALIZED_CLIFFORD: self.__generate_generalized_cliffords_strategy
+        }
 
     def set_strategy_type(self, strategy_type: StrategyTypes) -> None:
         self._strategy_type = strategy_type
@@ -31,13 +37,8 @@ class SimulationStrategyFactory:
             Generates simulation strategy of desired type. The type is selected in the constructor.
         :return: Simulation strategy of desired type.
         """
-        if self._strategy_type == StrategyTypes.UNIFORM_LOSS:
-            return self.__generate_uniform_losses_strategy()
-        if self._strategy_type == StrategyTypes.CLIFFORD_R:
-            return self.__generate_r_cliffords_strategy()
-        if self._strategy_type == StrategyTypes.GENERALIZED_CLIFFORD:
-            return self.__generate_generalized_cliffords_strategy()
-        return self.__generate_fixed_losses_strategy()
+        handler = self._strategy_mapping.get(self._strategy_type, self.__generate_fixed_losses_strategy)
+        return handler()
 
     def __generate_fixed_losses_strategy(self):
         """
