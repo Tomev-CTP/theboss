@@ -14,6 +14,7 @@ from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inp
     modes_state_to_particle_state, particle_state_to_modes_state
 
 
+# TODO TR: This class should be placed in separate folder
 @dataclass
 class BosonSamplingExperimentConfiguration:
     interferometer_matrix: ndarray  # A matrix describing interferometer.
@@ -25,7 +26,18 @@ class BosonSamplingExperimentConfiguration:
     probability_of_uniform_loss: float = 0
 
 
-class BosonSamplingWithFixedLossesExactDistributionCalculator:
+class BosonSamplingExactDistributionCalculator:
+    """ Interface for boson sampling exact distribution calculators """
+    def calculate_exact_distribution(self) -> List[List[float]]:
+        """ One has to be able to calculate exact distribution with it """
+        raise NotImplementedError
+
+    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+        """ One also has to know the order of objects that returned probabilities correspond to """
+        raise NotImplementedError
+
+
+class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExactDistributionCalculator):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
         self.configuration = deepcopy(configuration)
 
@@ -39,8 +51,10 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
         :return: List of probabilities of outcomes.
         """
+
         possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                       self.configuration.number_of_modes)
+
         outcomes_probabilities = []
         for outcome in possible_outcomes:
             outcomes_probabilities.append(self.__calculate_probability_of_outcome(outcome))
@@ -77,9 +91,10 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         # Symmetrize the input.
         lossy_inputs_list = generate_lossy_inputs(self.configuration.initial_state,
                                                   self.configuration.number_of_particles_left)
+
         for lossy_input in lossy_inputs_list:
             subprobability = abs(calculate_permanent(
-                self.__calculate_submatrix_for_permanent_calculation(lossy_input, outcome_state_in_mode_basis))) ** 2
+                self.__count_effective_boson_scattering_matrix(lossy_input, outcome_state_in_mode_basis))) ** 2
             for mode_occupation_number in lossy_input:
                 subprobability /= math.factorial(mode_occupation_number)
 
@@ -92,7 +107,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
 
         return probability_of_outcome
 
-    def __calculate_submatrix_for_permanent_calculation(
+    def __count_effective_boson_scattering_matrix(
             self, lossy_input: ndarray, outcome_state_in_mode_basis: ndarray) -> ndarray:
         """
         In order to calculate exact distribution of a boson sampling experiment with interferometer denoted as U, a
@@ -102,11 +117,11 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
         :param outcome_state_in_mode_basis:
         :return: The submatrix for permanent calculator.
         """
-        columns_permutation_submatrix = self.__create_column_submatrix_of_interferometer_matrix(lossy_input)
-        return self.__create_rows_submatrix_of_interferometer_column_submatrix(outcome_state_in_mode_basis,
-                                                                               columns_permutation_submatrix)
+        columns_permutation_submatrix = self.__create_column_submatrix_of_effective_boson_scattering_matrix(lossy_input)
+        return self.__create_rows_submatrix_of_effective_boson_scattering_matrix(outcome_state_in_mode_basis,
+                                                                                 columns_permutation_submatrix)
 
-    def __create_column_submatrix_of_interferometer_matrix(self, lossy_input: ndarray) -> ndarray:
+    def __create_column_submatrix_of_effective_boson_scattering_matrix(self, lossy_input: ndarray) -> ndarray:
         columns_permutation_submatrix = 1j * zeros((self.configuration.number_of_modes,
                                                     self.configuration.number_of_particles_left))
 
@@ -124,7 +139,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator:
 
         return columns_permutation_submatrix
 
-    def __create_rows_submatrix_of_interferometer_column_submatrix(
+    def __create_rows_submatrix_of_effective_boson_scattering_matrix(
             self, outcome_state_in_mode_basis: ndarray, columns_permutation_submatrix: ndarray) -> ndarray:
         permutation_submatrix = 1j * zeros((self.configuration.number_of_particles_left,
                                             self.configuration.number_of_particles_left))

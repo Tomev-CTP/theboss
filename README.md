@@ -27,7 +27,7 @@ Throughout this work PEP-8 will be used. There are several cases where this may 
 
 * In some versions of the code matrices may be denoted by capital letters (as in standard mathematical notation). In
 order to be more PEP-friendly I'll try to use prefix m_ instead of capital letters, e.g. m_u would be the equivalent of
-U. 
+U. Alternatively explicit use of matrix is also acceptable. 
 
 ## Running the tests
 
@@ -64,4 +64,6 @@ The work will follow the ideas presented in following works:
 
 [2] Brod D. J., Oszmaniec M., [arXiv:1906.06696](https://arxiv.org/abs/1906.06696) [quant-ph].
 
-[3] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
+[3] Maciejewski F. B., Zimboras Z., Oszmaniec M., [arXiv:1907.08518](https://arxiv.org/abs/1907.08518) [quant-ph].
+
+[4] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.

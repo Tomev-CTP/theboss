@@ -4,30 +4,15 @@ __author__ = 'Tomasz Rybotycki'
 
 from typing import List
 
-from numpy import abs, diag, dot, linalg, ndarray, sqrt
-from numpy.random import randn
+from numpy import abs, linalg, log2, ndarray, sqrt
+import qutip
 
 
-def generate_haar_random_unitary_matrix(n: int) -> ndarray:
-    """
-        This method generates Haar random unitary n x n matrix. Using ideas from [3].
-        :param n: Dimension of returned matrix.
-        :return: Haar random unitary matrix m_u.
-    """
-
-    z = (randn(n, n) + 1j * randn(n, n))
-    z /= sqrt(2.)
-    q, r = linalg.qr(z)
-
-    r = diag(r)
-    lamb = diag(r / abs(r))
-
-    m_u = dot(q, lamb)
-
-    return m_u.T @ m_u
+def generate_haar_random_unitary_matrix(d: int) -> ndarray:
+    return qutip.rand_unitary_haar(d).full()
 
 
-def calculate_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
+def count_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
@@ -44,7 +29,7 @@ def calculate_total_variation_distance(distribution1: List[float], distribution2
     return total_variation_distance / 2
 
 
-def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
+def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
     """
         Calculates distance between two given matrices. This method assumes, that the matrices have proper sizes.
         :param matrix1: First matrix.
@@ -52,3 +37,17 @@ def calculate_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> f
         :return: Distance between two given matrices.
     """
     return linalg.norm(matrix1 - matrix2)
+
+
+def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
+                                                        error_probability: float):
+    """
+        Calculates the distance bound between the experimental results and the n-sample estimation of these results.
+        :param outcomes_number:
+        :param samples_number: Number of samples used for estimation.
+        :param error_probability: Desired probability of error.
+        :return: Bound on the tv distance between the estimate and the experimental results.
+    """
+    error_bound = log2(float(2 ** outcomes_number - 2)) - log2(error_probability)
+    error_bound /= 2 * samples_number
+    return sqrt(error_bound)

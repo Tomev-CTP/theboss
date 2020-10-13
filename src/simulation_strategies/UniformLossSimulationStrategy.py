@@ -12,7 +12,8 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class UniformLossSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray, number_of_modes: int, probability_of_uniform_loss: float) \
+    def __init__(self, interferometer_matrix: ndarray,
+                 number_of_modes: int, probability_of_uniform_loss: float) \
             -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_modes = number_of_modes
@@ -39,4 +40,4 @@ class UniformLossSimulationStrategy(SimulationStrategy):
         simulator = BosonSamplingSimulator(number_of_particles_left_in_selected_separable_state, n,
                                            self.number_of_modes, strategy)
 
-        return simulator.get_classical_simulation_results()
+        return simulator.get_classical_simulation_results(input_state)
