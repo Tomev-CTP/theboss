@@ -35,7 +35,6 @@ class ApproximateDistributionCalculator:
         outcomes_probabilities = zeros(len(possible_outcomes))
 
         for i in range(samples_number):
-
             result = simulator.get_classical_simulation_results(self.configuration.initial_state)
 
             for j in range(len(possible_outcomes)):

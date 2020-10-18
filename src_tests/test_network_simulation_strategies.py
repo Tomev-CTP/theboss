@@ -35,6 +35,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         )
         self._strategy_factory = SimulationStrategyFactory(self._experiment_configuration)
 
+        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration)
+        self._possible_outcomes = calculator.get_outcomes_in_proper_order()
+        self._possible_outcomes_number = len(self._possible_outcomes)
+
     def test_lossy_network_simulation_number_of_particles(self) -> None:
         """
         This test checks if number of particles for lossy network simulator is lower than number of
@@ -59,93 +63,79 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         This test is for uniform losses. It checks if uniform losses in network simulations are close to
         simulation with uniform losses at the input. Given that both approximate the same quantity only
         sampling complexity error is assumed.
-        :return:
         """
-        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration)
-        outcomes = calculator.get_outcomes_in_proper_order()
-        outcomes_number = len(outcomes)
-
-        distance_bound_between_estimated_distributions = 2 * count_tv_distance_error_bound_of_experiment_results(
-            outcomes_number=outcomes_number,
-            samples_number=self._number_of_samples_for_experiments,
-            error_probability=self._probability_of_error_in_distribution_calculation
-        )
-
-        estimated_distribution_calculator = ApproximateDistributionCalculator(
-            experiment_configuration=self._experiment_configuration,
-            strategy=self._strategy_factory.generate_strategy(),
-            outcomes=outcomes
-        )
-
-        lossy_network_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
-
         self._strategy_factory.set_strategy_type(StrategyTypes.UNIFORM_LOSS)
 
         estimated_distribution_calculator = ApproximateDistributionCalculator(
             experiment_configuration=self._experiment_configuration,
             strategy=self._strategy_factory.generate_strategy(),
-            outcomes=outcomes
+            outcomes=self._possible_outcomes
         )
 
         uniform_losses_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
 
+        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(uniform_losses_distribution)
+
+    def __check_if_given_distribution_is_close_to_lossy_network_distribution(self, distribution: List[float]) -> None:
+        """
+        Common part of distribution comparison tests.
+        :param distribution: Given distribution to compare with lossy distribution.
+        """
+
+        self._strategy_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
+
+        distance_bound_between_estimated_distributions = \
+            self.__calculate_statistical_distance_bound_between_two_approximate_distributions(
+                outcomes_number=self._possible_outcomes_number)
+
+        estimated_distribution_calculator = ApproximateDistributionCalculator(
+            experiment_configuration=self._experiment_configuration,
+            strategy=self._strategy_factory.generate_strategy(),
+            outcomes=self._possible_outcomes
+        )
+
+        lossy_network_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
+
         distance_between_distributions = count_total_variation_distance(
-            lossy_network_distribution, uniform_losses_distribution
+            lossy_network_distribution, distribution
         )
 
         self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
 
-    def test_lossy_network_with_uniform_losses_distribution_accuracy_against_generalized_cliffords(self) -> None:
-        """
-        This test checks if lossy networks distribution
-
-        """
-        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration)
-        outcomes = calculator.get_outcomes_in_proper_order()
-        outcomes_number = len(outcomes)
-
-        distance_bound_between_estimated_distributions = 2 * count_tv_distance_error_bound_of_experiment_results(
+    def __calculate_statistical_distance_bound_between_two_approximate_distributions(self,
+                                                                                     outcomes_number: int) -> float:
+        return 2 * count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=outcomes_number,
             samples_number=self._number_of_samples_for_experiments,
             error_probability=self._probability_of_error_in_distribution_calculation
         )
 
-        estimated_distribution_calculator = ApproximateDistributionCalculator(
-            experiment_configuration=self._experiment_configuration,
-            strategy=self._strategy_factory.generate_strategy(),
-            outcomes=outcomes
-        )
+    def test_lossy_network_with_uniform_losses_distribution_accuracy_against_generalized_cliffords(self) -> None:
+        """
+        This test checks if lossy networks distribution provides same approximate (up to statistical bounds)
+        distribution as generalized cliffords distribution with lossy inputs.
+        """
+        generalized_cliffords_distribution = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs()
 
-        lossy_network_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
-        generalized_cliffords_distribution = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs(
-            outcomes)
+        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(generalized_cliffords_distribution)
 
-        distance_between_distributions = count_total_variation_distance(
-            lossy_network_distribution, generalized_cliffords_distribution
-        )
-
-        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
-
-    def __calculate_generalized_cliffords_distribution_with_lossy_inputs(self, outcomes: List[List[int]]) -> List[
-        float]:
+    def __calculate_generalized_cliffords_distribution_with_lossy_inputs(self) -> List[float]:
         """
         This method calculates approximate distribution for lossy states using generalized cliffords
         method.
-        :param outcomes: Possible outcomes list.
         :return: Approximate distribution.
         """
-        probabilities = [0] * len(outcomes)
+        probabilities = [0] * len(self._possible_outcomes)
         self._strategy_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
 
         for i in range(self._number_of_samples_for_experiments):
-
             result = simulator.get_classical_simulation_results(self.__get_uniformly_lossy_input_state())
 
-            for j in range(len(outcomes)):
+            for j in range(len(self._possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if all(result == outcomes[j]):  # Expect all elements of resultant list to be True.
+                if all(result == self._possible_outcomes[j]):  # Expect all elements of resultant list to be True.
                     probabilities[j] += 1
                     break
 
