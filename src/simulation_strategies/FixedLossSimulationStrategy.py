@@ -3,20 +3,26 @@ __author__ = 'Tomasz Rybotycki'
 from random import random
 from typing import List
 
-from numpy import conjugate, dot, exp, ndarray, sqrt, zeros
+from numpy import conjugate, exp, ndarray, sqrt, zeros
 from numpy.random import rand
 
+from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
+from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class FixedLossSimulationStrategy(SimulationStrategy):
 
     def __init__(self, interferometer_matrix: ndarray,
-                 number_of_photons_left: int, number_of_observed_modes: int) \
+                 number_of_photons_left: int, number_of_observed_modes: int,
+                 network_simulation_strategy: NetworkSimulationStrategy = None) \
             -> None:
+        if network_simulation_strategy is None:
+            network_simulation_strategy = LosslessNetworkSimulationStrategy(interferometer_matrix)
         self.number_of_photons_left = number_of_photons_left
         self.interferometer_matrix = interferometer_matrix
         self.number_of_observed_modes = number_of_observed_modes
+        self._network_simulation_strategy = network_simulation_strategy
 
     def simulate(self, input_state: ndarray) -> List[int]:
         """
@@ -25,7 +31,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             :return: A sample from the approximation.
         """
         phi_0 = self.__prepare_initial_state(input_state)
-        evolved_state = dot(self.interferometer_matrix, phi_0)
+        evolved_state = self._network_simulation_strategy.simulate(phi_0)
         probabilities = self.__calculate_probabilities(evolved_state)
         return self.__calculate_approximation_of_boson_sampling_outcome(probabilities)
 
