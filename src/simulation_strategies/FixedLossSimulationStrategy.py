@@ -78,6 +78,9 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             prob = probabilities[i]
             while x > prob:
                 i += 1
+                if len(probabilities) == i:
+                    break
                 prob += probabilities[i]
-            output[i] += 1
+            if len(probabilities) != i:
+                output[i] += 1
         return output
