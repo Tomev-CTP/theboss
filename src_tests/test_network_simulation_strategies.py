@@ -1,6 +1,8 @@
 import unittest
+from random import uniform
+from typing import List
 
-from numpy import asarray
+from numpy import asarray, ndarray
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import (
@@ -63,7 +65,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         outcomes = calculator.get_outcomes_in_proper_order()
         outcomes_number = len(outcomes)
 
-        distance_from_approximation_to_estimated = 2 * count_tv_distance_error_bound_of_experiment_results(
+        distance_bound_between_estimated_distributions = 2 * count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=outcomes_number,
             samples_number=self._number_of_samples_for_experiments,
             error_probability=self._probability_of_error_in_distribution_calculation
@@ -91,4 +93,76 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             lossy_network_distribution, uniform_losses_distribution
         )
 
-        self.assertLessEqual(distance_between_distributions, distance_from_approximation_to_estimated)
+        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
+
+    def test_lossy_network_with_uniform_losses_distribution_accuracy_against_generalized_cliffords(self) -> None:
+        """
+        This test checks if lossy networks distribution
+
+        """
+        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration)
+        outcomes = calculator.get_outcomes_in_proper_order()
+        outcomes_number = len(outcomes)
+
+        distance_bound_between_estimated_distributions = 2 * count_tv_distance_error_bound_of_experiment_results(
+            outcomes_number=outcomes_number,
+            samples_number=self._number_of_samples_for_experiments,
+            error_probability=self._probability_of_error_in_distribution_calculation
+        )
+
+        estimated_distribution_calculator = ApproximateDistributionCalculator(
+            experiment_configuration=self._experiment_configuration,
+            strategy=self._strategy_factory.generate_strategy(),
+            outcomes=outcomes
+        )
+
+        lossy_network_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
+        generalized_cliffords_distribution = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs(
+            outcomes)
+
+        distance_between_distributions = count_total_variation_distance(
+            lossy_network_distribution, generalized_cliffords_distribution
+        )
+
+        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
+
+    def __calculate_generalized_cliffords_distribution_with_lossy_inputs(self, outcomes: List[List[int]]) -> List[
+        float]:
+        """
+        This method calculates approximate distribution for lossy states using generalized cliffords
+        method.
+        :param outcomes: Possible outcomes list.
+        :return: Approximate distribution.
+        """
+        probabilities = [0] * len(outcomes)
+        self._strategy_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
+        strategy = self._strategy_factory.generate_strategy()
+        simulator = BosonSamplingSimulator(strategy)
+
+        for i in range(self._number_of_samples_for_experiments):
+
+            result = simulator.get_classical_simulation_results(self.__get_uniformly_lossy_input_state())
+
+            for j in range(len(outcomes)):
+                # Check if obtained result is one of possible outcomes.
+                if all(result == outcomes[j]):  # Expect all elements of resultant list to be True.
+                    probabilities[j] += 1
+                    break
+
+        for i in range(len(probabilities)):
+            probabilities[i] /= self._number_of_samples_for_experiments
+
+        return probabilities
+
+    def __get_uniformly_lossy_input_state(self) -> ndarray:
+        """
+        This method assumes that losses are uniform and specified in the configuration of the
+        experiment (in test case setup).
+        :return: Input state after losses.
+        """
+        lossy_input = asarray(self._initial_state)
+        for i in range(len(self._initial_state)):
+            for _ in range(self._initial_state[i]):
+                if uniform(0, 1) < self._experiment_configuration.probability_of_uniform_loss:
+                    lossy_input[i] -= 1
+        return lossy_input
