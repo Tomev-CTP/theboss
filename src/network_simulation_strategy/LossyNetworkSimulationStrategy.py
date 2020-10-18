@@ -1,7 +1,7 @@
 from numpy import block, delete, diag, identity, ndarray, sqrt, vstack, zeros_like
 from numpy.linalg import svd
 
-from src.network_simulation_strategy import NetworkSimulationStrategy
+from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 
 class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
@@ -32,17 +32,15 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         singular_values_matrix = diag(singular_values_vector)
         expanded_singular_values_matrix = \
             block([[singular_values_matrix, zeros_matrix], [singular_values_matrix_expansion, zeros_matrix]])
-        for i in range(self._matrix.shape[0]):
-            expanded_singular_values_matrix[i + self._matrix.shape[0]][i] = \
-                1 - expanded_singular_values_matrix[i][i]
         # Proceed with the rest of the evolution.
-        evolved_state = singular_values_matrix @ u_evolved_state
+        evolved_state = expanded_singular_values_matrix @ expanded_state
         evolved_state = expanded_v_matrix @ evolved_state
         # Trim the resultant state
         while evolved_state.shape[0] > input_state.shape[0]:
             evolved_state = delete(evolved_state, evolved_state.shape[0] - 1)
         # Reshape to usual states and result.
-        evolved_state = evolved_state.reshape(1, )
+        evolved_state = evolved_state.flatten()
+
         return evolved_state
 
     @staticmethod
