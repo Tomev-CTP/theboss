@@ -2,7 +2,9 @@ __author__ = 'Tomasz Rybotycki'
 
 from copy import copy
 from math import factorial
-from typing import List
+from typing import List, Union
+
+from collections import defaultdict
 
 from numpy import ndarray
 from numpy.linalg import norm
@@ -19,7 +21,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self.pmfs = []  # Probability mass functions calculated along the way.
         self.interferometer_matrix = interferometer_matrix
         self.input_state = []
-        self._labeled_states = dict()
+        self._labeled_states = defaultdict()
         self.current_outputs = []
 
     def simulate(self, input_state: ndarray) -> List[int]:
@@ -44,7 +46,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         possible_input_states = self.__calculate_all_input_substates(self.input_state[:])
 
         # Labeling them into dict where keys are being number of particles in the state.
-        self._labeled_states = dict()
+        self._labeled_states = defaultdict()
         particles_number = sum(self.input_state)
 
         for i in range(int(particles_number + 1)):
@@ -54,7 +56,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             states_particles_number = sum(state)
             self._labeled_states[states_particles_number].append(state)
 
-    def __calculate_all_input_substates(self, state_part_left: ndarray):
+    def __calculate_all_input_substates(self, state_part_left: Union[ndarray, List[int]]) -> List[List[int]]:
         """
         Calculates substates of the input in recursive manner.
         :param state_part_left: State with reduced modes number.
@@ -84,7 +86,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             self.__calculate_another_layer_of_pmfs()
             self.__sample_from_latest_pmf()
 
-    def __calculate_another_layer_of_pmfs(self):
+    def __calculate_another_layer_of_pmfs(self) -> None:
         number_of_particle_to_sample = sum(self.r_sample) + 1
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = []
@@ -110,7 +112,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return [self.__calculate_multinomial_coefficient(vector) for vector in corresponding_k_vectors]
 
     @staticmethod
-    def __calculate_multinomial_coefficient(vector: ndarray):
+    def __calculate_multinomial_coefficient(vector: ndarray) -> int:
         """
             Calculates multinomial coefficient of the vector, as proposed in Oszmaniec, Brod 2018
             (above formula 39).
@@ -124,7 +126,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
         return multinomial_coefficient
 
-    def __generate_possible_output_states(self):
+    def __generate_possible_output_states(self) -> List[List[int]]:
         possible_output_states = []
         for i in range(len(self.r_sample)):
             new_possible_output = copy(self.r_sample)
@@ -132,7 +134,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             possible_output_states.append(new_possible_output)
         return possible_output_states
 
-    def __calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray):
+    def __calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray) -> float:
         permanent_calculator = ChinHuhPermanentCalculator(self.interferometer_matrix, input_state=input_state,
                                                           output_state=output_state)
         probability = abs(permanent_calculator.calculate()) ** 2
@@ -142,6 +144,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             probability /= factorial(mode_occupation_number)
         return probability
 
-    def __sample_from_latest_pmf(self):
+    def __sample_from_latest_pmf(self) -> None:
         sample_index = choice([i for i in range(len(self.current_outputs))], 1, p=self.pmfs[-1])[0]
         self.r_sample = self.current_outputs[sample_index]

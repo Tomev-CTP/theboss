@@ -40,7 +40,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         prepared_state = [1 for _ in range(initial_number_of_photons)]
         while len(prepared_state) < self.number_of_observed_modes:
             prepared_state.append(0)
-        prepared_state /= sqrt(initial_number_of_photons)
+        prepared_state /= sqrt(initial_number_of_photons)  # Note, that numpy version of sqrt is used here!
         prepared_state = self.__randomize_modes_phases(prepared_state)
         return prepared_state
 

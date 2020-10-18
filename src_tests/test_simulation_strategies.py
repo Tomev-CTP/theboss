@@ -6,24 +6,27 @@ is that their code stays mostly the same and with every different strategy I end
 stuff with only minor differences (mostly in experiments setup). 
 """
 
-from typing import List
 import unittest
 from copy import deepcopy
+from dataclasses import dataclass
 from math import factorial
-from scipy.special import binom
+from typing import List
 
 from numpy import array, asarray, average
 from numpy.random import randint
+from scipy.special import binom
 
 from src.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExactDistributionCalculator, \
-    BosonSamplingExperimentConfiguration, BosonSamplingWithFixedLossesExactDistributionCalculator, BosonSamplingWithUniformLossesExactDistributionCalculator
+from src.LossyBosonSamplingExactDistributionCalculators import (
+    BosonSamplingExactDistributionCalculator,
+    BosonSamplingExperimentConfiguration,
+    BosonSamplingWithFixedLossesExactDistributionCalculator,
+    BosonSamplingWithUniformLossesExactDistributionCalculator)
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
+from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
 from src_tests.common_code_for_tests import ApproximateDistributionCalculator
-from dataclasses import dataclass
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 @dataclass
@@ -225,7 +228,6 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             approximation_distance_bound=self.__calculate_uniform_loss_distribution_error_bound(),
         )
         self.__perform_distance_of_approximate_distribution_from_ideal(distance_experiment_configuration)
-        pass
 
     def __calculate_uniform_loss_distribution_error_bound(self) -> float:
         """
