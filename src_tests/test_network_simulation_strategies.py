@@ -1,8 +1,9 @@
 import unittest
+from copy import deepcopy
 from random import uniform
 from typing import List
 
-from numpy import asarray, ndarray
+from numpy import asarray, block, eye, ndarray, zeros_like
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import (
@@ -156,3 +157,37 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
                 if uniform(0, 1) < self._experiment_configuration.probability_of_uniform_loss:
                     lossy_input[i] -= 1
         return lossy_input
+
+    def test_lossy_network_with_uniform_losses_on_bosonful_modes_and_higher_losses_on_bosonless(self) -> None:
+        """
+        This test checks the situation, for which losses are uniform only for these modes that have any bosons in it.
+        It assumes that initial state is [1, 1, 1, 1, 0, 0, 0, 0] as in initial version of the tests case. It goes to
+        extreme making bosonless modes completely lossy. The results should be identical (up to statistical error).
+        :return:
+        """
+        experiment_configuration = deepcopy(self._experiment_configuration)
+        updated_interferometer_matrix = experiment_configuration.interferometer_matrix
+        identity_on_bosonful_modes = eye(sum(self._initial_state))
+        zeros_on_bosonless_modes = zeros_like(identity_on_bosonful_modes)
+        update_matrix = block([
+            [identity_on_bosonful_modes, zeros_on_bosonless_modes],
+            [zeros_on_bosonless_modes, zeros_on_bosonless_modes]
+        ])
+        updated_interferometer_matrix = update_matrix @ updated_interferometer_matrix
+
+        experiment_configuration.interferometer_matrix = updated_interferometer_matrix
+
+        self._strategy_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
+        self._strategy_factory.set_experiment_configuration(experiment_configuration)
+
+        estimated_distribution_calculator = ApproximateDistributionCalculator(
+            experiment_configuration=self._experiment_configuration,
+            strategy=self._strategy_factory.generate_strategy(),
+            outcomes=self._possible_outcomes
+        )
+
+        distribution_with_huge_losses_on_bosonless_modes = estimated_distribution_calculator.calculate_approximate_distribution()
+
+        self._strategy_factory.set_experiment_configuration(self._experiment_configuration)
+        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
+            distribution_with_huge_losses_on_bosonless_modes)
