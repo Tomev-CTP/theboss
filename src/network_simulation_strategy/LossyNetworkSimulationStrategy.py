@@ -12,7 +12,7 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         """
         This method is for simulating lossy network. Instead of using NxN matrix, what we need to do is create a
         2N x 2N system, and then, depending on singular values of passed matrix, we have to transfer some photons
-        into inaccessible modes. This
+        into inaccessible, additional modes and then trim these additional modes.
         :param input_state: State before parsing through the interferometer. Assume mode occupation basis.
         :return: Lossy output state.
         """
@@ -49,13 +49,13 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         Prepares matrix expansion for singular values matrix. In order to simulate lossy interferometer we need to
         work on hilbert space with greater dimension. In that case we need to expand our operators. Singular values
         matrix should be build in such way, that if (s_1, ..., s_n) are singular values, the expansion is then diagonal
-        matrix with values [sqrt(1 - s_1^2, ..., sqrt(1- s^2_n)].
+        matrix with values [sqrt(1 - s_1^2, ..., sqrt(1- s_n^n)].
 
         Note, that singular values for lossless nets will be given by an unitary matrix, and this will have singular
         values equal to 1, which corresponds to expansion matrix being 0.
 
         :param singular_values_vector: Vector with singular values of given matrix.
-        :return:
+        :return: A matrix expansion for inaccessible modes of expanded space.
         """
         expansion_values = []
         for singular_value in singular_values_vector:

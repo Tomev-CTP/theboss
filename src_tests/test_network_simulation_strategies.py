@@ -163,7 +163,6 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         This test checks the situation, for which losses are uniform only for these modes that have any bosons in it.
         It assumes that initial state is [1, 1, 1, 1, 0, 0, 0, 0] as in initial version of the tests case. It goes to
         extreme making bosonless modes completely lossy. The results should be identical (up to statistical error).
-        :return:
         """
         experiment_configuration = deepcopy(self._experiment_configuration)
         updated_interferometer_matrix = experiment_configuration.interferometer_matrix
