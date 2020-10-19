@@ -30,14 +30,11 @@ class ApproximateDistributionCalculator:
             possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                           self.configuration.number_of_modes)
 
-        simulator = BosonSamplingSimulator(self.configuration.number_of_particles_left,
-                                           self.configuration.initial_number_of_particles,
-                                           self.configuration.number_of_modes, self.strategy)
+        simulator = BosonSamplingSimulator(self.strategy)
 
         outcomes_probabilities = zeros(len(possible_outcomes))
 
         for i in range(samples_number):
-
             result = simulator.get_classical_simulation_results(self.configuration.initial_state)
 
             for j in range(len(possible_outcomes)):

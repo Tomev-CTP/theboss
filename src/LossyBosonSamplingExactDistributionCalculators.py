@@ -12,6 +12,7 @@ from scipy import special
 
 from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inputs, generate_possible_outputs, \
     modes_state_to_particle_state, particle_state_to_modes_state
+from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 
 # TODO TR: This class should be placed in separate folder
@@ -24,6 +25,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_lost: int
     number_of_particles_left: int
     probability_of_uniform_loss: float = 0
+    network_simulation_strategy: NetworkSimulationStrategy = None
 
 
 class BosonSamplingExactDistributionCalculator:

@@ -52,6 +52,7 @@ See the [LICENSE.md](LICENSE.md) file for details.
 
   - Daniel Brod and Michał Oszmaniec, 
   - [CTP PAS](http://www.cft.edu.pl/new/public/pl).
+  - [sisco0](https://github.com/sisco0) - some minor bugs pointed out.
   
   
 ## References

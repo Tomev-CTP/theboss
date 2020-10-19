@@ -1,10 +1,11 @@
 import enum
+
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategy
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
+from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
 
 
 class StrategyTypes(enum.IntEnum):
@@ -46,9 +47,10 @@ class SimulationStrategyFactory:
         :return: Fixed loss strategy.
         """
         return FixedLossSimulationStrategy(
-            self._experiment_configuration.interferometer_matrix,
-            self._experiment_configuration.number_of_particles_left,
-            self._experiment_configuration.number_of_modes
+            interferometer_matrix=self._experiment_configuration.interferometer_matrix,
+            number_of_photons_left=self._experiment_configuration.number_of_particles_left,
+            number_of_observed_modes=self._experiment_configuration.number_of_modes,
+            network_simulation_strategy=self._experiment_configuration.network_simulation_strategy
         )
 
     def __generate_uniform_losses_strategy(self):
