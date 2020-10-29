@@ -15,7 +15,7 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray):
+    def __init__(self, interferometer_matrix: ndarray) -> None:
         self.r_sample = []
         self.number_of_input_photons = 0
         self.pmfs = []  # Probability mass functions calculated along the way.

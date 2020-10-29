@@ -1,8 +1,8 @@
-from numpy import block, delete, diag, identity, ndarray, sqrt, vstack, zeros_like, array
-from numpy.linalg import svd
+from numpy import delete, ndarray, vstack, zeros_like
 
-from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 from src.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
+from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
+
 
 class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
     def __init__(self, matrix: ndarray):
