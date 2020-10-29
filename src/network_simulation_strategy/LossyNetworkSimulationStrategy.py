@@ -27,22 +27,3 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         evolved_state = evolved_state.flatten()
 
         return evolved_state
-
-    @staticmethod
-    def __prepare_singular_values_matrix_expansion(singular_values_vector: array) -> ndarray:
-        """
-        Prepares matrix expansion for singular values matrix. In order to simulate lossy interferometer we need to
-        work on hilbert space with greater dimension. In that case we need to expand our operators. Singular values
-        matrix should be build in such way, that if (s_1, ..., s_n) are singular values, the expansion is then diagonal
-        matrix with values [sqrt(1 - s_1^2, ..., sqrt(1- s_n^n)].
-
-        Note, that singular values for lossless nets will be given by an unitary matrix, and this will have singular
-        values equal to 1, which corresponds to expansion matrix being 0.
-
-        :param singular_values_vector: Vector with singular values of given matrix.
-        :return: A matrix expansion for inaccessible modes of expanded space.
-        """
-        expansion_values = []
-        for singular_value in singular_values_vector:
-            expansion_values.append(sqrt(1.0 - pow(singular_value, 2)))
-        return diag(expansion_values)
