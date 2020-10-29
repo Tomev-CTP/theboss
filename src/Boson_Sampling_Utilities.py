@@ -5,7 +5,8 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List, Optional
 
-from numpy import complex128, ndarray, zeros
+from numpy import complex128, ndarray, zeros, diag, sqrt, zeros_like, ones_like, array, block
+from numpy.linalg import svd
 from scipy.special import binom
 
 
@@ -131,6 +132,22 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
         of n-particle m-mode bosonic space. Stars-and-bars argument applies here.
     """
     return binom(n + m - 1, n)
+
+def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
+    v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
+    expansions_zeros = zeros_like(v_matrix)
+    expansions_ones = ones_like(v_matrix)
+    expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
+    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion], [singular_values_matrix_expansion, diag(singular_values)]])
+    return expanded_v @ singular_values_expanded_matrix @ expanded_u
+
+def _calculate_singular_values_matrix_expansion(singular_values_vector: array) -> ndarray:
+    expansion_values = []
+    for singular_value in singular_values_vector:
+        expansion_values.append(sqrt(1.0 - pow(singular_value, 2)))
+    return diag(expansion_values)
 
 
 class EffectiveScatteringMatrixCalculator:
