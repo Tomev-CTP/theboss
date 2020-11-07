@@ -207,10 +207,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def __calculate_generalized_cliffords_distribution_with_lossy_network(self) -> List[float]:
         """
-                This method calculates approximate distribution for lossy states using generalized cliffords
-                method.
-                :return: Approximate distribution.
-                """
+        This method calculates approximate distribution for lossy states using generalized cliffords
+        method.
+        :return: Approximate distribution.
+        """
         probabilities = [0] * len(self._possible_outcomes)
         self._strategy_factory.set_strategy_type(StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD)
         strategy = self._strategy_factory.generate_strategy()
