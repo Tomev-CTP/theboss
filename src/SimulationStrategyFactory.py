@@ -6,6 +6,7 @@ from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimul
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
+from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import LossyNetworksGeneralizedCliffordsSimulationStrategy
 
 
 class StrategyTypes(enum.IntEnum):
@@ -13,6 +14,7 @@ class StrategyTypes(enum.IntEnum):
     UNIFORM_LOSS = enum.auto()
     CLIFFORD_R = enum.auto()
     GENERALIZED_CLIFFORD = enum.auto()
+    LOSSY_NET_GENERALIZED_CLIFFORD = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -24,7 +26,8 @@ class SimulationStrategyFactory:
             StrategyTypes.FIXED_LOSS: self.__generate_fixed_losses_strategy,
             StrategyTypes.UNIFORM_LOSS: self.__generate_uniform_losses_strategy,
             StrategyTypes.CLIFFORD_R: self.__generate_r_cliffords_strategy,
-            StrategyTypes.GENERALIZED_CLIFFORD: self.__generate_generalized_cliffords_strategy
+            StrategyTypes.GENERALIZED_CLIFFORD: self.__generate_generalized_cliffords_strategy,
+            StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD: self.__generate_lossy_net_generalized_cliffords_strategy
         }
 
     def set_strategy_type(self, strategy_type: StrategyTypes) -> None:
@@ -83,3 +86,11 @@ class SimulationStrategyFactory:
             self._experiment_configuration.interferometer_matrix
         )
 
+    def __generate_lossy_net_generalized_cliffords_strategy(self):
+        """
+            Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
+        :return: Generalized Cliffords strategy for lossy networks.
+        """
+        return LossyNetworksGeneralizedCliffordsSimulationStrategy(
+            self._experiment_configuration.interferometer_matrix
+        )

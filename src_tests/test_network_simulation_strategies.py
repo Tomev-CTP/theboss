@@ -190,3 +190,42 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._strategy_factory.set_experiment_configuration(self._experiment_configuration)
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
             distribution_with_huge_losses_on_bosonless_modes)
+
+    def test_distance_of_generalized_cliffords_with_lossy_network_and_lossy_input(self) -> None:
+        distribution_with_lossy_net = self.__calculate_generalized_cliffords_distribution_with_lossy_network()
+        distribution_with_lossy_input = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs()
+
+        distance_bound_between_estimated_distributions = \
+            self.__calculate_statistical_distance_bound_between_two_approximate_distributions(
+                outcomes_number=self._possible_outcomes_number)
+
+        distance_between_distributions = count_total_variation_distance(
+            distribution_with_lossy_input, distribution_with_lossy_net
+        )
+
+        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
+
+    def __calculate_generalized_cliffords_distribution_with_lossy_network(self) -> List[float]:
+        """
+        This method calculates approximate distribution for lossy states using generalized cliffords
+        method.
+        :return: Approximate distribution.
+        """
+        probabilities = [0] * len(self._possible_outcomes)
+        self._strategy_factory.set_strategy_type(StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD)
+        strategy = self._strategy_factory.generate_strategy()
+        simulator = BosonSamplingSimulator(strategy)
+
+        for i in range(self._number_of_samples_for_experiments):
+            result = simulator.get_classical_simulation_results(asarray(self._initial_state))
+
+            for j in range(len(self._possible_outcomes)):
+                # Check if obtained result is one of possible outcomes.
+                if all(result == self._possible_outcomes[j]):  # Expect all elements of resultant list to be True.
+                    probabilities[j] += 1
+                    break
+
+        for i in range(len(probabilities)):
+            probabilities[i] /= self._number_of_samples_for_experiments
+
+        return probabilities
