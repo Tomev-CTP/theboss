@@ -43,6 +43,10 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
                                                         error_probability: float) -> float:
     """
         Calculates the distance bound between the experimental results and the n-sample estimation of these results.
+
+        In case of large outcomes numbers one should consider solutions given here:
+        https://math.stackexchange.com/questions/2696344/is-there-a-way-to-find-the-log-of-very-large-numbers
+
         :param outcomes_number:
         :param samples_number: Number of samples used for estimation.
         :param error_probability: Desired probability of error.
