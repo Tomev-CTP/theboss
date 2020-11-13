@@ -51,8 +51,9 @@ See the [LICENSE.md](LICENSE.md) file for details.
 ## Acknowledgments
 
   - Daniel Brod and Michał Oszmaniec, 
-  - [CTP PAS](http://www.cft.edu.pl/new/public/pl).
-  - [sisco0](https://github.com/sisco0) - some minor bugs pointed out.
+  - [CTP PAS](http://www.cft.edu.pl/new/public/pl),
+  - [sisco0](https://github.com/sisco0) - some minor bugs pointed out,
+  - Poór Boldizsár - major code review.
   
   
 ## References
@@ -68,3 +69,5 @@ The work will follow the ideas presented in following works:
 [3] Maciejewski F. B., Zimboras Z., Oszmaniec M., [arXiv:1907.08518](https://arxiv.org/abs/1907.08518) [quant-ph].
 
 [4] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
+
+

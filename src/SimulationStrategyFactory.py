@@ -4,9 +4,10 @@ from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExpe
 from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategy
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import \
+    LossyNetworksGeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
-from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import LossyNetworksGeneralizedCliffordsSimulationStrategy
 
 
 class StrategyTypes(enum.IntEnum):
@@ -19,7 +20,7 @@ class StrategyTypes(enum.IntEnum):
 
 class SimulationStrategyFactory:
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
-                 strategy_type: StrategyTypes = StrategyTypes.FIXED_LOSS):
+                 strategy_type: StrategyTypes = StrategyTypes.FIXED_LOSS) -> None:
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
         self._strategy_mapping = {
@@ -44,7 +45,7 @@ class SimulationStrategyFactory:
         handler = self._strategy_mapping.get(self._strategy_type, self.__generate_fixed_losses_strategy)
         return handler()
 
-    def __generate_fixed_losses_strategy(self):
+    def __generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategy:
         """
             Generates fixed loss strategy.
         :return: Fixed loss strategy.
@@ -56,7 +57,7 @@ class SimulationStrategyFactory:
             network_simulation_strategy=self._experiment_configuration.network_simulation_strategy
         )
 
-    def __generate_uniform_losses_strategy(self):
+    def __generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
         """
             Generates uniform losses strategy.
         :return: Uniform losses strategy.
@@ -67,7 +68,7 @@ class SimulationStrategyFactory:
             self._experiment_configuration.probability_of_uniform_loss
         )
 
-    def __generate_r_cliffords_strategy(self):
+    def __generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
         """
             Generates Cliffords algorithm strategy using their code implemented in R.
         :return: Cliffords strategy in R.
@@ -77,7 +78,7 @@ class SimulationStrategyFactory:
             self._experiment_configuration.interferometer_matrix
         )
 
-    def __generate_generalized_cliffords_strategy(self):
+    def __generate_generalized_cliffords_strategy(self) -> GeneralizedCliffordsSimulationStrategy:
         """
             Generates generalized Cliffords strategy from Oszmaniec / Brod.
         :return: Generalized Cliffords strategy.
@@ -86,7 +87,8 @@ class SimulationStrategyFactory:
             self._experiment_configuration.interferometer_matrix
         )
 
-    def __generate_lossy_net_generalized_cliffords_strategy(self):
+    def __generate_lossy_net_generalized_cliffords_strategy(self) \
+            -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
         """
             Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
         :return: Generalized Cliffords strategy for lossy networks.

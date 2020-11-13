@@ -20,7 +20,7 @@ def count_total_variation_distance(distribution1: List[float], distribution2: Li
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), "Distributions must be equi-length!"
+    assert len(distribution1) == len(distribution2), "Distributions must have equal lengths!"
     total_variation_distance = 0
 
     for i in range(len(distribution1)):
@@ -40,7 +40,7 @@ def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float
 
 
 def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
-                                                        error_probability: float):
+                                                        error_probability: float) -> float:
     """
         Calculates the distance bound between the experimental results and the n-sample estimation of these results.
         :param outcomes_number:

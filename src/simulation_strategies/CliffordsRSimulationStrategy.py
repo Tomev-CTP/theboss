@@ -4,9 +4,8 @@ __author__ = 'Tomasz Rybotycki'
 # On my Windows 10, I am using anaconda and I had to add R_HOME env variable and R_path\bin, R_path\bin\x64 to the path.
 # https://cran.r-project.org/web/packages/BosonSampling/index.html
 
-from typing import List, Tuple
 
-from numpy import array
+from numpy import ndarray, array, arange
 from rpy2.robjects import packages
 
 from src.Boson_Sampling_Utilities import particle_state_to_modes_state
@@ -15,7 +14,7 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class CliffordsRSimulationStrategy(SimulationStrategy):
-    def __init__(self, number_of_bosons: int, interferometer_matrix: array) -> None:
+    def __init__(self, number_of_bosons: int, interferometer_matrix: ndarray) -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_bosons = number_of_bosons
 
@@ -32,14 +31,12 @@ class CliffordsRSimulationStrategy(SimulationStrategy):
 
         boson_sampling_package = packages.importr('BosonSampling')
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
-        first_n_columns_of_given_matrix = interferometer_matrix[:, [i for i in range(number_of_bosons)]]
+        first_n_columns_of_given_matrix = interferometer_matrix[:, arange(len(number_of_bosons))]
         self.boson_sampler_input_matrix = numpy_array_to_r_matrix(first_n_columns_of_given_matrix)
 
-    def simulate(self, initial_state) -> List[int]:  # Initial state is only added for interface compatibility.
+    def simulate(self, initial_state: ndarray) -> ndarray:  # Initial state is only added for interface compatibility.
         result, permanent, probability_mass_function = \
             self.cliffords_r_sampler(self.boson_sampler_input_matrix, sampleSize=1, perm=False)
-        python_result = []
-        for i in range(self.number_of_bosons):
-            python_result.append(result[i] - 1)  # -1 here is to 'fix' R indexation.
+        python_result = array([result[i] - 1 for i in range(self.number_of_bosons)])  # -1 here is to fix R indexation.
 
         return particle_state_to_modes_state(python_result, len(self.interferometer_matrix))

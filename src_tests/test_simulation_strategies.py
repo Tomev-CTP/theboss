@@ -103,7 +103,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         )
         self.__perform_distance_of_approximate_distribution_from_ideal(distance_experiment_configuration)
 
-    def __prepare_lossy_distance_experiment_settings(self):
+    def __prepare_lossy_distance_experiment_settings(self) -> None:
         # At least for now lossy experiments are only for classic [1, 1, ..., 1, 0, 0, ..., 0] states.
         self._distributions_distance_experiment_configuration.initial_state = self._distance_calculation_initial_state
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
@@ -184,7 +184,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._distributions_distance_experiment_configuration.number_of_particles_lost = 0
         self._distributions_distance_experiment_configuration.number_of_particles_left = initial_number_of_particles
 
-    def __continue_with_common_part_of_generalized_cliffords_strategy_tests(self):
+    def __continue_with_common_part_of_generalized_cliffords_strategy_tests(self) -> None:
         self._strategies_factory.set_experiment_configuration(self._distributions_distance_experiment_configuration)
         self._strategies_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(

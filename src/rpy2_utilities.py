@@ -11,6 +11,6 @@ def numpy_array_to_r_matrix(numpy_array: array) -> robjects.r.matrix:
 
     for col_num in range(columns_number):
         for row_num in range(rows_number):
-            r_matrix[int(row_num + col_num * rows_number)] = complex(numpy_array[row_num][col_num])
+            r_matrix[row_num + col_num * rows_number] = complex(numpy_array[row_num][col_num])
 
     return r_matrix

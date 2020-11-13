@@ -32,33 +32,33 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         difference = a - b
         return abs(difference) < float_info.epsilon
 
-    def __set_input_and_output_states(self, input_state: List[int], output_state: List[int]):
+    def __set_input_and_output_states(self, input_state: List[int], output_state: List[int]) -> None:
         self._ch_permanent_calculator.input_state = input_state
         self._ch_permanent_calculator.output_state = output_state
         self._cl_permanent_calculator.input_state = input_state
         self._cl_permanent_calculator.output_state = output_state
 
-    def test_full_input_output_case(self):
+    def test_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 1], [1, 1, 1, 1])
         self.assertTrue(self.__complex_almost_equal(self._cl_permanent_calculator.calculate(),
                                                     self._ch_permanent_calculator.calculate()))
 
-    def test_not_full_input_output_case(self):
+    def test_not_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [1, 0, 1, 1])
         self.assertTrue(self.__complex_almost_equal(self._cl_permanent_calculator.calculate(),
                                                     self._ch_permanent_calculator.calculate()))
 
-    def test_binned_input_case(self):
+    def test_binned_input_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 0, 0], [0, 1, 1, 1])
         self.assertTrue(self.__complex_almost_equal(self._cl_permanent_calculator.calculate(),
                                                     self._ch_permanent_calculator.calculate()))
 
-    def test_binned_output_case(self):
+    def test_binned_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [2, 1, 0, 0])
         self.assertTrue(self.__complex_almost_equal(self._cl_permanent_calculator.calculate(),
                                                     self._ch_permanent_calculator.calculate()))
 
-    def test_binned_input_binned_output_case(self):
+    def test_binned_input_binned_output_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(self.__complex_almost_equal(self._cl_permanent_calculator.calculate(),
                                                     self._ch_permanent_calculator.calculate()))

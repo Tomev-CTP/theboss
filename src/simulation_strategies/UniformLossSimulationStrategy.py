@@ -1,7 +1,5 @@
 __author__ = 'Tomasz Rybotycki'
 
-from typing import List
-
 from numpy import arange, ndarray
 from numpy.random import choice
 from scipy import special
@@ -19,17 +17,14 @@ class UniformLossSimulationStrategy(SimulationStrategy):
         self.number_of_modes = number_of_modes
         self.probability_of_uniform_loss = probability_of_uniform_loss
 
-    def simulate(self, input_state: ndarray) -> List[float]:
+    def simulate(self, input_state: ndarray) -> ndarray:
         initial_number_of_particles = int(sum(input_state))
-        separable_states_weights = []
 
         # Using n, eta, l notation from the paper.
         n = initial_number_of_particles
         eta = self.probability_of_uniform_loss
 
-        for number_of_particles_left in range(n + 1):
-            l = number_of_particles_left
-            separable_states_weights.append(pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l))
+        separable_states_weights = [pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l) for l in range( n + 1)]
 
         number_of_particles_left_in_selected_separable_state = choice(arange(0, n + 1), p=separable_states_weights)
 
