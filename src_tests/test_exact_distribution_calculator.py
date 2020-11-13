@@ -25,7 +25,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             [0, 1, 0, 0, 0],
         ])
 
-        self.initial_state = [1, 1, 1, 0, 0]
+        self.initial_state = array([1, 1, 1, 0, 0])
 
         # Create configuration object.
         self.experiment_configuration = BosonSamplingExperimentConfiguration(

@@ -5,7 +5,7 @@ from copy import copy
 from math import factorial
 from typing import List, Union
 
-from numpy import array, ndarray, arange
+from numpy import arange, array, ndarray, delete, insert
 from numpy.linalg import norm
 from numpy.random import choice
 
@@ -19,8 +19,8 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self.number_of_input_photons = 0
         self.pmfs = []  # Probability mass functions calculated along the way.
         self.interferometer_matrix = interferometer_matrix
-        self.input_state = []
-        self._labeled_states = defaultdict()
+        self.input_state = array([])
+        self._labeled_states = defaultdict(list)
         self.current_outputs = []
 
     def simulate(self, input_state: ndarray) -> ndarray:
@@ -53,25 +53,26 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             states_particles_number = sum(state)
             self._labeled_states[states_particles_number].append(state)
 
-    def __calculate_all_input_substates(self, state_part_left: Union[ndarray, List[int]]) -> List[ndarray]:
+    def __calculate_all_input_substates(self, state_part_left: ndarray) -> List[ndarray]:
         """
         Calculates substates of the input in recursive manner.
+
         :param state_part_left: State with reduced modes number.
         :return: All the substates for starting number of modes.
         """
         if len(state_part_left) < 1:
             return [array([])]
-        if not isinstance(state_part_left, list):
-            state_as_list = state_part_left.tolist()
-        else:
-            state_as_list = state_part_left
-        n = state_as_list.pop(0)
-        smaller_substates = self.__calculate_all_input_substates(state_as_list)
+
+        n = state_part_left[0]
+        state_part_left = delete(state_part_left, 0)
+
+        smaller_substates = self.__calculate_all_input_substates(state_part_left.copy())
+
         substates = []
         for i in range(int(n + 1)):
             for substate in smaller_substates:
                 new_substate = substate.copy()
-                new_substate.insert(0, i)
+                new_substate = insert(new_substate, 0, i)
                 substates.append(new_substate)
         return substates
 

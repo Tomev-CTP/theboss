@@ -3,7 +3,7 @@ from copy import deepcopy
 from random import uniform
 from typing import List
 
-from numpy import asarray, block, eye, ndarray, zeros_like
+from numpy import block, eye, ndarray, zeros_like, asarray
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import (

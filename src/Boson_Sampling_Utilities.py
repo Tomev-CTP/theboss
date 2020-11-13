@@ -355,7 +355,7 @@ class ChinHuhPermanentCalculator:
         if input_vector is None:
             input_vector = []
         v_vectors = []
-        for i in range(self.__input_state[len(input_vector)] + 1):
+        for i in range(int(self.__input_state[len(input_vector)]) + 1):
             input_state = input_vector.copy()
             input_state.append(i)
 
