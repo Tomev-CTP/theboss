@@ -1,10 +1,9 @@
 __author__ = 'Tomasz Rybotycki'
 
 import unittest
-from math import isclose
-
-from numpy import conjugate, identity, ndarray, transpose, complex128
 from sys import float_info
+
+from numpy import complex128, conjugate, identity, ndarray, transpose
 
 from src.Quantum_Computations_Utilities import generate_haar_random_unitary_matrix
 
@@ -28,9 +27,9 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
     @staticmethod
     def __complex_almost_equal(a: complex128, b: complex128) -> bool:
         difference = a - b
-        return abs(difference) < float_info.epsilon
+        return abs(difference) < 1e-13
 
-    def __are_matrices_elementwise_close(self, matrix1: ndarray, matrix2: ndarray) -> None:
+    def __are_matrices_elementwise_close(self, matrix1: ndarray, matrix2: ndarray) -> bool:
         #  I assume that there are only rectangular matrices
         if len(matrix2) != len(matrix1):
             return False
