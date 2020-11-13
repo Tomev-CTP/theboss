@@ -1,8 +1,6 @@
 __author__ = 'Tomasz Rybotycki'
 
-from typing import List
-
-from numpy import zeros
+from numpy import ndarray, zeros
 
 from src.Boson_Sampling_Utilities import generate_possible_outputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
@@ -17,7 +15,7 @@ class ApproximateDistributionCalculator:
         self.strategy = strategy
         self.outcomes = outcomes
 
-    def calculate_approximate_distribution(self, samples_number: int = 5000) -> List[float]:
+    def calculate_approximate_distribution(self, samples_number: int = 5000) -> ndarray:
         """
             Prepares the approximate distribution using boson sampling simulation method described by
             Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.

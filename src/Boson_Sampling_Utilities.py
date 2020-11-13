@@ -14,10 +14,10 @@ def calculate_permanent(matrix: ndarray) -> complex128:
     """
     Returns the permanent of the matrix.
     """
-    return permanent_recursive_part(matrix, column=0, selected=array([]), prod=complex128(1))
+    return permanent_recursive_part(matrix, column=0, selected=[], prod=complex128(1))
 
 
-def permanent_recursive_part(mtx: ndarray, column: int, selected: ndarray, prod: complex128) -> complex128:
+def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: complex128) -> complex128:
     """
     Row expansion for the permanent of matrix mtx.
     The counter column is the current column,

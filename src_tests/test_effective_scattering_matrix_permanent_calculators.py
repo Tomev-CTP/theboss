@@ -13,7 +13,7 @@ import unittest
 from sys import float_info
 from typing import List
 
-from numpy import complex128
+from numpy import array, complex128
 
 from src.Boson_Sampling_Utilities import ChinHuhPermanentCalculator, EffectiveScatteringMatrixPermanentCalculator
 from src.Quantum_Computations_Utilities import generate_haar_random_unitary_matrix
@@ -23,8 +23,8 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
     def setUp(self) -> None:
         self._matrix = generate_haar_random_unitary_matrix(4)
-        self._ch_permanent_calculator = ChinHuhPermanentCalculator(self._matrix, [], [])
-        self._cl_permanent_calculator = EffectiveScatteringMatrixPermanentCalculator(self._matrix, [], [])
+        self._ch_permanent_calculator = ChinHuhPermanentCalculator(self._matrix, array([]), array([]))
+        self._cl_permanent_calculator = EffectiveScatteringMatrixPermanentCalculator(self._matrix, array([]), array([]))
         pass
 
     @staticmethod
