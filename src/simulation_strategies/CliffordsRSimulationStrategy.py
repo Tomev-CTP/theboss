@@ -31,7 +31,7 @@ class CliffordsRSimulationStrategy(SimulationStrategy):
 
         boson_sampling_package = packages.importr('BosonSampling')
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
-        first_n_columns_of_given_matrix = interferometer_matrix[:, arange(len(number_of_bosons))]
+        first_n_columns_of_given_matrix = interferometer_matrix[:, arange(number_of_bosons)]
         self.boson_sampler_input_matrix = numpy_array_to_r_matrix(first_n_columns_of_given_matrix)
 
     def simulate(self, initial_state: ndarray) -> ndarray:  # Initial state is only added for interface compatibility.

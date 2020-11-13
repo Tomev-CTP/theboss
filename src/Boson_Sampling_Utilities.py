@@ -5,7 +5,7 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List, Optional
 
-from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like
+from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like, transpose
 from numpy.linalg import svd
 from scipy.special import binom
 
@@ -197,24 +197,22 @@ class EffectiveScatteringMatrixCalculator:
         self.__output_state = output_state
 
     def calculate(self) -> ndarray:
-        number_of_columns = sum(self.input_state)
-        effective_scattering_matrix = zeros(shape=(number_of_columns, number_of_columns), dtype=complex128)
-        helper_matrix = zeros(shape=(len(self.__matrix), number_of_columns), dtype=complex128)
-        next_column_index = 0
+        transposed_input_matrix = transpose(self.__matrix)
+        helper_mtx = []
 
-        for j in range(len(self.input_state)):
-            for i in range(self.input_state[j]):
-                helper_matrix[:, [next_column_index]] = self.__matrix[:, [j]]
-                next_column_index += 1
-        next_row_index = 0
+        for index_of_column_to_insert in range(len(self.__input_state)):
+            for _ in range(int(self.__input_state[index_of_column_to_insert])):
+                helper_mtx.append(transposed_input_matrix[index_of_column_to_insert])
 
-        for j in range(len(self.output_state)):
-            for i in range(int(self.output_state[j])):
-                effective_scattering_matrix[[next_row_index], :] = helper_matrix[[j], :]
+        helper_mtx = transpose(array(helper_mtx))
 
-                next_row_index += 1
+        effective_scattering_matrix = []
 
-        return effective_scattering_matrix
+        for index_of_row_to_insert in range(len(self.__output_state)):
+            for _ in range(int(self.__output_state[index_of_row_to_insert])):
+                effective_scattering_matrix.append(helper_mtx[index_of_row_to_insert])
+
+        return array(effective_scattering_matrix)
 
 
 class EffectiveScatteringMatrixPermanentCalculator:
