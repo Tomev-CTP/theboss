@@ -1,7 +1,6 @@
 __author__ = 'Tomasz Rybotycki'
 
 import unittest
-from sys import float_info
 
 from numpy import complex128, conjugate, identity, ndarray, transpose
 
@@ -40,7 +39,7 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
 
         for i in range(len(matrix1)):
             for j in range(len(matrix1[i])):
-                if not self.__complex_almost_equal(matrix1[i][j],  matrix2[i][j]):
+                if not self.__complex_almost_equal(matrix1[i][j], matrix2[i][j]):
                     return False
         return are_matrices_elementwise_close
 
