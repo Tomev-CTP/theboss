@@ -2,7 +2,7 @@ __author__ = 'Tomasz Rybotycki'
 
 # TODO TR: Consider releasing this file as a separate package.
 
-from typing import List
+from typing import List, Union
 
 from numpy import abs, linalg, log2, ndarray, sqrt
 import qutip
@@ -12,7 +12,8 @@ def generate_haar_random_unitary_matrix(d: int) -> ndarray:
     return qutip.rand_unitary_haar(d).full()
 
 
-def count_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
+def count_total_variation_distance(distribution1: Union[List[float], ndarray],
+                                   distribution2: Union[List[float], ndarray]) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
