@@ -3,9 +3,9 @@ __author__ = 'Tomasz Rybotycki'
 from collections import defaultdict
 from copy import copy
 from math import factorial
-from typing import List, Union
+from typing import List
 
-from numpy import arange, array, ndarray, delete, insert
+from numpy import arange, array, delete, insert, ndarray
 from numpy.linalg import norm
 from numpy.random import choice
 
