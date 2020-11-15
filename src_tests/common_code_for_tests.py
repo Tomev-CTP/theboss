@@ -32,12 +32,11 @@ class ApproximateDistributionCalculator:
 
         outcomes_probabilities = zeros(len(possible_outcomes))
 
-        for i in range(samples_number):
-            result = simulator.get_classical_simulation_results(self.configuration.initial_state)
-
+        samples = simulator.get_classical_simulation_results(self.configuration.initial_state, samples_number)
+        for sample in samples:
             for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if all(result == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
+                if all(sample == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
                     outcomes_probabilities[j] += 1
                     break
 

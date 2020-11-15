@@ -1,5 +1,7 @@
 __author__ = 'Tomasz Rybotycki'
 
+from typing import List
+
 from numpy import arange, ndarray
 from numpy.random import choice
 from scipy import special
@@ -17,21 +19,25 @@ class UniformLossSimulationStrategy(SimulationStrategy):
         self.number_of_modes = number_of_modes
         self.probability_of_uniform_loss = probability_of_uniform_loss
 
-    def simulate(self, input_state: ndarray) -> ndarray:
+    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         initial_number_of_particles = int(sum(input_state))
 
         # Using n, eta, l notation from the paper.
         n = initial_number_of_particles
         eta = self.probability_of_uniform_loss
 
-        separable_states_weights = [pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l) for l in range( n + 1)]
+        separable_states_weights = [pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l) for l in range(n + 1)]
 
-        number_of_particles_left_in_selected_separable_state = choice(arange(0, n + 1), p=separable_states_weights)
+        samples = []
+        while len(samples) < samples_number:
+            number_of_particles_left_in_selected_separable_state = choice(arange(0, n + 1), p=separable_states_weights)
 
-        strategy = FixedLossSimulationStrategy(self.interferometer_matrix,
-                                               number_of_particles_left_in_selected_separable_state,
-                                               self.number_of_modes)
+            strategy = FixedLossSimulationStrategy(self.interferometer_matrix,
+                                                   number_of_particles_left_in_selected_separable_state,
+                                                   self.number_of_modes)
 
-        simulator = BosonSamplingSimulator(strategy)
+            simulator = BosonSamplingSimulator(strategy)
 
-        return simulator.get_classical_simulation_results(input_state)
+            samples.append(simulator.get_classical_simulation_results(input_state)[0])
+
+        return samples

@@ -17,23 +17,32 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
     def __init__(self, interferometer_matrix: ndarray) -> None:
         self.r_sample = []
         self.number_of_input_photons = 0
-        self.pmfs = []  # Probability mass functions calculated along the way.
+        self.pmfs = dict()  # Probability mass functions calculated along the way. Keys should be ids of current r.
         self.interferometer_matrix = interferometer_matrix
         self.input_state = array([])
         self._labeled_states = defaultdict(list)
-        self.current_outputs = []
+        self.possible_outputs = dict()
+        self.current_key = hash(tuple(self.r_sample))
 
-    def simulate(self, input_state: ndarray) -> ndarray:
+    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
             Returns sample from linear optics experiments given output state.
+
             :param input_state: Input state in particle basis.
+            :param samples_number: Number of samples to simulate.
             :return: A resultant state after traversing through interferometer.
         """
         self.input_state = input_state
         self.number_of_input_photons = sum(input_state)
         self.__get_sorted_possible_states()
-        self.__fill_r_sample()
-        return array(self.r_sample)
+        self.pmfs = dict()
+
+        samples = []
+
+        while len(samples) < samples_number:
+            self.__fill_r_sample()
+            samples.append(array(self.r_sample))
+        return samples
 
     def __get_sorted_possible_states(self) -> None:
         """
@@ -77,25 +86,26 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return substates
 
     def __fill_r_sample(self) -> None:
-        self.pmfs = []
         self.r_sample = [0 for _ in self.interferometer_matrix]
+        self.current_key = hash(tuple(self.r_sample))
 
         while self.number_of_input_photons > sum(self.r_sample):
-            self.__calculate_another_layer_of_pmfs()
+            if self.current_key not in self.pmfs:
+                self.__calculate_new_layer_of_pmfs()
             self.__sample_from_latest_pmf()
 
-    def __calculate_another_layer_of_pmfs(self) -> None:
+    def __calculate_new_layer_of_pmfs(self) -> None:
         number_of_particle_to_sample = sum(self.r_sample) + 1
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
         weights = self.__calculate_weights_from_k_vectors(array(corresponding_k_vectors))
         normalized_weights = weights / norm(weights)
-        self.current_outputs = self.__generate_possible_output_states()
+        self.possible_outputs[self.current_key] = self.__generate_possible_output_states()
 
         pmf = []
 
-        for output in self.current_outputs:
+        for output in self.possible_outputs[self.current_key]:
             pmf.append(0)
             for i in range(len(possible_input_states)):
                 probability = self.__calculate_outputs_probability(possible_input_states[i], output)
@@ -103,8 +113,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
                 pmf[-1] += probability
 
         probabilities_sum = sum(pmf)
+
         pmf = [probability / probabilities_sum for probability in pmf]
-        self.pmfs.append(pmf)
+        self.pmfs[self.current_key] = pmf
 
     def __calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
         return array([self.__calculate_multinomial_coefficient(vector) for vector in corresponding_k_vectors])
@@ -143,5 +154,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return probability
 
     def __sample_from_latest_pmf(self) -> None:
-        sample_index = choice(arange(len(self.current_outputs)), 1, p=self.pmfs[-1])[0]
-        self.r_sample = self.current_outputs[sample_index]
+        sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]
+        self.r_sample = self.possible_outputs[self.current_key][sample_index]
+        self.current_key = hash(tuple(self.r_sample))

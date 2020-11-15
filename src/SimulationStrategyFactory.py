@@ -73,10 +73,7 @@ class SimulationStrategyFactory:
             Generates Cliffords algorithm strategy using their code implemented in R.
         :return: Cliffords strategy in R.
         """
-        return CliffordsRSimulationStrategy(
-            self._experiment_configuration.number_of_particles_left,
-            self._experiment_configuration.interferometer_matrix
-        )
+        return CliffordsRSimulationStrategy(self._experiment_configuration.interferometer_matrix)
 
     def __generate_generalized_cliffords_strategy(self) -> GeneralizedCliffordsSimulationStrategy:
         """

@@ -1,7 +1,7 @@
 __author__ = 'Tomasz Rybotycki'
 
 from random import random
-from typing import Optional
+from typing import List, Optional
 
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
 from numpy.random import rand
@@ -24,16 +24,21 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         self.number_of_observed_modes = number_of_observed_modes
         self._network_simulation_strategy = network_simulation_strategy
 
-    def simulate(self, input_state: ndarray) -> ndarray:
+    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
             Returns an sample from the approximate distribution in fixed losses regime.
+
+            :param samples_number: Number of samples one wants to simulate.
             :param input_state: Usually n-particle Fock state in m modes.
             :return: A sample from the approximation.
         """
-        phi_0 = self.__prepare_initial_state(input_state)
-        evolved_state = self._network_simulation_strategy.simulate(phi_0)
-        probabilities = self.__calculate_probabilities(evolved_state)
-        return self.__calculate_approximation_of_boson_sampling_outcome(probabilities)
+        samples = []
+        while len(samples) < samples_number:
+            phi_0 = self.__prepare_initial_state(input_state)
+            evolved_state = self._network_simulation_strategy.simulate(phi_0)
+            probabilities = self.__calculate_probabilities(evolved_state)
+            samples.append(self.__calculate_approximation_of_boson_sampling_outcome(probabilities))
+        return samples
 
     def __prepare_initial_state(self, input_state: ndarray) -> ndarray:
         """

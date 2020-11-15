@@ -1,7 +1,7 @@
 import unittest
 from copy import deepcopy
 from random import uniform
-from typing import List
+from typing import List, Union
 
 from numpy import block, eye, ndarray, zeros_like, asarray
 
@@ -51,9 +51,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         lossy_average_number_of_particles = 0
-
-        for _ in range(self._number_of_samples_for_experiments):
-            lossy_average_number_of_particles += sum(simulator.get_classical_simulation_results(self._initial_state))
+        samples = simulator.get_classical_simulation_results(self._initial_state,
+                                                             self._number_of_samples_for_experiments)
+        for sample in samples:
+            lossy_average_number_of_particles += sum(sample)
 
         lossy_average_number_of_particles /= self._number_of_samples_for_experiments
         lossless_number_of_particles = sum(self._initial_state)
@@ -77,7 +78,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(uniform_losses_distribution)
 
-    def __check_if_given_distribution_is_close_to_lossy_network_distribution(self, distribution: List[float]) -> None:
+    def __check_if_given_distribution_is_close_to_lossy_network_distribution(
+            self, distribution: Union[ndarray, List[float]]) -> None:
         """
         Common part of distribution comparison tests.
         :param distribution: Given distribution to compare with lossy distribution.
@@ -126,22 +128,28 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         method.
         :return: Approximate distribution.
         """
-        probabilities = [0] * len(self._possible_outcomes)
         self._strategy_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
 
-        for i in range(self._number_of_samples_for_experiments):
-            result = simulator.get_classical_simulation_results(self.__get_uniformly_lossy_input_state())
+        samples = simulator.get_classical_simulation_results(self.__get_uniformly_lossy_input_state(),
+                                                             self._number_of_samples_for_experiments)
 
-            for j in range(len(self._possible_outcomes)):
+        return self.__calculate_distribution(samples, self._possible_outcomes)
+
+    @staticmethod
+    def __calculate_distribution(samples: List[ndarray], possible_outcomes: List[ndarray]) -> List[float]:
+        probabilities = [0] * len(possible_outcomes)
+
+        for sample in samples:
+            for i in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if all(result == self._possible_outcomes[j]):  # Expect all elements of resultant list to be True.
-                    probabilities[j] += 1
+                if all(sample == possible_outcomes[i]):  # Expect all elements of resultant list to be True.
+                    probabilities[i] += 1
                     break
 
         for i in range(len(probabilities)):
-            probabilities[i] /= self._number_of_samples_for_experiments
+            probabilities[i] /= len(samples)
 
         return probabilities
 
@@ -185,7 +193,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             outcomes=self._possible_outcomes
         )
 
-        distribution_with_huge_losses_on_bosonless_modes = estimated_distribution_calculator.calculate_approximate_distribution()
+        distribution_with_huge_losses_on_bosonless_modes = \
+            estimated_distribution_calculator.calculate_approximate_distribution()
 
         self._strategy_factory.set_experiment_configuration(self._experiment_configuration)
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
@@ -211,21 +220,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         method.
         :return: Approximate distribution.
         """
-        probabilities = [0] * len(self._possible_outcomes)
         self._strategy_factory.set_strategy_type(StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD)
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
+        samples = simulator.get_classical_simulation_results(asarray(self._initial_state),
+                                                             self._number_of_samples_for_experiments)
 
-        for i in range(self._number_of_samples_for_experiments):
-            result = simulator.get_classical_simulation_results(asarray(self._initial_state))
-
-            for j in range(len(self._possible_outcomes)):
-                # Check if obtained result is one of possible outcomes.
-                if all(result == self._possible_outcomes[j]):  # Expect all elements of resultant list to be True.
-                    probabilities[j] += 1
-                    break
-
-        for i in range(len(probabilities)):
-            probabilities[i] /= self._number_of_samples_for_experiments
-
-        return probabilities
+        return self.__calculate_distribution(samples, self._possible_outcomes)

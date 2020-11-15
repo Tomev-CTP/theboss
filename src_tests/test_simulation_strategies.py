@@ -53,6 +53,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._probability_of_error_in_distribution_calculation = 1e-3
 
         self._distance_calculation_initial_state = [1, 1, 1, 1, 0]
+        #self._distance_calculation_initial_state = [1, 1, 0, 0, 0]
         self._distance_calculation_binned_initial_state = [2, 1, 1, 0, 0]
         self._distance_calculation_number_of_particles_lost = 2
         distance_calculation_initial_number_of_particles = sum(self._distance_calculation_initial_state)

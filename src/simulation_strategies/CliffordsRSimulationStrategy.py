@@ -5,7 +5,7 @@ __author__ = 'Tomasz Rybotycki'
 # https://cran.r-project.org/web/packages/BosonSampling/index.html
 
 
-from numpy import ndarray, array, arange
+from numpy import ndarray, array, arange, array_split
 from rpy2.robjects import packages
 
 from src.Boson_Sampling_Utilities import particle_state_to_modes_state
@@ -14,9 +14,8 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 
 class CliffordsRSimulationStrategy(SimulationStrategy):
-    def __init__(self, number_of_bosons: int, interferometer_matrix: ndarray) -> None:
+    def __init__(self, interferometer_matrix: ndarray) -> None:
         self.interferometer_matrix = interferometer_matrix
-        self.number_of_bosons = number_of_bosons
 
         required_packages = ('BosonSampling', 'Rcpp', 'RcppArmadillo')
 
@@ -31,12 +30,19 @@ class CliffordsRSimulationStrategy(SimulationStrategy):
 
         boson_sampling_package = packages.importr('BosonSampling')
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
-        first_n_columns_of_given_matrix = interferometer_matrix[:, arange(number_of_bosons)]
-        self.boson_sampler_input_matrix = numpy_array_to_r_matrix(first_n_columns_of_given_matrix)
 
-    def simulate(self, initial_state: ndarray) -> ndarray:  # Initial state is only added for interface compatibility.
+    def simulate(self, initial_state: ndarray, samples_number: int = 1) -> ndarray:
+        number_of_bosons = sum(initial_state)
+        boson_sampler_input_matrix = numpy_array_to_r_matrix(self.interferometer_matrix[:, arange(number_of_bosons)])
+
         result, permanent, probability_mass_function = \
-            self.cliffords_r_sampler(self.boson_sampler_input_matrix, sampleSize=1, perm=False)
-        python_result = array([result[i] - 1 for i in range(self.number_of_bosons)])  # -1 here is to fix R indexation.
+            self.cliffords_r_sampler(boson_sampler_input_matrix, sampleSize=samples_number, perm=False)
+        # Add -1 to R indexation of modes (they start from 1).
+        python_result = array([result[i] - 1 for i in range(len(result))])
+        samples_in_particle_states = array_split(python_result, number_of_bosons)
 
-        return particle_state_to_modes_state(python_result, len(self.interferometer_matrix))
+        samples = [particle_state_to_modes_state(sample, len(self.interferometer_matrix))
+                   for sample in samples_in_particle_states]
+
+        return samples
+        #return particle_state_to_modes_state(python_result, len(self.interferometer_matrix))
