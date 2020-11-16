@@ -2,7 +2,7 @@ __author__ = 'Tomasz Rybotycki'
 
 # TODO TR: Consider releasing this file as a separate package.
 
-from typing import List
+from typing import List, Union
 
 from numpy import abs, linalg, log2, ndarray, sqrt
 import qutip
@@ -12,7 +12,8 @@ def generate_haar_random_unitary_matrix(d: int) -> ndarray:
     return qutip.rand_unitary_haar(d).full()
 
 
-def count_total_variation_distance(distribution1: List[float], distribution2: List[float]) -> float:
+def count_total_variation_distance(distribution1: Union[List[float], ndarray],
+                                   distribution2: Union[List[float], ndarray]) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
@@ -20,7 +21,7 @@ def count_total_variation_distance(distribution1: List[float], distribution2: Li
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), "Distributions must be equi-length!"
+    assert len(distribution1) == len(distribution2), "Distributions must have equal lengths!"
     total_variation_distance = 0
 
     for i in range(len(distribution1)):
@@ -40,14 +41,40 @@ def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float
 
 
 def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
-                                                        error_probability: float):
+                                                        error_probability: float) -> float:
     """
         Calculates the distance bound between the experimental results and the n-sample estimation of these results.
+
+        In case of large outcomes numbers one should consider solutions given here:
+        https://math.stackexchange.com/questions/2696344/is-there-a-way-to-find-the-log-of-very-large-numbers
+
         :param outcomes_number:
         :param samples_number: Number of samples used for estimation.
         :param error_probability: Desired probability of error.
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
-    error_bound = log2(float(2 ** outcomes_number - 2)) - log2(error_probability)
+    possibly_huge_number = 2 ** outcomes_number - 2
+    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+
+    error_bound = log2(error_probability)
+
+    for prime_factor in prime_factors_of_the_number:
+        error_bound += log2(prime_factor)
+
     error_bound /= 2 * samples_number
     return sqrt(error_bound)
+
+
+def get_prime_factors(number: int) -> List[int]:
+    prime_factors = []
+
+    while number % 2 == 0:
+        prime_factors.append(2)
+        number = number / 2
+
+    for i in range(3,int(sqrt(number)) + 1,2):
+        while number % i == 0:
+            prime_factors.append(i)
+            number = number / i
+
+    return prime_factors

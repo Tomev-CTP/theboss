@@ -1,9 +1,9 @@
 __author__ = 'Tomasz Rybotycki'
 
 from random import random
-from typing import List
+from typing import List, Optional
 
-from numpy import conjugate, exp, ndarray, sqrt, zeros
+from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, int64
 from numpy.random import rand
 
 from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
@@ -15,7 +15,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
 
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_photons_left: int, number_of_observed_modes: int,
-                 network_simulation_strategy: NetworkSimulationStrategy = None) \
+                 network_simulation_strategy: Optional[NetworkSimulationStrategy] = None) \
             -> None:
         if network_simulation_strategy is None:
             network_simulation_strategy = LosslessNetworkSimulationStrategy(interferometer_matrix)
@@ -24,16 +24,21 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         self.number_of_observed_modes = number_of_observed_modes
         self._network_simulation_strategy = network_simulation_strategy
 
-    def simulate(self, input_state: ndarray) -> List[int]:
+    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
             Returns an sample from the approximate distribution in fixed losses regime.
+
+            :param samples_number: Number of samples one wants to simulate.
             :param input_state: Usually n-particle Fock state in m modes.
             :return: A sample from the approximation.
         """
-        phi_0 = self.__prepare_initial_state(input_state)
-        evolved_state = self._network_simulation_strategy.simulate(phi_0)
-        probabilities = self.__calculate_probabilities(evolved_state)
-        return self.__calculate_approximation_of_boson_sampling_outcome(probabilities)
+        samples = []
+        while len(samples) < samples_number:
+            phi_0 = self.__prepare_initial_state(input_state)
+            evolved_state = self._network_simulation_strategy.simulate(phi_0)
+            probabilities = self.__calculate_probabilities(evolved_state)
+            samples.append(self.__calculate_approximation_of_boson_sampling_outcome(probabilities))
+        return samples
 
     def __prepare_initial_state(self, input_state: ndarray) -> ndarray:
         """
@@ -43,12 +48,11 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             on n photons 'smeared' on first n modes).
         """
         initial_number_of_photons = int(sum(input_state))
-        prepared_state = [1 for _ in range(initial_number_of_photons)]
-        while len(prepared_state) < self.number_of_observed_modes:
-            prepared_state.append(0)
+        prepared_state = ones(self.number_of_observed_modes, dtype=float)
+        prepared_state[initial_number_of_photons:] = 0
         prepared_state /= sqrt(initial_number_of_photons)  # Note, that numpy version of sqrt is used here!
-        prepared_state = self.__randomize_modes_phases(prepared_state)
-        return prepared_state
+
+        return self.__randomize_modes_phases(prepared_state)
 
     @staticmethod
     def __randomize_modes_phases(state_in_modes_basis: ndarray) -> ndarray:
@@ -61,7 +65,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
 
     @staticmethod
     def __calculate_probabilities(state: ndarray) -> ndarray:
-        return [conjugate(detector) * detector for detector in state]
+        return conjugate(state) * state
 
     def __calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
         """

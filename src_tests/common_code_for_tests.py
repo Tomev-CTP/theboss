@@ -1,8 +1,6 @@
 __author__ = 'Tomasz Rybotycki'
 
-from typing import List
-
-from numpy import zeros
+from numpy import ndarray, zeros, int64
 
 from src.Boson_Sampling_Utilities import generate_possible_outputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
@@ -17,7 +15,7 @@ class ApproximateDistributionCalculator:
         self.strategy = strategy
         self.outcomes = outcomes
 
-    def calculate_approximate_distribution(self, samples_number: int = 5000) -> List[float]:
+    def calculate_approximate_distribution(self, samples_number: int = 5000) -> ndarray:
         """
             Prepares the approximate distribution using boson sampling simulation method described by
             Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
@@ -32,14 +30,13 @@ class ApproximateDistributionCalculator:
 
         simulator = BosonSamplingSimulator(self.strategy)
 
-        outcomes_probabilities = zeros(len(possible_outcomes))
+        outcomes_probabilities = zeros(len(possible_outcomes), dtype=int64)
 
-        for i in range(samples_number):
-            result = simulator.get_classical_simulation_results(self.configuration.initial_state)
-
+        samples = simulator.get_classical_simulation_results(self.configuration.initial_state, samples_number)
+        for sample in samples:
             for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if all(result == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
+                if all(sample == possible_outcomes[j]):  # Expect all elements of resultant list to be True.
                     outcomes_probabilities[j] += 1
                     break
 

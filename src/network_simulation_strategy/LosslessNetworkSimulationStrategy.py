@@ -6,7 +6,7 @@ from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSim
 
 
 class LosslessNetworkSimulationStrategy(NetworkSimulationStrategy):
-    def __init__(self, matrix: ndarray):
+    def __init__(self, matrix: ndarray) -> None:
         self._matrix = matrix
 
     def simulate(self, input_state: ndarray) -> ndarray:

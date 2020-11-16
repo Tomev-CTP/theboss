@@ -5,7 +5,7 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List, Optional
 
-from numpy import complex128, ndarray, zeros, diag, sqrt, zeros_like, ones_like, array, block
+from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like, transpose, int64, asarray
 from numpy.linalg import svd
 from scipy.special import binom
 
@@ -27,22 +27,20 @@ def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], pro
     if column == mtx.shape[1]:
         return prod
 
-    result = 0
+    result = complex128(0 + 0j)
     for row in range(mtx.shape[0]):
         if row not in selected:
-            result = result \
-                     + permanent_recursive_part(mtx, column + 1, selected + [row], prod * mtx[row, column])
+            result += permanent_recursive_part(mtx, column + 1, selected + [row], prod * mtx[row, column])
     return result
 
 
-def particle_state_to_modes_state(particle_state: List[int], observed_modes_number: int) -> List[int]:
+def particle_state_to_modes_state(particle_state: ndarray, observed_modes_number: int) -> ndarray:
     modes_state = zeros(observed_modes_number)
 
     # Adding the particle to it's mode.
-    for particle in particle_state:
-        modes_state[int(particle)] += 1
+    for particles_mode in asarray(particle_state, dtype=int64):
+        modes_state[particles_mode] += 1
 
-    # numbers of particles in each mode
     return modes_state
 
 
@@ -64,7 +62,7 @@ def modes_state_to_particle_state(mode_state: ndarray, particles_number: int) ->
 
         if modes[i] > 0:
             modes[i] -= 1
-            particles_state[k] = int(i)
+            particles_state[k] = i
             k += 1
         else:
             i += 1
@@ -95,7 +93,7 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int) ->
     return outputs
 
 
-def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[List[int]]:
+def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[ndarray]:
     """
         From initial state generate all possible input states after losses application.
         :param initial_state: The state we start with.
@@ -109,29 +107,36 @@ def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int)
         x0.extend([i] * int(initial_state[i]))
 
     lossy_inputs_list = []
+    lossy_inputs_hashes = []
 
-    # Symmetrization
+    # Symmetrization.
     for combination in itertools.combinations(list(range(initial_number_of_particles)), number_of_particles_left):
-        lossy_input_in_particle_basis = []
-        for el in combination:
-            lossy_input_in_particle_basis.append(x0[el])
+        lossy_input_in_particle_basis = array([x0[el] for el in combination], dtype=int64)
 
         lossy_input = particle_state_to_modes_state(lossy_input_in_particle_basis, number_of_modes)
 
         # Check if calculated lossy input is already in the list. If not, add it.
-        if all(list(lossy_input_in_list) != list(lossy_input) for lossy_input_in_list in lossy_inputs_list):
+        lossy_input_hash = hash(tuple(lossy_input))
+        if lossy_input_hash not in lossy_inputs_hashes:
             lossy_inputs_list.append(lossy_input)
+            lossy_inputs_hashes.append(lossy_input_hash)
 
     return lossy_inputs_list
 
 
 def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int) -> int:
     """
-        Calculates the number of possible output states with n particles placed around m modes. This is basically
-        the same answer as to in how many possible combinations can we put n objects in m bins. It's also a dimension
-        of n-particle m-mode bosonic space. Stars-and-bars argument applies here.
+        Calculates the number of possible output states with n particles placed around m modes.
+
+        This is basically the same answer as to in how many possible combinations can we put n objects in m bins. It's
+        also a dimension of n-particle m-mode bosonic space. Stars-and-bars argument applies here.
+
+        :param n: Number of particles.
+        :param m: Number of modes.
+        :return: Dimension of n-particle m-mode bosonic space.
     """
     return binom(n + m - 1, n)
+
 
 def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
@@ -140,13 +145,13 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
     expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
-    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion], [singular_values_matrix_expansion, diag(singular_values)]])
+    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
+                                             [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
-def _calculate_singular_values_matrix_expansion(singular_values_vector: array) -> ndarray:
-    expansion_values = []
-    for singular_value in singular_values_vector:
-        expansion_values.append(sqrt(1.0 - pow(singular_value, 2)))
+
+def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
+    expansion_values = sqrt(1.0 - power(singular_values_vector, 2))
     return diag(expansion_values)
 
 
@@ -156,12 +161,12 @@ class EffectiveScatteringMatrixCalculator:
         I decided to implement an calculator that'd be used if every single one of these methods.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
-                 output_state: Optional[List[int]] = None):
+    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
+                 output_state: Optional[ndarray] = None) -> None:
         if output_state is None:
-            output_state = []
+            output_state = array([], dtype=int64)
         if input_state is None:
-            input_state = []
+            input_state = array([], dtype=int64)
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -171,44 +176,42 @@ class EffectiveScatteringMatrixCalculator:
         return self.__matrix
 
     @matrix.setter
-    def matrix(self, matrix) -> None:
+    def matrix(self, matrix: ndarray) -> None:
         self.__matrix = matrix
 
     @property
-    def input_state(self) -> List[int]:
+    def input_state(self) -> ndarray:
         return self.__input_state
 
     @input_state.setter
-    def input_state(self, input_state) -> None:
-        self.__input_state = input_state
+    def input_state(self, input_state: ndarray) -> None:
+        self.__input_state = asarray(input_state, dtype=int64)
 
     @property
-    def output_state(self) -> List[int]:
+    def output_state(self) -> ndarray:
         return self.__output_state
 
     @output_state.setter
-    def output_state(self, output_state) -> None:
-        self.__output_state = output_state
+    def output_state(self, output_state: ndarray) -> None:
+        self.__output_state = asarray(output_state, dtype=int64)
 
     def calculate(self) -> ndarray:
-        number_of_columns = sum(self.input_state)
-        effective_scattering_matrix = zeros(shape=(number_of_columns, number_of_columns), dtype=complex128)
-        helper_matrix = zeros(shape=(len(self.__matrix), number_of_columns), dtype=complex128)
-        next_column_index = 0
+        transposed_input_matrix = transpose(self.__matrix)
+        helper_mtx = []
 
-        for j in range(len(self.input_state)):
-            for i in range(self.input_state[j]):
-                helper_matrix[:, [next_column_index]] = self.__matrix[:, [j]]
-                next_column_index += 1
-        next_row_index = 0
+        for index_of_column_to_insert in range(len(self.__input_state)):
+            helper_mtx += [transposed_input_matrix[index_of_column_to_insert]] * \
+                int(self.__input_state[index_of_column_to_insert])
 
-        for j in range(len(self.output_state)):
-            for i in range(int(self.output_state[j])):
-                effective_scattering_matrix[[next_row_index], :] = helper_matrix[[j], :]
+        helper_mtx = transpose(array(helper_mtx, dtype=complex128))
 
-                next_row_index += 1
+        effective_scattering_matrix = []
 
-        return effective_scattering_matrix
+        for index_of_row_to_insert in range(len(self.__output_state)):
+            effective_scattering_matrix += [helper_mtx[index_of_row_to_insert]] * \
+                int(self.__output_state[index_of_row_to_insert])
+
+        return array(effective_scattering_matrix, dtype=complex128)
 
 
 class EffectiveScatteringMatrixPermanentCalculator:
@@ -217,12 +220,12 @@ class EffectiveScatteringMatrixPermanentCalculator:
         generates the matrix, and then calculates the permanent via standard means.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
-                 output_state: Optional[List[int]] = None):
+    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
+                 output_state: Optional[ndarray] = None) -> None:
         if output_state is None:
-            output_state = []
+            output_state = array([], dtype=int64)
         if input_state is None:
-            input_state = []
+            input_state = array([], dtype=int64)
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -232,24 +235,24 @@ class EffectiveScatteringMatrixPermanentCalculator:
         return self.__matrix
 
     @matrix.setter
-    def matrix(self, matrix) -> None:
+    def matrix(self, matrix: ndarray) -> None:
         self.__matrix = matrix
 
     @property
-    def input_state(self) -> List[int]:
+    def input_state(self) -> ndarray:
         return self.__input_state
 
     @input_state.setter
-    def input_state(self, input_state) -> None:
-        self.__input_state = input_state
+    def input_state(self, input_state: ndarray) -> None:
+        self.__input_state = asarray(input_state, dtype=int64)
 
     @property
-    def output_state(self) -> List[int]:
+    def output_state(self) -> ndarray:
         return self.__output_state
 
     @output_state.setter
-    def output_state(self, output_state) -> None:
-        self.__output_state = output_state
+    def output_state(self, output_state: ndarray) -> None:
+        self.__output_state = asarray(output_state, dtype=int64)
 
     def calculate(self) -> complex128:
         scattering_matrix_calculator = \
@@ -265,12 +268,12 @@ class ChinHuhPermanentCalculator:
         states are set to [1, 1, ..., 1] with proper dimensions.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[List[int]] = None,
-                 output_state: Optional[List[int]] = None):
+    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
+                 output_state: Optional[ndarray] = None) -> None:
         if output_state is None:
-            output_state = []
+            output_state = array([], dtype=int64)
         if input_state is None:
-            input_state = []
+            input_state = array([], dtype=int64)
         self.__matrix = matrix
         self.__input_state = input_state
         self.__output_state = output_state
@@ -280,24 +283,24 @@ class ChinHuhPermanentCalculator:
         return self.__matrix
 
     @matrix.setter
-    def matrix(self, matrix) -> None:
+    def matrix(self, matrix: ndarray) -> None:
         self.__matrix = matrix
 
     @property
-    def input_state(self) -> List[int]:
+    def input_state(self) -> ndarray:
         return self.__input_state
 
     @input_state.setter
-    def input_state(self, input_state) -> None:
-        self.__input_state = input_state
+    def input_state(self, input_state: ndarray) -> None:
+        self.__input_state = asarray(input_state, dtype=int64)
 
     @property
-    def output_state(self) -> List[int]:
+    def output_state(self) -> ndarray:
         return self.__output_state
 
     @output_state.setter
-    def output_state(self, output_state) -> None:
-        self.__output_state = output_state
+    def output_state(self, output_state: ndarray) -> None:
+        self.__output_state = asarray(output_state, dtype=int64)
 
     def calculate(self) -> complex128:
         """
@@ -312,7 +315,7 @@ class ChinHuhPermanentCalculator:
 
         v_vectors = self.__calculate_v_vectors()
 
-        permanent = 0
+        permanent = complex128(0)
         for v_vector in v_vectors:
             v_sum = sum(v_vector)
             addend = pow(-1, v_sum)
@@ -342,14 +345,14 @@ class ChinHuhPermanentCalculator:
             :return: Information if the calculation can be performed.
         """
         return self.__matrix.shape[0] == self.__matrix.shape[1] \
-               and len(self.__output_state) == len(self.__input_state) \
-               and len(self.__output_state) == self.__matrix.shape[0]
+            and len(self.__output_state) == len(self.__input_state) \
+            and len(self.__output_state) == self.__matrix.shape[0]
 
-    def __calculate_v_vectors(self, input_vector: Optional[list] = None) -> List[List[int]]:
+    def __calculate_v_vectors(self, input_vector: Optional[ndarray] = None) -> List[ndarray]:
         if input_vector is None:
             input_vector = []
         v_vectors = []
-        for i in range(self.__input_state[len(input_vector)] + 1):
+        for i in range(int(self.__input_state[len(input_vector)]) + 1):
             input_state = input_vector.copy()
             input_state.append(i)
 

@@ -30,11 +30,11 @@ class BosonSamplingExperimentConfiguration:
 
 class BosonSamplingExactDistributionCalculator:
     """ Interface for boson sampling exact distribution calculators """
-    def calculate_exact_distribution(self) -> List[List[float]]:
+    def calculate_exact_distribution(self) -> List[float]:
         """ One has to be able to calculate exact distribution with it """
         raise NotImplementedError
 
-    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+    def get_outcomes_in_proper_order(self) -> List[ndarray]:
         """ One also has to know the order of objects that returned probabilities correspond to """
         raise NotImplementedError
 
@@ -43,11 +43,11 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
     def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
         self.configuration = deepcopy(configuration)
 
-    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+    def get_outcomes_in_proper_order(self) -> List[ndarray]:
         return generate_possible_outputs(self.configuration.number_of_particles_left,
                                          self.configuration.number_of_modes)
 
-    def calculate_exact_distribution(self) -> List[List[float]]:
+    def calculate_exact_distribution(self) -> List[float]:
         """
         This method will be used to calculate the exact distribution of lossy boson sampling experiment.
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
@@ -57,9 +57,8 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
         possible_outcomes = generate_possible_outputs(self.configuration.number_of_particles_left,
                                                       self.configuration.number_of_modes)
 
-        outcomes_probabilities = []
-        for outcome in possible_outcomes:
-            outcomes_probabilities.append(self.__calculate_probability_of_outcome(outcome))
+        outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for outcome in possible_outcomes]
+
         return outcomes_probabilities
 
     def __calculate_probability_of_outcome(self, outcome: ndarray) -> float:
@@ -69,7 +68,6 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
         :param outcome: An outcome which probability of obtaining will be calculated.
         :return: Probability of obtaining given outcome in situation presented by by the
         """
-        outcome_probability = 0  # Initialize with 0 for later debug purposes.
         outcome_state_in_particle_basis = modes_state_to_particle_state(outcome,
                                                                         self.configuration.number_of_particles_left)
 
@@ -85,8 +83,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
 
     def __calculate_probability_of_outcome_state_for_indistinguishable_photons(
             self, outcome_state_in_particle_basis: ndarray) -> float:
-        copy_of_outcome_state = outcome_state_in_particle_basis.copy()
-        outcome_state_in_mode_basis = particle_state_to_modes_state(copy_of_outcome_state,
+        outcome_state_in_mode_basis = particle_state_to_modes_state(outcome_state_in_particle_basis,
                                                                     self.configuration.number_of_modes)
         probability_of_outcome = 0
 
@@ -124,8 +121,8 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
                                                                                  columns_permutation_submatrix)
 
     def __create_column_submatrix_of_effective_boson_scattering_matrix(self, lossy_input: ndarray) -> ndarray:
-        columns_permutation_submatrix = 1j * zeros((self.configuration.number_of_modes,
-                                                    self.configuration.number_of_particles_left))
+        columns_permutation_submatrix = zeros((self.configuration.number_of_modes,
+                                               self.configuration.number_of_particles_left), dtype=complex)
 
         # Copying occupation_number times the i-th column of permutation_matrix (or U in general).
         column_iterator = 0
@@ -143,8 +140,8 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
 
     def __create_rows_submatrix_of_effective_boson_scattering_matrix(
             self, outcome_state_in_mode_basis: ndarray, columns_permutation_submatrix: ndarray) -> ndarray:
-        permutation_submatrix = 1j * zeros((self.configuration.number_of_particles_left,
-                                            self.configuration.number_of_particles_left))
+        permutation_submatrix = zeros((self.configuration.number_of_particles_left,
+                                       self.configuration.number_of_particles_left), dtype=complex)
         submatrix_row = 0
 
         # Copying occupation_number times the i-th row of columns_permutation_submatrix.
@@ -161,9 +158,9 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
 class BosonSamplingWithUniformLossesExactDistributionCalculator \
             (BosonSamplingWithFixedLossesExactDistributionCalculator):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
-        self.configuration = deepcopy(configuration)
+        super().__init__(configuration)
 
-    def calculate_exact_distribution(self) -> List[List[float]]:
+    def calculate_exact_distribution(self) -> List[float]:
         """
         This method will be used to calculate the exact distribution of lossy boson sampling experiment.
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
@@ -194,7 +191,7 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
 
         return exact_distribution
 
-    def get_outcomes_in_proper_order(self) -> List[List[int]]:
+    def get_outcomes_in_proper_order(self) -> List[ndarray]:
         possible_outcomes = []
 
         for number_of_particles_left in range(self.configuration.initial_number_of_particles + 1):
