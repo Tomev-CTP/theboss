@@ -2,7 +2,7 @@ __author__ = 'Tomasz Rybotycki'
 
 import unittest
 
-from numpy import array
+from numpy import array, complex128, int64
 
 from src.LossyBosonSamplingExactDistributionCalculators import (
     BosonSamplingExperimentConfiguration,
@@ -23,9 +23,9 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             [0, 0, 0, 1, 0],
             [0, 0, 0, 0, 1],
             [0, 1, 0, 0, 0],
-        ])
+        ], dtype=complex128)
 
-        self.initial_state = array([1, 1, 1, 0, 0])
+        self.initial_state = array([1, 1, 1, 0, 0], dtype=int64)
 
         # Create configuration object.
         self.experiment_configuration = BosonSamplingExperimentConfiguration(

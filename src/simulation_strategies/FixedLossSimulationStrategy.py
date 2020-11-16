@@ -3,7 +3,7 @@ __author__ = 'Tomasz Rybotycki'
 from random import random
 from typing import List, Optional
 
-from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
+from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, int64
 from numpy.random import rand
 
 from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
@@ -48,7 +48,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             on n photons 'smeared' on first n modes).
         """
         initial_number_of_photons = int(sum(input_state))
-        prepared_state = ones(self.number_of_observed_modes)
+        prepared_state = ones(self.number_of_observed_modes, dtype=float)
         prepared_state[initial_number_of_photons:] = 0
         prepared_state /= sqrt(initial_number_of_photons)  # Note, that numpy version of sqrt is used here!
 

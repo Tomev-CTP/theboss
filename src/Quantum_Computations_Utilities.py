@@ -53,6 +53,28 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         :param error_probability: Desired probability of error.
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
-    error_bound = log2(float(2 ** outcomes_number - 2)) - log2(error_probability)
+    possibly_huge_number = 2 ** outcomes_number - 2
+    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+
+    error_bound = log2(error_probability)
+
+    for prime_factor in prime_factors_of_the_number:
+        error_bound += log2(prime_factor)
+
     error_bound /= 2 * samples_number
     return sqrt(error_bound)
+
+
+def get_prime_factors(number: int) -> List[int]:
+    prime_factors = []
+
+    while number % 2 == 0:
+        prime_factors.append(2)
+        number = number / 2
+
+    for i in range(3,int(sqrt(number)) + 1,2):
+        while number % i == 0:
+            prime_factors.append(i)
+            number = number / i
+
+    return prime_factors

@@ -1,4 +1,4 @@
-from numpy import delete, ndarray, vstack, zeros_like
+from numpy import delete, ndarray, vstack, zeros_like, complex128
 
 from src.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
@@ -21,7 +21,7 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         """
         # Divide by two, because we have 2N x 2N matrix
         input_state = input_state.reshape(self._matrix.shape[0] // 2, 1)
-        expansion_zeros = zeros_like(input_state)
+        expansion_zeros = zeros_like(input_state, dtype=complex128)
         expanded_state = vstack([input_state, expansion_zeros])
         evolved_state = self._matrix @ expanded_state
         # Trim the resultant state

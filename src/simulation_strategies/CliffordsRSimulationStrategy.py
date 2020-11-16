@@ -5,7 +5,9 @@ __author__ = 'Tomasz Rybotycki'
 # https://cran.r-project.org/web/packages/BosonSampling/index.html
 
 
-from numpy import ndarray, array, arange, array_split
+from typing import List
+
+from numpy import arange, array, array_split, int64, ndarray
 from rpy2.robjects import packages
 
 from src.Boson_Sampling_Utilities import particle_state_to_modes_state
@@ -31,18 +33,19 @@ class CliffordsRSimulationStrategy(SimulationStrategy):
         boson_sampling_package = packages.importr('BosonSampling')
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
 
-    def simulate(self, initial_state: ndarray, samples_number: int = 1) -> ndarray:
+    def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         number_of_bosons = sum(initial_state)
+
         boson_sampler_input_matrix = numpy_array_to_r_matrix(self.interferometer_matrix[:, arange(number_of_bosons)])
 
         result, permanent, probability_mass_function = \
             self.cliffords_r_sampler(boson_sampler_input_matrix, sampleSize=samples_number, perm=False)
+
         # Add -1 to R indexation of modes (they start from 1).
-        python_result = array([result[i] - 1 for i in range(len(result))])
+        python_result = array([mode_value - 1 for mode_value in result], dtype=int64)
         samples_in_particle_states = array_split(python_result, number_of_bosons)
 
         samples = [particle_state_to_modes_state(sample, len(self.interferometer_matrix))
                    for sample in samples_in_particle_states]
 
         return samples
-        #return particle_state_to_modes_state(python_result, len(self.interferometer_matrix))

@@ -5,7 +5,7 @@ from copy import copy
 from math import factorial
 from typing import List
 
-from numpy import arange, array, delete, insert, ndarray
+from numpy import arange, array, delete, insert, ndarray, int64, float64
 from numpy.linalg import norm
 from numpy.random import choice
 
@@ -17,12 +17,12 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
     def __init__(self, interferometer_matrix: ndarray) -> None:
         self.r_sample = []
         self.number_of_input_photons = 0
-        self.pmfs = dict()  # Probability mass functions calculated along the way. Keys should be ids of current r.
+        self.pmfs = dict()  # Probability mass functions calculated along the way. Keys should be current r as tuples.
         self.interferometer_matrix = interferometer_matrix
-        self.input_state = array([])
+        self.input_state = array([], dtype=int64)
         self._labeled_states = defaultdict(list)
         self.possible_outputs = dict()
-        self.current_key = hash(tuple(self.r_sample))
+        self.current_key = tuple(self.r_sample)
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -41,7 +41,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
         while len(samples) < samples_number:
             self.__fill_r_sample()
-            samples.append(array(self.r_sample))
+            samples.append(array(self.r_sample, dtype=int64))
         return samples
 
     def __get_sorted_possible_states(self) -> None:
@@ -70,7 +70,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         :return: All the substates for starting number of modes.
         """
         if len(state_part_left) < 1:
-            return [array([])]
+            return [array([], dtype=int64)]
 
         n = state_part_left[0]
         state_part_left = delete(state_part_left, 0)
@@ -87,7 +87,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
     def __fill_r_sample(self) -> None:
         self.r_sample = [0 for _ in self.interferometer_matrix]
-        self.current_key = hash(tuple(self.r_sample))
+        self.current_key = tuple(self.r_sample)
 
         while self.number_of_input_photons > sum(self.r_sample):
             if self.current_key not in self.pmfs:
@@ -99,7 +99,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
-        weights = self.__calculate_weights_from_k_vectors(array(corresponding_k_vectors))
+        weights = self.__calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=int64))
         normalized_weights = weights / norm(weights)
         self.possible_outputs[self.current_key] = self.__generate_possible_output_states()
 
@@ -118,7 +118,8 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self.pmfs[self.current_key] = pmf
 
     def __calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
-        return array([self.__calculate_multinomial_coefficient(vector) for vector in corresponding_k_vectors])
+        return array([self.__calculate_multinomial_coefficient(vector)
+                      for vector in corresponding_k_vectors], dtype=float64)
 
     @staticmethod
     def __calculate_multinomial_coefficient(vector: ndarray) -> int:
@@ -140,7 +141,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         for i in range(len(self.r_sample)):
             new_possible_output = copy(self.r_sample)
             new_possible_output[i] += 1
-            possible_output_states.append(array(new_possible_output))
+            possible_output_states.append(array(new_possible_output, dtype=int64))
         return possible_output_states
 
     def __calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray) -> float:
@@ -156,4 +157,4 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
     def __sample_from_latest_pmf(self) -> None:
         sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]
         self.r_sample = self.possible_outputs[self.current_key][sample_index]
-        self.current_key = hash(tuple(self.r_sample))
+        self.current_key = tuple(self.r_sample)

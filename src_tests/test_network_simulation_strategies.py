@@ -26,7 +26,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             len(self._initial_state))
         self._experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._lossy_interferometer_matrix,
-            initial_state=asarray(self._initial_state),
+            initial_state=asarray(self._initial_state, dtype=int),
             initial_number_of_particles=sum(self._initial_state),
             number_of_modes=len(self._initial_state),
             number_of_particles_lost=0,  # Losses should only come from network.
@@ -51,7 +51,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         lossy_average_number_of_particles = 0
-        samples = simulator.get_classical_simulation_results(self._initial_state,
+        samples = simulator.get_classical_simulation_results(asarray(self._initial_state, dtype=int),
                                                              self._number_of_samples_for_experiments)
         for sample in samples:
             lossy_average_number_of_particles += sum(sample)
@@ -159,7 +159,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         experiment (in test case setup).
         :return: Input state after losses.
         """
-        lossy_input = asarray(self._initial_state)
+        lossy_input = asarray(self._initial_state, dtype=int)
         for i in range(len(self._initial_state)):
             for _ in range(self._initial_state[i]):
                 if uniform(0, 1) < self._experiment_configuration.probability_of_uniform_loss:
@@ -174,8 +174,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         """
         experiment_configuration = deepcopy(self._experiment_configuration)
         updated_interferometer_matrix = experiment_configuration.interferometer_matrix
-        identity_on_bosonful_modes = eye(sum(self._initial_state))
-        zeros_on_bosonless_modes = zeros_like(identity_on_bosonful_modes)
+        identity_on_bosonful_modes = eye(sum(self._initial_state), dtype=complex)
+        zeros_on_bosonless_modes = zeros_like(identity_on_bosonful_modes, dtype=complex)
         update_matrix = block([
             [identity_on_bosonful_modes, zeros_on_bosonless_modes],
             [zeros_on_bosonless_modes, zeros_on_bosonless_modes]
@@ -223,7 +223,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._strategy_factory.set_strategy_type(StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD)
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
-        samples = simulator.get_classical_simulation_results(asarray(self._initial_state),
+        samples = simulator.get_classical_simulation_results(asarray(self._initial_state, dtype=int),
                                                              self._number_of_samples_for_experiments)
 
         return self.__calculate_distribution(samples, self._possible_outcomes)
