@@ -1,6 +1,6 @@
 __author__ = 'Tomasz Rybotycki'
 
-from numpy import ndarray, zeros, int64
+from numpy import ndarray, zeros, float64
 
 from src.Boson_Sampling_Utilities import generate_possible_outputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
@@ -30,7 +30,7 @@ class ApproximateDistributionCalculator:
 
         simulator = BosonSamplingSimulator(self.strategy)
 
-        outcomes_probabilities = zeros(len(possible_outcomes), dtype=int64)
+        outcomes_probabilities = zeros(len(possible_outcomes), dtype=float64)
 
         samples = simulator.get_classical_simulation_results(self.configuration.initial_state, samples_number)
         for sample in samples:
@@ -40,7 +40,6 @@ class ApproximateDistributionCalculator:
                     outcomes_probabilities[j] += 1
                     break
 
-        for i in range(len(outcomes_probabilities)):
-            outcomes_probabilities[i] /= samples_number
+        outcomes_probabilities = outcomes_probabilities / samples_number
 
         return outcomes_probabilities
