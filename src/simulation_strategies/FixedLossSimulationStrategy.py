@@ -6,7 +6,8 @@ from typing import List, Optional
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, int64
 from numpy.random import rand
 
-from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
+# from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
+from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
@@ -18,7 +19,7 @@ class FixedLossSimulationStrategy(SimulationStrategy):
                  network_simulation_strategy: Optional[NetworkSimulationStrategy] = None) \
             -> None:
         if network_simulation_strategy is None:
-            network_simulation_strategy = LosslessNetworkSimulationStrategy(interferometer_matrix)
+            network_simulation_strategy = LossyNetworkSimulationStrategy(interferometer_matrix)
         self.number_of_photons_left = number_of_photons_left
         self.interferometer_matrix = interferometer_matrix
         self.number_of_observed_modes = number_of_observed_modes
