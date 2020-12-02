@@ -45,20 +45,20 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         """
             This method is used to prepare psi_0 state (formula 23 from ref. [1]).
             :param input_state: Initial lossy bosonic state.
-            :return: Returns initial state of the formula (being an equal superposition
-            on n photons 'smeared' on first n modes).
+            :return: Returns the initial state of the formula, which is an equal superposition
+            of n photons 'smeared' on the first n modes.
         """
         initial_number_of_photons = int(sum(input_state))
         prepared_state = ones(self.number_of_observed_modes, dtype=float)
         prepared_state[initial_number_of_photons:] = 0
         prepared_state /= sqrt(initial_number_of_photons)  # Note, that numpy version of sqrt is used here!
 
-        return self.__randomize_modes_phases(prepared_state)
+        return self._randomize_modes_phases(prepared_state)
 
     @staticmethod
-    def __randomize_modes_phases(state_in_modes_basis: ndarray) -> ndarray:
+    def _randomize_modes_phases(state_in_modes_basis: ndarray) -> ndarray:
         """
-            Randomize the phases of given mode state. Each mode should have different iid random
+            Randomize the phases of given mode state. Each mode should have different iid random phase.
             :param state_in_modes_basis: A given state in modes basis.
             :return: Given mode state with randomized phases.
         """
