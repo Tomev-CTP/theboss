@@ -8,6 +8,7 @@ from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrate
     LossyNetworksGeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
+from src.simulation_strategies.LosslessModesSimulationStrategy import LosslessModesSimulationStrategy
 
 
 class StrategyTypes(enum.IntEnum):
@@ -16,6 +17,7 @@ class StrategyTypes(enum.IntEnum):
     CLIFFORD_R = enum.auto()
     GENERALIZED_CLIFFORD = enum.auto()
     LOSSY_NET_GENERALIZED_CLIFFORD = enum.auto()
+    LOSSLESS_MODES_STRATEGY = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -28,7 +30,8 @@ class SimulationStrategyFactory:
             StrategyTypes.UNIFORM_LOSS: self.__generate_uniform_losses_strategy,
             StrategyTypes.CLIFFORD_R: self.__generate_r_cliffords_strategy,
             StrategyTypes.GENERALIZED_CLIFFORD: self.__generate_generalized_cliffords_strategy,
-            StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD: self.__generate_lossy_net_generalized_cliffords_strategy
+            StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD: self.__generate_lossy_net_generalized_cliffords_strategy,
+            StrategyTypes.LOSSLESS_MODES_STRATEGY: self.__generate_lossless_modes_strategy
         }
 
     def set_strategy_type(self, strategy_type: StrategyTypes) -> None:
@@ -93,3 +96,9 @@ class SimulationStrategyFactory:
         return LossyNetworksGeneralizedCliffordsSimulationStrategy(
             self._experiment_configuration.interferometer_matrix
         )
+
+    def __generate_lossless_modes_strategy(self) -> LosslessModesSimulationStrategy:
+        return LosslessModesSimulationStrategy(self._experiment_configuration.interferometer_matrix,
+                                               self._experiment_configuration.number_of_particles_left,
+                                               self._experiment_configuration.number_of_modes,
+                                               self._experiment_configuration.lossy_modes_number)

@@ -3,10 +3,9 @@ __author__ = 'Tomasz Rybotycki'
 from random import random
 from typing import List, Optional
 
-from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, int64
+from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
 from numpy.random import rand
 
-# from src.network_simulation_strategy.LosslessNetworkSimulationStrategy import LosslessNetworkSimulationStrategy
 from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy

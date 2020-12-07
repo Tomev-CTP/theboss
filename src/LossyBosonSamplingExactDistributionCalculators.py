@@ -26,6 +26,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_left: int
     probability_of_uniform_loss: float = 0
     network_simulation_strategy: NetworkSimulationStrategy = None
+    lossy_modes_number: int = 0
 
 
 class BosonSamplingExactDistributionCalculator:
