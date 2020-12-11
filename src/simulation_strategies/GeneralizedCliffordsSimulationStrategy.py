@@ -8,6 +8,7 @@ from typing import List
 from numpy import arange, array, delete, insert, ndarray, int64, float64
 from numpy.linalg import norm
 from numpy.random import choice
+from numpy.random import random
 
 from src.Boson_Sampling_Utilities import ChinHuhPermanentCalculator
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
@@ -155,6 +156,16 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return probability
 
     def __sample_from_latest_pmf(self) -> None:
-        sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]
+        # sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]  $ Takes too long, due to casting.
+
+        sample_index = 0
+        random_value = random()
+        current_probability = 0
+        for probability in self.pmfs[self.current_key]:
+            current_probability += probability
+            if current_probability > random_value:
+                break
+            sample_index += 1
+
         self.r_sample = self.possible_outputs[self.current_key][sample_index]
         self.current_key = tuple(self.r_sample)
