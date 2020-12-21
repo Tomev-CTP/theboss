@@ -24,6 +24,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         self._labeled_states = defaultdict(list)
         self.possible_outputs = dict()
         self.current_key = tuple(self.r_sample)
+        self.current_sample_probability = 1
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -89,6 +90,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
     def __fill_r_sample(self) -> None:
         self.r_sample = [0 for _ in self.interferometer_matrix]
         self.current_key = tuple(self.r_sample)
+        self.current_sample_probability = 1
 
         while self.number_of_input_photons > sum(self.r_sample):
             if self.current_key not in self.pmfs:
@@ -100,8 +102,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
-        weights = self.__calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=int64))
-        normalized_weights = weights / norm(weights)
+        weights = self.__calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
         self.possible_outputs[self.current_key] = self.__generate_possible_output_states()
 
         pmf = []
@@ -110,12 +111,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
             pmf.append(0)
             for i in range(len(possible_input_states)):
                 probability = self.__calculate_outputs_probability(possible_input_states[i], output)
-                probability *= normalized_weights[i] ** 2
+                probability *= weights[i]
                 pmf[-1] += probability
 
-        probabilities_sum = sum(pmf)
-
-        pmf = [probability / probabilities_sum for probability in pmf]
         self.pmfs[self.current_key] = pmf
 
     def __calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
@@ -159,7 +157,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         # sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]  $ Takes too long, due to casting.
 
         sample_index = 0
-        random_value = random()
+        random_value = random() * sum(self.pmfs[self.current_key]) # PMFs are not normalized.
         current_probability = 0
         for probability in self.pmfs[self.current_key]:
             current_probability += probability
@@ -167,5 +165,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
                 break
             sample_index += 1
 
+
+        self.current_sample_probability = self.pmfs[self.current_key][sample_index]
         self.r_sample = self.possible_outputs[self.current_key][sample_index]
         self.current_key = tuple(self.r_sample)

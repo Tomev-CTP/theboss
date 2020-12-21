@@ -5,7 +5,7 @@ __author__ = 'Tomasz Rybotycki'
 import itertools
 from typing import List, Optional
 
-from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like, transpose, int64, asarray
+from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like, transpose, int64, asarray, eye
 from numpy.linalg import svd
 from scipy.special import binom
 
@@ -141,17 +141,22 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
 def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
     expansions_zeros = zeros_like(v_matrix)
-    expansions_ones = ones_like(v_matrix)
+    expansions_ones = eye(len(v_matrix))
     expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
-    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
-                                             [singular_values_matrix_expansion, diag(singular_values)]])
+    singular_values_expanded_matrix = block([[diag(singular_values), expansions_zeros],
+                                             [singular_values_matrix_expansion, expansions_zeros]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
 def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
-    expansion_values = sqrt(1.0 - power(singular_values_vector, 2))
+    vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
+    for i in range(len(vector_of_squared_expansions)):
+        if vector_of_squared_expansions[i] < 0:
+            vector_of_squared_expansions[i] = 0
+
+    expansion_values = sqrt(vector_of_squared_expansions)
     return diag(expansion_values)
 
 

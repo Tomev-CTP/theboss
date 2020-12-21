@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
 from numpy.random import rand
+from numpy.linalg import norm
 
 from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
@@ -34,13 +35,15 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         """
         samples = []
         while len(samples) < samples_number:
-            phi_0 = self.__prepare_initial_state(input_state)
+            phi_0 = self._prepare_initial_state(input_state)
             evolved_state = self._network_simulation_strategy.simulate(phi_0)
-            probabilities = self.__calculate_probabilities(evolved_state)
-            samples.append(self.__calculate_approximation_of_boson_sampling_outcome(probabilities))
+            evolved_state = evolved_state / norm(input_state)
+            probabilities = self._calculate_probabilities(evolved_state)
+            print(probabilities)
+            samples.append(self._calculate_approximation_of_boson_sampling_outcome(probabilities))
         return samples
 
-    def __prepare_initial_state(self, input_state: ndarray) -> ndarray:
+    def _prepare_initial_state(self, input_state: ndarray) -> ndarray:
         """
             This method is used to prepare psi_0 state (formula 23 from ref. [1]).
             :param input_state: Initial lossy bosonic state.
@@ -64,10 +67,10 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         return exp(1j * rand(len(state_in_modes_basis))) * state_in_modes_basis
 
     @staticmethod
-    def __calculate_probabilities(state: ndarray) -> ndarray:
+    def _calculate_probabilities(state: ndarray) -> ndarray:
         return conjugate(state) * state
 
-    def __calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
+    def _calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
         """
             This method applies evolution to every photon. Note, that evolution of each particle is independent of
             each other.
