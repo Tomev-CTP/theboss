@@ -50,7 +50,6 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights =\
             [pow(self._uniform_losses, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
-        #print(self._binomial_weights)
         self.distribution[0] = self._binomial_weights[0]
 
         samples = []
@@ -69,7 +68,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         self.current_sample_probability = 1
 
         for i in range(self.number_of_input_photons):
-            if random() <= power(self._uniform_losses, 2):
+            if random() >= power(self._uniform_losses, 2):
                 continue
             if self.current_key not in self.pmfs:
                 self._calculate_new_layer_of_pmfs()
