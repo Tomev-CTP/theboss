@@ -103,6 +103,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+        weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
@@ -147,10 +148,12 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         permanent_calculator = ChinHuhPermanentCalculator(self.interferometer_matrix, input_state=input_state,
                                                           output_state=output_state)
         probability = abs(permanent_calculator.calculate()) ** 2
+
         for mode_occupation_number in input_state:
             probability /= factorial(mode_occupation_number)
         for mode_occupation_number in output_state:
             probability /= factorial(mode_occupation_number)
+
         return probability
 
     def _sample_from_latest_pmf(self) -> None:

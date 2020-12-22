@@ -12,7 +12,7 @@ from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWith
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
     def __init__(self, interferometer_matrix: ndarray, uniform_losses: float = 0):
         self._uniform_losses = uniform_losses
-        self._distribution = []
+        self.distribution = []
         self._possible_outputs = []
         self._binomial_weights = []
         super().__init__(interferometer_matrix=interferometer_matrix)
@@ -38,16 +38,20 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
             initial_state=input_state,
             initial_number_of_particles=n,
             number_of_modes=len(input_state),
-            probability_of_uniform_loss=eta
+            probability_of_uniform_loss=eta,
+            number_of_particles_lost=0,
+            number_of_particles_left=0
         )
 
         calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(configuration)
         self._possible_outputs = calculator.get_outcomes_in_proper_order()
-        self._distribution = [0 for _ in self._possible_outputs]
+        self.distribution = [0 for _ in self._possible_outputs]
 
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights =\
-            [pow(self._uniform_losses, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in n + 1]
+            [pow(self._uniform_losses, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
+        #print(self._binomial_weights)
+        self.distribution[0] = self._binomial_weights[0]
 
         samples = []
 
@@ -77,6 +81,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+        weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
@@ -88,7 +93,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
                 probability *= weights[i]
                 pmf[-1] += probability
             for i in range(len(self._possible_outputs)):
-                if all(output == self._possible_outputs[i]) == 0:
-                    self._distribution[i] = pmf[-1] * self._binomial_weights[sum(output)]
+                if all(output == self._possible_outputs[i]):
+                    self.distribution[i] = pmf[-1] * self._binomial_weights[sum(output)]
 
         self.pmfs[self.current_key] = pmf
