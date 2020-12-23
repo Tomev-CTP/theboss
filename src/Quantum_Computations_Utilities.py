@@ -56,7 +56,7 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
     possibly_huge_number = 2 ** outcomes_number - 2
     prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
 
-    error_bound = log2(error_probability)
+    error_bound = -log2(error_probability)
 
     for prime_factor in prime_factors_of_the_number:
         error_bound += log2(prime_factor)
@@ -77,4 +77,22 @@ def get_prime_factors(number: int) -> List[int]:
             prime_factors.append(i)
             number = number / i
 
+    prime_factors.append(number)
+
     return prime_factors
+
+
+def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
+                                                           accuracy: float) -> int:
+
+    possibly_huge_number = 2 ** outcomes_number - 2
+    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+
+    samples_number = -log2(error_probability)
+
+    for prime_factor in prime_factors_of_the_number:
+        samples_number += log2(prime_factor)
+
+    samples_number /= 2 * pow(accuracy, 2)
+
+    return int(samples_number) + 1

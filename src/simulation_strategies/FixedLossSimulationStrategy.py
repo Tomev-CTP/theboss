@@ -39,7 +39,6 @@ class FixedLossSimulationStrategy(SimulationStrategy):
             evolved_state = self._network_simulation_strategy.simulate(phi_0)
             evolved_state = evolved_state / norm(input_state)
             probabilities = self._calculate_probabilities(evolved_state)
-            print(probabilities)
             samples.append(self._calculate_approximation_of_boson_sampling_outcome(probabilities))
         return samples
 

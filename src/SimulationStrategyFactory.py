@@ -33,7 +33,8 @@ class SimulationStrategyFactory:
             StrategyTypes.CLIFFORD_R: self._generate_r_cliffords_strategy,
             StrategyTypes.GENERALIZED_CLIFFORD: self._generate_generalized_cliffords_strategy,
             StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD: self._generate_lossy_net_generalized_cliffords_strategy,
-            StrategyTypes.LOSSLESS_MODES_STRATEGY: self._generate_lossless_modes_strategy
+            StrategyTypes.LOSSLESS_MODES_STRATEGY: self._generate_lossless_modes_strategy,
+            StrategyTypes.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy
         }
 
     def set_strategy_type(self, strategy_type: StrategyTypes) -> None:

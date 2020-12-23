@@ -17,7 +17,7 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         expansion_zeros = zeros_like(input_state)
         expanded_state = vstack([input_state, expansion_zeros])
         expanded_state = expanded_state.reshape(2 * len(input_state), )
-        expanded_samples = self._helper_strategy.simulate(expanded_state)
+        expanded_samples = self._helper_strategy.simulate(expanded_state, samples_number)
         # Trim output state
         samples = []
 
