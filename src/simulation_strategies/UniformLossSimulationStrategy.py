@@ -13,18 +13,18 @@ from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 class UniformLossSimulationStrategy(SimulationStrategy):
     def __init__(self, interferometer_matrix: ndarray,
-                 number_of_modes: int, probability_of_uniform_loss: float) \
+                 number_of_modes: int, transmissivity: float) \
             -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_modes = number_of_modes
-        self.probability_of_uniform_loss = probability_of_uniform_loss
+        self.transmissivity = transmissivity
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         initial_number_of_particles = int(sum(input_state))
 
         # Using n, eta, l notation from the paper.
         n = initial_number_of_particles
-        eta = self.probability_of_uniform_loss
+        eta = self.transmissivity
 
         separable_states_weights = [pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l) for l in range(n + 1)]
 
