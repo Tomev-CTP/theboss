@@ -71,7 +71,7 @@ class SimulationStrategyFactory:
         return UniformLossSimulationStrategy(
             self._experiment_configuration.interferometer_matrix,
             self._experiment_configuration.number_of_modes,
-            self._experiment_configuration.probability_of_uniform_loss
+            self._experiment_configuration.uniform_transmissivity
         )
 
     def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
@@ -108,4 +108,4 @@ class SimulationStrategyFactory:
 
     def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
         return GeneralizedCliffordsUniformLossesSimulationStrategy(self._experiment_configuration.interferometer_matrix,
-                                                                   self._experiment_configuration.probability_of_uniform_loss)
+                                                                   self._experiment_configuration.uniform_transmissivity)

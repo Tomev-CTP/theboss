@@ -7,11 +7,11 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import List
 
-from numpy import ndarray, zeros
+from numpy import ndarray, zeros, asarray
 from scipy import special
 
 from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inputs, generate_possible_outputs, \
-    modes_state_to_particle_state, particle_state_to_modes_state
+    modes_state_to_particle_state, particle_state_to_modes_state, ChinHuhPermanentCalculator
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 
@@ -24,7 +24,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_modes: int
     number_of_particles_lost: int
     number_of_particles_left: int
-    probability_of_uniform_loss: float = 0
+    uniform_transmissivity: float = 0
     network_simulation_strategy: NetworkSimulationStrategy = None
     lossy_modes_number: int = 0
 
@@ -69,11 +69,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
         :param outcome: An outcome which probability of obtaining will be calculated.
         :return: Probability of obtaining given outcome in situation presented by by the
         """
-        outcome_state_in_particle_basis = modes_state_to_particle_state(outcome,
-                                                                        self.configuration.number_of_particles_left)
-
-        outcome_probability = self.__calculate_probability_of_outcome_state_for_indistinguishable_photons(
-            outcome_state_in_particle_basis)
+        outcome_probability = self.__calculate_probability_of_outcome_state_for_indistinguishable_photons(outcome)
 
         # Different states in particles-basis may give the same outcome state.
         outcome_probability *= math.factorial(self.configuration.number_of_particles_left)
@@ -82,10 +78,7 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
 
         return outcome_probability
 
-    def __calculate_probability_of_outcome_state_for_indistinguishable_photons(
-            self, outcome_state_in_particle_basis: ndarray) -> float:
-        outcome_state_in_mode_basis = particle_state_to_modes_state(outcome_state_in_particle_basis,
-                                                                    self.configuration.number_of_modes)
+    def __calculate_probability_of_outcome_state_for_indistinguishable_photons(self, outcome_state: ndarray) -> float:
         probability_of_outcome = 0
 
         # Symmetrize the input.
@@ -93,8 +86,10 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
                                                   self.configuration.number_of_particles_left)
 
         for lossy_input in lossy_inputs_list:
-            subprobability = abs(calculate_permanent(
-                self.__count_effective_boson_scattering_matrix(lossy_input, outcome_state_in_mode_basis))) ** 2
+            permanent_calculator = ChinHuhPermanentCalculator(self.configuration.interferometer_matrix,
+                                                              input_state=lossy_input,
+                                                              output_state=outcome_state)
+            subprobability = abs(permanent_calculator.calculate()) ** 2
             for mode_occupation_number in lossy_input:
                 subprobability /= math.factorial(mode_occupation_number)
 
@@ -106,54 +101,6 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
                                                 self.configuration.number_of_particles_left)
 
         return probability_of_outcome
-
-    def __count_effective_boson_scattering_matrix(
-            self, lossy_input: ndarray, outcome_state_in_mode_basis: ndarray) -> ndarray:
-        """
-        In order to calculate exact distribution of a boson sampling experiment with interferometer denoted as U, a
-        permanent of specific matrix has to be calculated. The matrix has no distinct name, and it's only description
-        is a recipe how to construct it (described in e.g. Brod and Oszmaniec).
-        :param lossy_input:
-        :param outcome_state_in_mode_basis:
-        :return: The submatrix for permanent calculator.
-        """
-        columns_permutation_submatrix = self.__create_column_submatrix_of_effective_boson_scattering_matrix(lossy_input)
-        return self.__create_rows_submatrix_of_effective_boson_scattering_matrix(outcome_state_in_mode_basis,
-                                                                                 columns_permutation_submatrix)
-
-    def __create_column_submatrix_of_effective_boson_scattering_matrix(self, lossy_input: ndarray) -> ndarray:
-        columns_permutation_submatrix = zeros((self.configuration.number_of_modes,
-                                               self.configuration.number_of_particles_left), dtype=complex)
-
-        # Copying occupation_number times the i-th column of permutation_matrix (or U in general).
-        column_iterator = 0
-        mode_number = 0
-
-        for occupation_number in lossy_input:
-            while occupation_number > 0:
-                columns_permutation_submatrix[:, column_iterator] = \
-                    self.configuration.interferometer_matrix[:, mode_number]
-                column_iterator += 1
-                occupation_number -= 1
-            mode_number += 1
-
-        return columns_permutation_submatrix
-
-    def __create_rows_submatrix_of_effective_boson_scattering_matrix(
-            self, outcome_state_in_mode_basis: ndarray, columns_permutation_submatrix: ndarray) -> ndarray:
-        permutation_submatrix = zeros((self.configuration.number_of_particles_left,
-                                       self.configuration.number_of_particles_left), dtype=complex)
-        submatrix_row = 0
-
-        # Copying occupation_number times the i-th row of columns_permutation_submatrix.
-        for mode_number in range(self.configuration.number_of_modes):
-            occupation_number = outcome_state_in_mode_basis[mode_number]
-            while occupation_number > 0:
-                permutation_submatrix[submatrix_row, :] = columns_permutation_submatrix[mode_number, :]
-                occupation_number -= 1
-                submatrix_row += 1
-
-        return permutation_submatrix
 
 
 class BosonSamplingWithUniformLossesExactDistributionCalculator \
@@ -172,7 +119,8 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
 
         # Using eta, n and l notation from the paper for readability purposes.
         n = self.configuration.initial_number_of_particles
-        eta = self.configuration.probability_of_uniform_loss
+        eta = self.configuration.uniform_transmissivity
+
         for number_of_particles_left in range(n + 1):  # +1 to include situation with all particles left.
 
             l = number_of_particles_left
