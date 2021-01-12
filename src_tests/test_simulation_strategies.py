@@ -250,7 +250,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         #
         error_bound = 0
         n = self._distributions_distance_experiment_configuration.initial_number_of_particles
-        eta = self._distributions_distance_experiment_configuration.probability_of_uniform_loss
+        eta = self._distributions_distance_experiment_configuration.uniform_transmissivity
         for number_of_particles_left in range(n + 1):
             l = number_of_particles_left
             subdistribution_weight = pow(eta, l) * binom(n, l) * pow(1.0 - eta, n - l)

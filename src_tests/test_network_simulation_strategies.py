@@ -162,7 +162,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         lossy_input = asarray(self._initial_state, dtype=int)
         for i in range(len(self._initial_state)):
             for _ in range(self._initial_state[i]):
-                if uniform(0, 1) < self._experiment_configuration.probability_of_uniform_loss:
+                if uniform(0, 1) < self._experiment_configuration.uniform_transmissivity:
                     lossy_input[i] -= 1
         return lossy_input
 

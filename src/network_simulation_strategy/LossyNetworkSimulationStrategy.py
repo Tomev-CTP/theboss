@@ -27,7 +27,7 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         # Trim the resultant state
         while evolved_state.shape[0] > input_state.shape[0]:
             evolved_state = delete(evolved_state, evolved_state.shape[0] - 1)
-        # Reshape to usual states and result.
+        # Reshape to usual space and return.
         evolved_state = evolved_state.flatten()
 
         return evolved_state
