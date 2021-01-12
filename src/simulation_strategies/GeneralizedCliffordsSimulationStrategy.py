@@ -103,7 +103,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
-        weights /= sum(weights)
+        # weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
@@ -151,8 +151,8 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
         for mode_occupation_number in input_state:
             probability /= factorial(mode_occupation_number)
-        for mode_occupation_number in output_state:
-            probability /= factorial(mode_occupation_number)
+
+        probability /= factorial(sum(input_state))
 
         return probability
 

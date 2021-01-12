@@ -10,8 +10,8 @@ from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWith
 
 
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray, uniform_losses: float = 0):
-        self._uniform_losses = uniform_losses
+    def __init__(self, interferometer_matrix: ndarray, transmissivity: float = 0):
+        self._transmissivity = transmissivity
         self.distribution = []
         self._possible_outputs = []
         self._binomial_weights = []
@@ -31,14 +31,14 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         self.pmfs = dict()
 
         n = sum(input_state)
-        eta = self._uniform_losses
+        eta = self._transmissivity
 
         configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self.interferometer_matrix,
             initial_state=input_state,
             initial_number_of_particles=n,
             number_of_modes=len(input_state),
-            probability_of_uniform_loss=eta,
+            uniform_transmissivity=eta,
             number_of_particles_lost=0,
             number_of_particles_left=0
         )
@@ -49,7 +49,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
 
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights =\
-            [pow(self._uniform_losses, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
+            [pow(self._transmissivity, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
         self.distribution[0] = self._binomial_weights[0]
 
         samples = []
@@ -68,7 +68,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         self.current_sample_probability = 1
 
         for i in range(self.number_of_input_photons):
-            if random() >= power(self._uniform_losses, 2):
+            if random() >= self._transmissivity:
                 continue
             if self.current_key not in self.pmfs:
                 self._calculate_new_layer_of_pmfs()
