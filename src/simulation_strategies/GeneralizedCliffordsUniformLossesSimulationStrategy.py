@@ -5,6 +5,7 @@ from typing import List
 from random import random
 from numpy import ndarray, power, array, int64
 from scipy import special
+from math import factorial
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWithUniformLossesExactDistributionCalculator, BosonSamplingExperimentConfiguration
 
@@ -94,5 +95,8 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
             for i in range(len(self._possible_outputs)):
                 if all(output == self._possible_outputs[i]):
                     self.distribution[i] = pmf[-1] * self._binomial_weights[sum(output)]
+                    self.distribution[i] *= factorial(sum(output))
+                    for val in output:
+                        self.distribution[i] /= factorial(val)
 
         self.pmfs[self.current_key] = pmf

@@ -9,6 +9,9 @@ from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqr
 from numpy.linalg import svd
 from scipy.special import binom
 
+from joblib import Parallel, delayed
+import multiprocessing
+
 
 def calculate_permanent(matrix: ndarray) -> complex128:
     """
@@ -109,6 +112,9 @@ def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int)
     lossy_inputs_list = []
     lossy_inputs_hashes = []
 
+    if sum(initial_state) == 0:
+        return [initial_state]
+
     # Symmetrization.
     for combination in itertools.combinations(list(range(initial_number_of_particles)), number_of_particles_left):
         lossy_input_in_particle_basis = array([x0[el] for el in combination], dtype=int64)
@@ -145,18 +151,21 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
     expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
     singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
-    singular_values_expanded_matrix = block([[diag(singular_values), expansions_zeros],
-                                             [singular_values_matrix_expansion, expansions_zeros]])
+    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
+                                             [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
 def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
+    # return diag(1.0 - singular_values_vector)
+
     vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
     for i in range(len(vector_of_squared_expansions)):
         if vector_of_squared_expansions[i] < 0:
             vector_of_squared_expansions[i] = 0
 
     expansion_values = sqrt(vector_of_squared_expansions)
+
     return diag(expansion_values)
 
 
@@ -279,33 +288,33 @@ class ChinHuhPermanentCalculator:
             output_state = array([], dtype=int64)
         if input_state is None:
             input_state = array([], dtype=int64)
-        self.__matrix = matrix
-        self.__input_state = input_state
-        self.__output_state = output_state
+        self._matrix = matrix
+        self._input_state = input_state
+        self._output_state = output_state
 
     @property
     def matrix(self) -> ndarray:
-        return self.__matrix
+        return self._matrix
 
     @matrix.setter
     def matrix(self, matrix: ndarray) -> None:
-        self.__matrix = matrix
+        self._matrix = matrix
 
     @property
     def input_state(self) -> ndarray:
-        return self.__input_state
+        return self._input_state
 
     @input_state.setter
     def input_state(self, input_state: ndarray) -> None:
-        self.__input_state = asarray(input_state, dtype=int64)
+        self._input_state = asarray(input_state, dtype=int64)
 
     @property
     def output_state(self) -> ndarray:
-        return self.__output_state
+        return self._output_state
 
     @output_state.setter
     def output_state(self, output_state: ndarray) -> None:
-        self.__output_state = asarray(output_state, dtype=int64)
+        self._output_state = asarray(output_state, dtype=int64)
 
     def calculate(self) -> complex128:
         """
@@ -315,10 +324,10 @@ class ChinHuhPermanentCalculator:
             input state.
             :return: Permanent of effective scattering matrix.
         """
-        if not self.__can_calculation_be_performed():
+        if not self._can_calculation_be_performed():
             raise AttributeError
 
-        v_vectors = self.__calculate_v_vectors()
+        v_vectors = self._calculate_v_vectors()
 
         permanent = complex128(0)
         for v_vector in v_vectors:
@@ -326,44 +335,101 @@ class ChinHuhPermanentCalculator:
             addend = pow(-1, v_sum)
             # Binomials calculation
             for i in range(len(v_vector)):
-                addend *= binom(self.__input_state[i], v_vector[i])
+                addend *= binom(self._input_state[i], v_vector[i])
             # Product calculation
             product = 1
-            for j in range(len(self.__input_state)):
-                if self.__output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
+            for j in range(len(self._input_state)):
+                if self._output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
                     continue
                 # Otherwise we calculate the sum
                 product_part = 0
-                for i in range(len(self.__input_state)):
-                    product_part += (self.__input_state[i] - 2 * v_vector[i]) * self.__matrix[j][i]
-                product_part = pow(product_part, self.__output_state[j])
+                for i in range(len(self._input_state)):
+                    product_part += (self._input_state[i] - 2 * v_vector[i]) * self._matrix[j][i]
+                product_part = pow(product_part, self._output_state[j])
                 product *= product_part
             addend *= product
             permanent += addend
-        permanent /= pow(2, sum(self.__input_state))
+        permanent /= pow(2, sum(self._input_state))
         return permanent
 
-    def __can_calculation_be_performed(self) -> bool:
+    def _can_calculation_be_performed(self) -> bool:
         """
             Checks if calculation can be performed. For this to happen sizes of given matrix and states have
             to match.
             :return: Information if the calculation can be performed.
         """
-        return self.__matrix.shape[0] == self.__matrix.shape[1] \
-            and len(self.__output_state) == len(self.__input_state) \
-            and len(self.__output_state) == self.__matrix.shape[0]
+        return self._matrix.shape[0] == self._matrix.shape[1] \
+               and len(self._output_state) == len(self._input_state) \
+               and len(self._output_state) == self._matrix.shape[0]
 
-    def __calculate_v_vectors(self, input_vector: Optional[ndarray] = None) -> List[ndarray]:
+    def _calculate_v_vectors(self, input_vector: Optional[ndarray] = None) -> List[ndarray]:
         if input_vector is None:
             input_vector = []
         v_vectors = []
-        for i in range(int(self.__input_state[len(input_vector)]) + 1):
+        for i in range(int(self._input_state[len(input_vector)]) + 1):
             input_state = input_vector.copy()
             input_state.append(i)
 
-            if len(input_state) == len(self.__input_state):
+            if len(input_state) == len(self._input_state):
                 v_vectors.append(input_state)
             else:
-                v_vectors.extend(self.__calculate_v_vectors(input_state))
+                v_vectors.extend(self._calculate_v_vectors(input_state))
 
         return v_vectors
+
+class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
+    """
+        This class is meant to parallelize the CH Permanent Calculator.
+    """
+
+    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
+                 output_state: Optional[ndarray] = None) -> None:
+        if output_state is None:
+            output_state = array([], dtype=int64)
+        if input_state is None:
+            input_state = array([], dtype=int64)
+        self._matrix = matrix
+        self._input_state = input_state
+        self._output_state = output_state
+
+    def calculate(self) -> complex128:
+        """
+            This is the main method of the calculator. Assuming that input state, output state and the matrix are
+            defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
+            permanent of an effective scattering matrix related to probability of obtaining output state from given
+            input state.
+            :return: Permanent of effective scattering matrix.
+        """
+        if not self._can_calculation_be_performed():
+            raise AttributeError
+
+        v_vectors = self._calculate_v_vectors()
+
+        permanent = complex128(0)
+
+        num_cores = multiprocessing.cpu_count()
+        results = Parallel(n_jobs=num_cores)(delayed(self.compute_permanent_addend)(v_vector) for v_vector in v_vectors)
+        permanent += sum(results)
+        permanent /= pow(2, sum(self._input_state))
+
+        return permanent
+
+    def compute_permanent_addend(self, v_vector):
+        v_sum = sum(v_vector)
+        addend = pow(-1, v_sum)
+        # Binomials calculation
+        for i in range(len(v_vector)):
+            addend *= binom(self._input_state[i], v_vector[i])
+        # Product calculation
+        product = 1
+        for j in range(len(self._input_state)):
+            if self._output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
+                continue
+            # Otherwise we calculate the sum
+            product_part = 0
+            for i in range(len(self._input_state)):
+                product_part += (self._input_state[i] - 2 * v_vector[i]) * self._matrix[j][i]
+            product_part = pow(product_part, self._output_state[j])
+            product *= product_part
+        addend *= product
+        return addend
