@@ -3,10 +3,9 @@ __author__ = 'Tomasz Rybotycki'
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
-import multiprocessing
+from multiprocessing import Pool
 from typing import List, Optional
 
-from joblib import delayed, Parallel
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
     zeros_like
 from numpy.linalg import svd
@@ -396,6 +395,9 @@ class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
             defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
             permanent of an effective scattering matrix related to probability of obtaining output state from given
             input state.
+
+            This method uses multiprocessing!
+
             :return: Permanent of effective scattering matrix.
         """
         if not self._can_calculation_be_performed():
@@ -405,8 +407,8 @@ class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
 
         permanent = complex128(0)
 
-        num_cores = multiprocessing.cpu_count()
-        results = Parallel(n_jobs=num_cores)(delayed(self.compute_permanent_addend)(v_vector) for v_vector in v_vectors)
+        with Pool() as p:
+            results = p.map(self.compute_permanent_addend, v_vectors)
         permanent += sum(results)
         permanent /= pow(2, sum(self._input_state))
 
