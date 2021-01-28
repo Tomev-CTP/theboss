@@ -3,14 +3,14 @@ __author__ = 'Tomasz Rybotycki'
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
+import multiprocessing
 from typing import List, Optional
 
-from numpy import array, block, complex128, diag, ndarray, ones_like, power, sqrt, zeros, zeros_like, transpose, int64, asarray, eye
+from joblib import delayed, Parallel
+from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
+    zeros_like
 from numpy.linalg import svd
 from scipy.special import binom
-
-from joblib import Parallel, delayed
-import multiprocessing
 
 
 def calculate_permanent(matrix: ndarray) -> complex128:
@@ -331,24 +331,7 @@ class ChinHuhPermanentCalculator:
 
         permanent = complex128(0)
         for v_vector in v_vectors:
-            v_sum = sum(v_vector)
-            addend = pow(-1, v_sum)
-            # Binomials calculation
-            for i in range(len(v_vector)):
-                addend *= binom(self._input_state[i], v_vector[i])
-            # Product calculation
-            product = 1
-            for j in range(len(self._input_state)):
-                if self._output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
-                    continue
-                # Otherwise we calculate the sum
-                product_part = 0
-                for i in range(len(self._input_state)):
-                    product_part += (self._input_state[i] - 2 * v_vector[i]) * self._matrix[j][i]
-                product_part = pow(product_part, self._output_state[j])
-                product *= product_part
-            addend *= product
-            permanent += addend
+            permanent += self.compute_permanent_addend(v_vector)
         permanent /= pow(2, sum(self._input_state))
         return permanent
 
@@ -377,6 +360,27 @@ class ChinHuhPermanentCalculator:
 
         return v_vectors
 
+    def compute_permanent_addend(self, v_vector: ndarray) -> complex128:
+        v_sum = sum(v_vector)
+        addend = pow(-1, v_sum)
+        # Binomials calculation
+        for i in range(len(v_vector)):
+            addend *= binom(self._input_state[i], v_vector[i])
+        # Product calculation
+        product = 1
+        for j in range(len(self._input_state)):
+            if self._output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
+                continue
+            # Otherwise we calculate the sum
+            product_part = 0
+            for i in range(len(self._input_state)):
+                product_part += (self._input_state[i] - 2 * v_vector[i]) * self._matrix[j][i]
+            product_part = pow(product_part, self._output_state[j])
+            product *= product_part
+        addend *= product
+        return addend
+
+
 class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
     """
         This class is meant to parallelize the CH Permanent Calculator.
@@ -384,13 +388,7 @@ class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
 
     def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
                  output_state: Optional[ndarray] = None) -> None:
-        if output_state is None:
-            output_state = array([], dtype=int64)
-        if input_state is None:
-            input_state = array([], dtype=int64)
-        self._matrix = matrix
-        self._input_state = input_state
-        self._output_state = output_state
+        super().__init__(matrix, input_state, output_state)
 
     def calculate(self) -> complex128:
         """
@@ -413,23 +411,3 @@ class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
         permanent /= pow(2, sum(self._input_state))
 
         return permanent
-
-    def compute_permanent_addend(self, v_vector):
-        v_sum = sum(v_vector)
-        addend = pow(-1, v_sum)
-        # Binomials calculation
-        for i in range(len(v_vector)):
-            addend *= binom(self._input_state[i], v_vector[i])
-        # Product calculation
-        product = 1
-        for j in range(len(self._input_state)):
-            if self._output_state[j] == 0:  # There's no reason to calculate the sum if t_j = 0
-                continue
-            # Otherwise we calculate the sum
-            product_part = 0
-            for i in range(len(self._input_state)):
-                product_part += (self._input_state[i] - 2 * v_vector[i]) * self._matrix[j][i]
-            product_part = pow(product_part, self._output_state[j])
-            product *= product_part
-        addend *= product
-        return addend
