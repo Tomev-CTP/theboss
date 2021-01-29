@@ -37,7 +37,7 @@ class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
         permanent = complex128(0)
 
         with Pool() as p:
-            results = p.map(self.compute_permanent_addend, v_vectors)
+            results = p.map(self._compute_permanent_addend, v_vectors)
         permanent += sum(results)
         permanent /= pow(2, sum(self._input_state))
 

@@ -6,6 +6,8 @@ __author__ = "Tomasz Rybotycki"
 
 import enum
 
+from typing import Optional
+
 from numpy import ndarray
 
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
@@ -25,7 +27,7 @@ class PermanentCalculatorType(enum.IntEnum):
 
 
 class PermanentCalculatorFactory:
-    def __init__(self, matrix: ndarray, input_state: ndarray, output_state: ndarray,
+    def __init__(self, matrix: Optional[ndarray], input_state: Optional[ndarray], output_state: Optional[ndarray],
                  calculator_type: PermanentCalculatorType = PermanentCalculatorType.PARALLEL_CHIN_HUH):
         self._matrix = matrix
         self._input_state = input_state

@@ -2,6 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 # TR TODO: This could be a part ob Boson_Sampling_Utilities package.
 
+import abc
 import math
 from copy import deepcopy
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from numpy import ndarray
 from scipy import special
 
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_lossy_inputs, generate_possible_outputs
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 
@@ -28,20 +31,25 @@ class BosonSamplingExperimentConfiguration:
     lossy_modes_number: int = 0
 
 
-class BosonSamplingExactDistributionCalculator:
+class BosonSamplingExactDistributionCalculator(abc.ABC):
     """ Interface for boson sampling exact distribution calculators """
+
+    @abc.abstractmethod
     def calculate_exact_distribution(self) -> List[float]:
         """ One has to be able to calculate exact distribution with it """
         raise NotImplementedError
 
+    @abc.abstractmethod
     def get_outcomes_in_proper_order(self) -> List[ndarray]:
         """ One also has to know the order of objects that returned probabilities correspond to """
         raise NotImplementedError
 
 
-class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExactDistributionCalculator):
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
+class BosonSamplingWithFixedLossesExactDistributionCalculator(BosonSamplingExactDistributionCalculator):
+    def __init__(self, configuration: BosonSamplingExperimentConfiguration,
+                 permanent_calculator: BSPermanentCalculatorInterface) -> None:
         self.configuration = deepcopy(configuration)
+        self._permanent_calculator = permanent_calculator
 
     def get_outcomes_in_proper_order(self) -> List[ndarray]:
         return generate_possible_outputs(self.configuration.number_of_particles_left,
@@ -85,10 +93,10 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
                                                   self.configuration.number_of_particles_left)
 
         for lossy_input in lossy_inputs_list:
-            permanent_calculator = ChinHuhPermanentCalculator(self.configuration.interferometer_matrix,
-                                                              input_state=lossy_input,
-                                                              output_state=outcome_state)
-            subprobability = abs(permanent_calculator.calculate()) ** 2
+            self._permanent_calculator.matrix = self.configuration.interferometer_matrix
+            self._permanent_calculator.input_state = lossy_input
+            self._permanent_calculator.output_state = outcome_state
+            subprobability = abs(self._permanent_calculator.calculate()) ** 2
             for mode_occupation_number in lossy_input:
                 subprobability /= math.factorial(mode_occupation_number)
 
@@ -104,8 +112,9 @@ class BosonSamplingWithFixedLossesExactDistributionCalculator (BosonSamplingExac
 
 class BosonSamplingWithUniformLossesExactDistributionCalculator \
             (BosonSamplingWithFixedLossesExactDistributionCalculator):
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration) -> None:
-        super().__init__(configuration)
+    def __init__(self, configuration: BosonSamplingExperimentConfiguration,
+                 permanent_calculator: BSPermanentCalculatorInterface) -> None:
+        super().__init__(configuration, permanent_calculator)
 
     def calculate_exact_distribution(self) -> List[float]:
         """
@@ -129,7 +138,7 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
             subconfiguration.number_of_particles_left = number_of_particles_left
             subconfiguration.number_of_particles_lost = n - l
             subdistribution_calculator = \
-                BosonSamplingWithFixedLossesExactDistributionCalculator(subconfiguration)
+                BosonSamplingWithFixedLossesExactDistributionCalculator(subconfiguration, self._permanent_calculator)
             possible_outcomes.extend(subdistribution_calculator.get_outcomes_in_proper_order())
             subdistribution = subdistribution_calculator.calculate_exact_distribution()
             subdistribution_weight = pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)

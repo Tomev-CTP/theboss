@@ -9,6 +9,8 @@ from src.LossyBosonSamplingExactDistributionCalculators import (
     BosonSamplingWithFixedLossesExactDistributionCalculator,
     BosonSamplingWithUniformLossesExactDistributionCalculator)
 
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import \
+    PermanentCalculatorType, PermanentCalculatorFactory
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
 
@@ -35,17 +37,25 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             initial_number_of_particles=sum(self.initial_state),
             number_of_particles_lost=self.number_of_particles_lost,
             number_of_particles_left=sum(self.initial_state) - self.number_of_particles_lost,
-            probability_of_uniform_loss=0.8
+            uniform_transmissivity=0.8
         )
+
+        self._calculator_type = PermanentCalculatorType.PARALLEL_CHIN_HUH
+        self._permanent_calculator_factory = PermanentCalculatorFactory(matrix=None, input_state=None,
+                                                                        output_state=None,
+                                                                        calculator_type=self._calculator_type)
+        self._permanent_calculator = self._permanent_calculator_factory.generate_calculator()
 
     def test_probabilities_sum_in_fixed_losses_scenario(self) -> None:
         exact_distribution_calculator = \
-            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration)
+            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration,
+                                                                    self._permanent_calculator)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
 
     def test_probabilities_sum_in_uniform_losses_scenario(self) -> None:
         exact_distribution_calculator = \
-            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration)
+            BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration,
+                                                                      self._permanent_calculator)
         exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
