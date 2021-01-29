@@ -14,7 +14,7 @@ from numpy import ndarray, complex128
 class BSPermanentCalculatorInterface(abc.ABC):
 
     @classmethod
-    def __subclasshook__(mcs, subclass):
+    def __subclasshook__(cls, subclass):
         return (hasattr(subclass, "compute_permanent") and
                 callable(subclass.compute_permanent) and
                 hasattr(subclass, "matrix") and
