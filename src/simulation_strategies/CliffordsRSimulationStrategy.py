@@ -10,7 +10,7 @@ from typing import List
 from numpy import arange, array, array_split, int64, ndarray
 from rpy2.robjects import packages
 
-from src.Boson_Sampling_Utilities import particle_state_to_modes_state
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import particle_state_to_modes_state
 from src.rpy2_utilities import numpy_array_to_r_matrix
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 

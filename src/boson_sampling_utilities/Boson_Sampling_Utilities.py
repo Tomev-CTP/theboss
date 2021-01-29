@@ -12,30 +12,6 @@ from numpy.linalg import svd
 from scipy.special import binom
 
 
-def calculate_permanent(matrix: ndarray) -> complex128:
-    """
-    Returns the permanent of the matrix.
-    """
-    return permanent_recursive_part(matrix, column=0, selected=[], prod=complex128(1))
-
-
-def permanent_recursive_part(mtx: ndarray, column: int, selected: List[int], prod: complex128) -> complex128:
-    """
-    Row expansion for the permanent of matrix mtx.
-    The counter column is the current column,
-    selected is a list of indices of selected rows,
-    and prod accumulates the current product.
-    """
-    if column == mtx.shape[1]:
-        return prod
-
-    result = complex128(0 + 0j)
-    for row in range(mtx.shape[0]):
-        if row not in selected:
-            result += permanent_recursive_part(mtx, column + 1, selected + [row], prod * mtx[row, column])
-    return result
-
-
 def particle_state_to_modes_state(particle_state: ndarray, observed_modes_number: int) -> ndarray:
     modes_state = zeros(observed_modes_number)
 
@@ -225,53 +201,6 @@ class EffectiveScatteringMatrixCalculator:
                 int(self.__output_state[index_of_row_to_insert])
 
         return array(effective_scattering_matrix, dtype=complex128)
-
-
-class EffectiveScatteringMatrixPermanentCalculator:
-    """
-        This class is used to calculate permanent of effective scattering matrix. It first
-        generates the matrix, and then calculates the permanent via standard means.
-    """
-
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
-        if output_state is None:
-            output_state = array([], dtype=int64)
-        if input_state is None:
-            input_state = array([], dtype=int64)
-        self.__matrix = matrix
-        self.__input_state = input_state
-        self.__output_state = output_state
-
-    @property
-    def matrix(self) -> ndarray:
-        return self.__matrix
-
-    @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
-        self.__matrix = matrix
-
-    @property
-    def input_state(self) -> ndarray:
-        return self.__input_state
-
-    @input_state.setter
-    def input_state(self, input_state: ndarray) -> None:
-        self.__input_state = asarray(input_state, dtype=int64)
-
-    @property
-    def output_state(self) -> ndarray:
-        return self.__output_state
-
-    @output_state.setter
-    def output_state(self, output_state: ndarray) -> None:
-        self.__output_state = asarray(output_state, dtype=int64)
-
-    def calculate(self) -> complex128:
-        scattering_matrix_calculator = \
-            EffectiveScatteringMatrixCalculator(self.__matrix, self.__input_state, self.__output_state)
-        scattering_matrix = scattering_matrix_calculator.calculate()
-        return calculate_permanent(scattering_matrix)
 
 
 class ChinHuhPermanentCalculator:

@@ -1,6 +1,6 @@
 from numpy import delete, ndarray, vstack, zeros_like, complex128
 
-from src.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 

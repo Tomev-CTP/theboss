@@ -7,11 +7,11 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import List
 
-from numpy import ndarray, zeros, asarray
+from numpy import ndarray
 from scipy import special
 
-from src.Boson_Sampling_Utilities import calculate_permanent, generate_lossy_inputs, generate_possible_outputs, \
-    modes_state_to_particle_state, particle_state_to_modes_state, ChinHuhPermanentCalculator
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_lossy_inputs, generate_possible_outputs, \
+    ChinHuhPermanentCalculator
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 

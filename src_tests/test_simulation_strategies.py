@@ -16,7 +16,7 @@ from numpy import array, average, ndarray
 from numpy.random import randint
 from scipy.special import binom
 
-from src.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import calculate_number_of_possible_n_particle_m_mode_output_states
 from src.LossyBosonSamplingExactDistributionCalculators import (
     BosonSamplingExactDistributionCalculator,
     BosonSamplingExperimentConfiguration,

@@ -5,12 +5,10 @@ from copy import copy
 from math import factorial
 from typing import List
 
-from numpy import arange, array, delete, insert, ndarray, int64, float64
-from numpy.linalg import norm
-from numpy.random import choice
+from numpy import array, delete, insert, ndarray, int64, float64
 from numpy.random import random
 
-from src.Boson_Sampling_Utilities import ChinHuhPermanentCalculator
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import ChinHuhPermanentCalculator
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
 
 

@@ -2,7 +2,7 @@ __author__ = 'Tomasz Rybotycki'
 
 from numpy import ndarray, zeros, float64
 
-from src.Boson_Sampling_Utilities import generate_possible_outputs
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.SimulationStrategy import SimulationStrategy
