@@ -14,8 +14,10 @@ from typing import List
 
 from numpy import allclose, array
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import ChinHuhPermanentCalculator, EffectiveScatteringMatrixPermanentCalculator, ParallelChinHuhPermanentCalculator
+from src.boson_sampling_utilities.permanent_calculators.ChinHuhPermanentCalculator import ChinHuhPermanentCalculator
 from src.boson_sampling_utilities.permanent_calculators.ClassicPermanentCalculator import ClassicPermanentCalculator
+from src.boson_sampling_utilities.permanent_calculators.ParallelChinHuhPermanentCalculator import \
+    ParallelChinHuhPermanentCalculator
 from src.Quantum_Computations_Utilities import generate_haar_random_unitary_matrix
 
 
@@ -24,7 +26,6 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
     def setUp(self) -> None:
         self._matrix = generate_haar_random_unitary_matrix(4)
         self._ch_permanent_calculator = ChinHuhPermanentCalculator(self._matrix, array([]), array([]))
-        #self._cl_permanent_calculator = EffectiveScatteringMatrixPermanentCalculator(self._matrix, array([]), array([]))
         self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix, input_state=array([]), output_state=array([]))
         self._pch_permanent_calculator = ParallelChinHuhPermanentCalculator(self._matrix, array([]), array([]))
 
@@ -39,27 +40,27 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
     def test_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 1], [1, 1, 1, 1])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.calculate()))
+                                 self._ch_permanent_calculator.compute_permanent()))
 
     def test_not_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [1, 0, 1, 1])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.calculate()))
+                                 self._ch_permanent_calculator.compute_permanent()))
 
     def test_binned_input_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 0, 0], [0, 1, 1, 1])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.calculate()))
+                                 self._ch_permanent_calculator.compute_permanent()))
 
     def test_binned_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [2, 1, 0, 0])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.calculate()))
+                                 self._ch_permanent_calculator.compute_permanent()))
 
     def test_binned_input_binned_output_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.calculate()))
+                                 self._ch_permanent_calculator.compute_permanent()))
 
     # Given that the only difference between Chin-Huh and Parallel Chin-Huh is the parallelization in the main
     # method, the only thing I believe I need to check is if it works. Results are expected to be the same in
@@ -67,4 +68,4 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
     def test_parallel_binned_input_binned_output_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._pch_permanent_calculator.calculate()))
+                                 self._pch_permanent_calculator.compute_permanent()))
