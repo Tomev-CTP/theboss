@@ -1,22 +1,27 @@
 __author__ = "Tomasz Rybotycki"
 
+from math import factorial
+from random import random
 from typing import List
 
-from random import random
-from numpy import ndarray, power, array, int64
+from numpy import array, int64, ndarray
 from scipy import special
-from math import factorial
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingWithUniformLossesExactDistributionCalculator, BosonSamplingExperimentConfiguration
+
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
+from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
+    BosonSamplingWithUniformLossesExactDistributionCalculator
+from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
+    GeneralizedCliffordsSimulationStrategy
 
 
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray, transmissivity: float = 0):
+    def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, transmissivity: float = 0):
         self._transmissivity = transmissivity
         self.distribution = []
         self._possible_outputs = []
         self._binomial_weights = []
-        super().__init__(interferometer_matrix=interferometer_matrix)
+        super().__init__(bs_permanent_calculator)
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -35,7 +40,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         eta = self._transmissivity
 
         configuration = BosonSamplingExperimentConfiguration(
-            interferometer_matrix=self.interferometer_matrix,
+            interferometer_matrix=self._bs_permanent_calculator.matrix,
             initial_state=input_state,
             initial_number_of_particles=n,
             number_of_modes=len(input_state),
@@ -80,11 +85,12 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
+
+        pmf = []
+
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
         weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
-
-        pmf = []
 
         for output in self.possible_outputs[self.current_key]:
             pmf.append(0)

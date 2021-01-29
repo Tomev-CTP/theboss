@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 """
     This file holds the implementation of Chin and Huhs method of permanent calculation, as presented in [2].

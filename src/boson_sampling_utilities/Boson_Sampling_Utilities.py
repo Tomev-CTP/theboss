@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 

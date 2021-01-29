@@ -1,16 +1,16 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
-from numpy import ndarray, zeros, float64
+from numpy import float64, ndarray, zeros
 
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
 class ApproximateDistributionCalculator:
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
-                 strategy: SimulationStrategy, outcomes=None) -> None:
+                 strategy: SimulationStrategyInterface, outcomes=None) -> None:
         self.configuration = experiment_configuration
         self.strategy = strategy
         self.outcomes = outcomes

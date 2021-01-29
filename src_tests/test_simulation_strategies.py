@@ -1,9 +1,9 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 """
-The intention behind this code is to have tests for different simulation strategies in one place. The reason for that
-is that their code stays mostly the same and with every different strategy I end up writing more and more of the same
-stuff with only minor differences (mostly in experiments setup). 
+    The intention behind this code is to have tests for different simulation strategies in one place. The reason for
+    that is that their code stays mostly the same and with every different strategy I end up writing more and more of
+    the same stuff with only minor differences (mostly in experiments setup). 
 """
 
 import unittest
@@ -24,8 +24,8 @@ from src.LossyBosonSamplingExactDistributionCalculators import (
     BosonSamplingWithUniformLossesExactDistributionCalculator)
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
-from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.simulation_strategies.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
 from src_tests.common_code_for_tests import ApproximateDistributionCalculator
 
 
@@ -137,10 +137,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             + distance_from_approximation_to_estimated
 
         self.assertLessEqual(distance_from_exact_to_estimated, max_allowed_distance,
-                             f'Distance from exact distribution ({distance_from_exact_to_estimated}) is '
-                             f'greater than maximum distance allowed ({max_allowed_distance}).')
+                             f"Distance from exact distribution ({distance_from_exact_to_estimated}) is "
+                             f"greater than maximum distance allowed ({max_allowed_distance}).")
 
-    def __generate_estimated_distribution_calculator(self, strategy: SimulationStrategy,
+    def __generate_estimated_distribution_calculator(self, strategy: SimulationStrategyInterface,
                                                      outcomes: List[ndarray] = None)\
             -> ApproximateDistributionCalculator:
         estimated_distribution_calculator = ApproximateDistributionCalculator(
@@ -319,7 +319,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         for i in range(self._haar_random_matrices_number):
 
-            print(f'Current Haar random matrix index: {i} out of {self._haar_random_matrices_number}.')
+            print(f"Current Haar random matrix index: {i} out of {self._haar_random_matrices_number}.")
 
             experiment_configuration = deepcopy(self._haar_random_experiment_configuration)
             experiment_configuration.interferometer_matrix = generate_haar_random_unitary_matrix(

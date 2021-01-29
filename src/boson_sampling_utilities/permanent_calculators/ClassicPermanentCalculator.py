@@ -5,11 +5,13 @@ __author__ = "Tomasz Rybotycki"
     calculates the permanent via standard means.
 """
 
-from typing import Optional, List
-from numpy import ndarray, complex128, int64, array, asarray
+from typing import List, Optional
+
+from numpy import array, asarray, complex128, int64, ndarray
 
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import EffectiveScatteringMatrixCalculator
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import BSPermanentCalculatorInterface
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
 
 
 class ClassicPermanentCalculator(BSPermanentCalculatorInterface):

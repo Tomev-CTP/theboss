@@ -1,9 +1,11 @@
+__author__ = "Tomasz Rybotycki"
+
 import unittest
 from copy import deepcopy
 from random import uniform
 from typing import List, Union
 
-from numpy import block, eye, ndarray, zeros_like, asarray
+from numpy import asarray, block, eye, ndarray, zeros_like
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.LossyBosonSamplingExactDistributionCalculators import (
@@ -11,7 +13,7 @@ from src.LossyBosonSamplingExactDistributionCalculators import (
 from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
-from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
+from src.simulation_strategies.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
 from src_tests.common_code_for_tests import ApproximateDistributionCalculator
 
 

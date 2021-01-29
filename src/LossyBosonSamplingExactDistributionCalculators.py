@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 # TR TODO: This could be a part ob Boson_Sampling_Utilities package.
 
@@ -10,8 +10,7 @@ from typing import List
 from numpy import ndarray
 from scipy import special
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_lossy_inputs, generate_possible_outputs, \
-    ChinHuhPermanentCalculator
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_lossy_inputs, generate_possible_outputs
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
 
 

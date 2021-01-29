@@ -8,7 +8,8 @@ __author__ = "Tomasz Rybotycki"
 """
 
 import abc
-from numpy import ndarray, complex128
+
+from numpy import complex128, ndarray
 
 
 class BSPermanentCalculatorInterface(abc.ABC):
@@ -22,7 +23,7 @@ class BSPermanentCalculatorInterface(abc.ABC):
                 hasattr(subclass, "input_state") and
                 callable(subclass.input_state) and
                 hasattr(subclass, "output_state") and
-                callable(subclass.output_state) )
+                callable(subclass.output_state))
 
     @abc.abstractmethod
     def compute_permanent(self) -> complex128:

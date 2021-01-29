@@ -1,11 +1,11 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 # TODO TR: Consider releasing this file as a separate package.
 
 from typing import List, Union
 
-from numpy import abs, linalg, log2, ndarray, sqrt
 import qutip
+from numpy import abs, linalg, log2, ndarray, sqrt
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:

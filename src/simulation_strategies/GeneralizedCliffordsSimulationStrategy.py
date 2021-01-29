@@ -1,23 +1,25 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from collections import defaultdict
 from copy import copy
 from math import factorial
 from typing import List
 
-from numpy import array, delete, insert, ndarray, int64, float64
+from numpy import array, delete, float64, insert, int64, ndarray
 from numpy.random import random
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import ChinHuhPermanentCalculator
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
+
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray) -> None:
+class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
+    def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         self.r_sample = []
         self.number_of_input_photons = 0
         self.pmfs = dict()  # Probability mass functions calculated along the way. Keys should be current r as tuples.
-        self.interferometer_matrix = interferometer_matrix
+        self._bs_permanent_calculator = bs_permanent_calculator
         self.input_state = array([], dtype=int64)
         self._labeled_states = defaultdict(list)
         self.possible_outputs = dict()
@@ -86,7 +88,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return substates
 
     def _fill_r_sample(self) -> None:
-        self.r_sample = [0 for _ in self.interferometer_matrix]
+        self.r_sample = [0 for _ in self.input_state]
         self.current_key = tuple(self.r_sample)
         self.current_sample_probability = 1
 
@@ -101,7 +103,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
-        # weights /= sum(weights)
+        weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
@@ -136,16 +138,18 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
 
     def _generate_possible_output_states(self) -> List[ndarray]:
         possible_output_states = []
+
         for i in range(len(self.r_sample)):
             new_possible_output = copy(self.r_sample)
             new_possible_output[i] += 1
             possible_output_states.append(array(new_possible_output, dtype=int64))
+
         return possible_output_states
 
     def _calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray) -> float:
-        permanent_calculator = ChinHuhPermanentCalculator(self.interferometer_matrix, input_state=input_state,
-                                                          output_state=output_state)
-        probability = abs(permanent_calculator.calculate()) ** 2
+        self._bs_permanent_calculator.input_state = input_state
+        self._bs_permanent_calculator.output_state = output_state
+        probability = abs(self._bs_permanent_calculator.compute_permanent()) ** 2
 
         for mode_occupation_number in input_state:
             probability /= factorial(mode_occupation_number)
@@ -155,10 +159,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategy):
         return probability
 
     def _sample_from_latest_pmf(self) -> None:
-        # sample_index = choice(arange(len(self.possible_outputs[self.current_key])), 1, p=self.pmfs[self.current_key])[0]  # Takes too long, due to casting.
 
         sample_index = 0
-        random_value = random() * sum(self.pmfs[self.current_key]) # PMFs are not normalized.
+        random_value = random() * sum(self.pmfs[self.current_key])  # PMFs are not normalized.
         current_probability = 0
         for probability in self.pmfs[self.current_key]:
             current_probability += probability

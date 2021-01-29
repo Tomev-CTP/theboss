@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from typing import List
 
@@ -7,11 +7,11 @@ from numpy.random import choice
 from scipy import special
 
 from src.BosonSamplingSimulator import BosonSamplingSimulator
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategyInterface
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class UniformLossSimulationStrategy(SimulationStrategy):
+class UniformLossSimulationStrategyInterface(SimulationStrategyInterface):
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_modes: int, transmissivity: float) \
             -> None:
@@ -32,9 +32,9 @@ class UniformLossSimulationStrategy(SimulationStrategy):
         while len(samples) < samples_number:
             number_of_particles_left_in_selected_separable_state = choice(arange(0, n + 1), p=separable_states_weights)
 
-            strategy = FixedLossSimulationStrategy(self.interferometer_matrix,
-                                                   number_of_particles_left_in_selected_separable_state,
-                                                   self.number_of_modes)
+            strategy = FixedLossSimulationStrategyInterface(self.interferometer_matrix,
+                                                            number_of_particles_left_in_selected_separable_state,
+                                                            self.number_of_modes)
 
             simulator = BosonSamplingSimulator(strategy)
 

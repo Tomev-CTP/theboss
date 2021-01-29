@@ -1,14 +1,19 @@
+__author__ = "Tomasz Rybotycki"
+
+"""
+    This file holds a factory for simulation strategies.
+"""
+
 import enum
 
 from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
-from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategy
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
+from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategyInterface
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategyInterface
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import \
-    LossyNetworksGeneralizedCliffordsSimulationStrategy
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
-from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
-from src.simulation_strategies.LosslessModesSimulationStrategy import LosslessModesSimulationStrategy
+    LossyNetworksGeneralizedCliffordsSimulationStrategyInterface
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategyInterface
 from src.simulation_strategies.GeneralizedCliffordsUniformLossesSimulationStrategy import GeneralizedCliffordsUniformLossesSimulationStrategy
 
 
@@ -33,7 +38,6 @@ class SimulationStrategyFactory:
             StrategyTypes.CLIFFORD_R: self._generate_r_cliffords_strategy,
             StrategyTypes.GENERALIZED_CLIFFORD: self._generate_generalized_cliffords_strategy,
             StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD: self._generate_lossy_net_generalized_cliffords_strategy,
-            StrategyTypes.LOSSLESS_MODES_STRATEGY: self._generate_lossless_modes_strategy,
             StrategyTypes.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy
         }
 
@@ -43,7 +47,7 @@ class SimulationStrategyFactory:
     def set_experiment_configuration(self, experiment_configuration: BosonSamplingExperimentConfiguration) -> None:
         self._experiment_configuration = experiment_configuration
 
-    def generate_strategy(self) -> SimulationStrategy:
+    def generate_strategy(self) -> SimulationStrategyInterface:
         """
             Generates simulation strategy of desired type. The type is selected in the constructor.
         :return: Simulation strategy of desired type.
@@ -51,35 +55,35 @@ class SimulationStrategyFactory:
         handler = self._strategy_mapping.get(self._strategy_type, self._generate_fixed_losses_strategy)
         return handler()
 
-    def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategy:
+    def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategyInterface:
         """
             Generates fixed loss strategy.
         :return: Fixed loss strategy.
         """
-        return FixedLossSimulationStrategy(
+        return FixedLossSimulationStrategyInterface(
             interferometer_matrix=self._experiment_configuration.interferometer_matrix,
             number_of_photons_left=self._experiment_configuration.number_of_particles_left,
             number_of_observed_modes=self._experiment_configuration.number_of_modes,
             network_simulation_strategy=self._experiment_configuration.network_simulation_strategy
         )
 
-    def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
+    def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategyInterface:
         """
             Generates uniform losses strategy.
         :return: Uniform losses strategy.
         """
-        return UniformLossSimulationStrategy(
+        return UniformLossSimulationStrategyInterface(
             self._experiment_configuration.interferometer_matrix,
             self._experiment_configuration.number_of_modes,
             self._experiment_configuration.uniform_transmissivity
         )
 
-    def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
+    def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategyInterface:
         """
             Generates Cliffords algorithm strategy using their code implemented in R.
         :return: Cliffords strategy in R.
         """
-        return CliffordsRSimulationStrategy(self._experiment_configuration.interferometer_matrix)
+        return CliffordsRSimulationStrategyInterface(self._experiment_configuration.interferometer_matrix)
 
     def _generate_generalized_cliffords_strategy(self) -> GeneralizedCliffordsSimulationStrategy:
         """
@@ -91,20 +95,14 @@ class SimulationStrategyFactory:
         )
 
     def _generate_lossy_net_generalized_cliffords_strategy(self) \
-            -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
+            -> LossyNetworksGeneralizedCliffordsSimulationStrategyInterface:
         """
             Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
         :return: Generalized Cliffords strategy for lossy networks.
         """
-        return LossyNetworksGeneralizedCliffordsSimulationStrategy(
+        return LossyNetworksGeneralizedCliffordsSimulationStrategyInterface(
             self._experiment_configuration.interferometer_matrix
         )
-
-    def _generate_lossless_modes_strategy(self) -> LosslessModesSimulationStrategy:
-        return LosslessModesSimulationStrategy(self._experiment_configuration.interferometer_matrix,
-                                               self._experiment_configuration.number_of_particles_left,
-                                               self._experiment_configuration.number_of_modes,
-                                               self._experiment_configuration.lossy_modes_number)
 
     def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
         return GeneralizedCliffordsUniformLossesSimulationStrategy(self._experiment_configuration.interferometer_matrix,

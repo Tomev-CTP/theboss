@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from numpy import dot, ndarray
 

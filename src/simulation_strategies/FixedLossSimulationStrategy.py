@@ -1,18 +1,18 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from random import random
 from typing import List, Optional
 
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
-from numpy.random import rand
 from numpy.linalg import norm
+from numpy.random import rand
 
 from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class FixedLossSimulationStrategy(SimulationStrategy):
+class FixedLossSimulationStrategyInterface(SimulationStrategyInterface):
 
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_photons_left: int, number_of_observed_modes: int,

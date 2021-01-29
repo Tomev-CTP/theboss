@@ -1,4 +1,4 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 """
 Throughout the Boson Sampling Simulation methods there are many different methods of calculating effective scattering

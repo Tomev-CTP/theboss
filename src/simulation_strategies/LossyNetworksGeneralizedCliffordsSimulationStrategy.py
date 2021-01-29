@@ -1,16 +1,19 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from numpy import delete, ndarray, vstack, zeros_like
 
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
+from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
+    GeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategy):
-    def __init__(self, interferometer_matrix: ndarray) -> None:
-        self._helper_strategy = GeneralizedCliffordsSimulationStrategy(
-            prepare_interferometer_matrix_in_expanded_space(interferometer_matrix))
+class LossyNetworksGeneralizedCliffordsSimulationStrategyInterface(SimulationStrategyInterface):
+    def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
+        bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(bs_permanent_calculator.matrix)
+        self._helper_strategy = GeneralizedCliffordsSimulationStrategy(bs_permanent_calculator)
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> [ndarray]:
         input_state = input_state.reshape(len(input_state), )  # Divide by two, coz we have 2N x 2N matrix
