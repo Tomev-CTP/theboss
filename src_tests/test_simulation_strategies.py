@@ -25,7 +25,7 @@ from src.LossyBosonSamplingExactDistributionCalculators import (
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
-from src.simulation_strategies.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
+from src.simulation_strategies.SimulationStrategyFactory import SimulationStrategyFactory, StrategyType
 from src_tests.common_code_for_tests import ApproximateDistributionCalculator
 
 
@@ -65,7 +65,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             number_of_particles_lost=self._distance_calculation_number_of_particles_lost,
             number_of_particles_left=distance_calculation_initial_number_of_particles -
             self._distance_calculation_number_of_particles_lost,
-            probability_of_uniform_loss=0.8
+            uniform_transmissivity=0.8
         )
 
         self._strategies_factory = SimulationStrategyFactory(self._distributions_distance_experiment_configuration)
@@ -90,7 +90,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def test_distribution_accuracy_for_fixed_losses_strategy(self) -> None:
         self.__prepare_lossy_distance_experiment_settings()
         self._strategies_factory.set_experiment_configuration(self._distributions_distance_experiment_configuration)
-        self._strategies_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
+        self._strategies_factory.set_strategy_type(StrategyType.FIXED_LOSS)
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
             exact_calculator=BosonSamplingWithFixedLossesExactDistributionCalculator(
                 self._distributions_distance_experiment_configuration),
@@ -195,7 +195,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def __continue_with_common_part_of_generalized_cliffords_strategy_tests(self) -> None:
         self._strategies_factory.set_experiment_configuration(self._distributions_distance_experiment_configuration)
-        self._strategies_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
+        self._strategies_factory.set_strategy_type(StrategyType.GENERALIZED_CLIFFORD)
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
             # This exact calculator, when there are no losses, will do the work just fine.
             exact_calculator=BosonSamplingWithFixedLossesExactDistributionCalculator(
@@ -226,7 +226,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def test_distribution_accuracy_for_uniform_losses_strategy(self) -> None:
         self.__prepare_lossy_distance_experiment_settings()
         self._strategies_factory.set_experiment_configuration(self._distributions_distance_experiment_configuration)
-        self._strategies_factory.set_strategy_type(StrategyTypes.UNIFORM_LOSS)
+        self._strategies_factory.set_strategy_type(StrategyType.UNIFORM_LOSS)
         exact_calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(
             self._distributions_distance_experiment_configuration)
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
@@ -261,25 +261,25 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def test_haar_random_interferometers_distance_for_fixed_losses_strategy(self) -> None:
         self.__set_experiment_configuration_for_standard_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
-                                                     StrategyTypes.FIXED_LOSS)
+                                                     StrategyType.FIXED_LOSS)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def test_haar_random_interferometers_distance_for_cliffords_r_strategy(self) -> None:
         self.__set_experiment_configuration_for_lossless_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
-                                                     StrategyTypes.CLIFFORD_R)
+                                                     StrategyType.CLIFFORD_R)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def test_haar_random_interferometers_distance_for_generalized_cliffords_strategy(self) -> None:
         self.__set_experiment_configuration_for_lossless_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
-                                                     StrategyTypes.GENERALIZED_CLIFFORD)
+                                                     StrategyType.GENERALIZED_CLIFFORD)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def test_haar_random_interferometers_distance_for_generalized_cliffords_strategy_with_binned_input(self) -> None:
         self.__set_experiment_configuration_for_binned_haar_random()
         strategy_factory = SimulationStrategyFactory(self._haar_random_experiment_configuration,
-                                                     StrategyTypes.GENERALIZED_CLIFFORD)
+                                                     StrategyType.GENERALIZED_CLIFFORD)
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(strategy_factory)
 
     def __set_experiment_configuration_for_binned_haar_random(self) -> None:
