@@ -4,7 +4,7 @@ import unittest
 
 from numpy import array, complex128, int64
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import PermanentCalculatorFactory, \
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import BSPermanentCalculatorFactory, \
     PermanentCalculatorType
 from src.distribution_calculators.BSDistributionCalculatorWithFixedLosses import BSDistributionCalculatorWithFixedLosses
 from src.distribution_calculators.BSExactDistributionWithUniformLosses import BosonSamplingExperimentConfiguration, \
@@ -40,9 +40,9 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
         )
 
         self._calculator_type = PermanentCalculatorType.PARALLEL_CHIN_HUH
-        self._permanent_calculator_factory = PermanentCalculatorFactory(matrix=None, input_state=None,
-                                                                        output_state=None,
-                                                                        calculator_type=self._calculator_type)
+        self._permanent_calculator_factory = BSPermanentCalculatorFactory(matrix=None, input_state=None,
+                                                                          output_state=None,
+                                                                          calculator_type=self._calculator_type)
         self._permanent_calculator = self._permanent_calculator_factory.generate_calculator()
 
     def test_probabilities_sum_in_fixed_losses_scenario(self) -> None:

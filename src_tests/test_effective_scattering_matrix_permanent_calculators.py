@@ -26,7 +26,8 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
     def setUp(self) -> None:
         self._matrix = generate_haar_random_unitary_matrix(4)
         self._ch_permanent_calculator = ChinHuhPermanentCalculator(self._matrix, array([]), array([]))
-        self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix, input_state=array([]), output_state=array([]))
+        self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix, input_state=array([]),
+                                                                   output_state=array([]))
         self._pch_permanent_calculator = ParallelChinHuhPermanentCalculator(self._matrix, array([]), array([]))
 
     def __set_input_and_output_states(self, input_state: List[int], output_state: List[int]) -> None:
