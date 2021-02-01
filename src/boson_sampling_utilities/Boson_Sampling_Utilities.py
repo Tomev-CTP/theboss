@@ -47,7 +47,26 @@ def modes_state_to_particle_state(mode_state: ndarray, particles_number: int) ->
     return particles_state
 
 
-def generate_possible_outputs(number_of_particles: int, number_of_modes: int) -> List[ndarray]:
+def generate_possible_outputs(number_of_particles: int, number_of_modes: int, consider_loses: bool = False) \
+        -> List[ndarray]:
+    if number_of_particles < 0 or number_of_modes < 1:
+        return []
+    if number_of_particles == 0:
+        return [zeros(number_of_modes)]
+
+    outputs = []
+    starting_number_of_particles = number_of_particles
+
+    if consider_loses:
+        starting_number_of_particles = 0
+
+    for n in range(starting_number_of_particles, number_of_particles + 1):
+        outputs.extend(generate_possible_n_particle_outputs(n, number_of_modes))
+
+    return outputs
+
+
+def generate_possible_n_particle_outputs(number_of_particles: int, number_of_modes: int) -> List[ndarray]:
     outputs = []
 
     output = zeros(number_of_modes)
