@@ -4,13 +4,12 @@ import unittest
 
 from numpy import array, complex128, int64
 
-from src.LossyBosonSamplingExactDistributionCalculators import (
-    BosonSamplingExperimentConfiguration,
-    BosonSamplingWithFixedLossesExactDistributionCalculator,
-    BosonSamplingWithUniformLossesExactDistributionCalculator)
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import PermanentCalculatorFactory, \
+    PermanentCalculatorType
+from src.distribution_calculators.BSDistributionCalculatorWithFixedLosses import BSDistributionCalculatorWithFixedLosses
+from src.distribution_calculators.BSExactDistributionWithUniformLosses import BosonSamplingExperimentConfiguration, \
+    BosonSamplingWithUniformLossesExactDistributionCalculator
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import \
-    PermanentCalculatorType, PermanentCalculatorFactory
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
 
@@ -48,14 +47,14 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
 
     def test_probabilities_sum_in_fixed_losses_scenario(self) -> None:
         exact_distribution_calculator = \
-            BosonSamplingWithFixedLossesExactDistributionCalculator(self.experiment_configuration,
-                                                                    self._permanent_calculator)
-        exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
+            BSDistributionCalculatorWithFixedLosses(self.experiment_configuration,
+                                                    self._permanent_calculator)
+        exact_distribution = exact_distribution_calculator.calculate_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
 
     def test_probabilities_sum_in_uniform_losses_scenario(self) -> None:
         exact_distribution_calculator = \
             BosonSamplingWithUniformLossesExactDistributionCalculator(self.experiment_configuration,
                                                                       self._permanent_calculator)
-        exact_distribution = exact_distribution_calculator.calculate_exact_distribution()
+        exact_distribution = exact_distribution_calculator.calculate_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)

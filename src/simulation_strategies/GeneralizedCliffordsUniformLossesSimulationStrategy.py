@@ -9,7 +9,7 @@ from scipy import special
 
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
     BSPermanentCalculatorInterface
-from src.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
+from src.distribution_calculators.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
     BosonSamplingWithUniformLossesExactDistributionCalculator
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
     GeneralizedCliffordsSimulationStrategy
