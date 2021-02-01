@@ -6,15 +6,19 @@ __author__ = "Tomasz Rybotycki"
 
 import enum
 
-from src.distribution_calculators.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration
+from src.distribution_calculators.BSDistributionCalculatorInterface import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategyInterface
 from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategyInterface
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.GeneralizedCliffordsUniformLossesSimulationStrategy import \
+    GeneralizedCliffordsUniformLossesSimulationStrategy
 from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import \
-    LossyNetworksGeneralizedCliffordsSimulationStrategyInterface
+    LossyNetworksGeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategyInterface
-from src.simulation_strategies.GeneralizedCliffordsUniformLossesSimulationStrategy import GeneralizedCliffordsUniformLossesSimulationStrategy
+
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+    BSPermanentCalculatorInterface
 
 
 class StrategyType(enum.IntEnum):
@@ -29,9 +33,11 @@ class StrategyType(enum.IntEnum):
 
 class SimulationStrategyFactory:
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
+                 bs_permanent_calculator: BSPermanentCalculatorInterface,
                  strategy_type: StrategyType = StrategyType.FIXED_LOSS) -> None:
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
+        self._bs_permanent_calculator = bs_permanent_calculator
         self._strategy_mapping = {
             StrategyType.FIXED_LOSS: self._generate_fixed_losses_strategy,
             StrategyType.UNIFORM_LOSS: self._generate_uniform_losses_strategy,
@@ -41,11 +47,29 @@ class SimulationStrategyFactory:
             StrategyType.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy
         }
 
-    def set_strategy_type(self, strategy_type: StrategyType) -> None:
+    @property
+    def strategy_type(self) -> StrategyType:
+        return self._strategy_type
+
+    @strategy_type.setter
+    def strategy_type(self, strategy_type: StrategyType) -> None:
         self._strategy_type = strategy_type
 
-    def set_experiment_configuration(self, experiment_configuration: BosonSamplingExperimentConfiguration) -> None:
+    @property
+    def experiment_configuration(self) -> BosonSamplingExperimentConfiguration:
+        return self._experiment_configuration
+
+    @experiment_configuration.setter
+    def experiment_configuration(self, experiment_configuration: BosonSamplingExperimentConfiguration) -> None:
         self._experiment_configuration = experiment_configuration
+
+    @property
+    def bs_permanent_calculator(self) -> BSPermanentCalculatorInterface:
+        return self._bs_permanent_calculator
+
+    @bs_permanent_calculator.setter
+    def bs_permanent_calculator(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
+        self._bs_permanent_calculator = bs_permanent_calculator
 
     def generate_strategy(self) -> SimulationStrategyInterface:
         """
@@ -90,20 +114,16 @@ class SimulationStrategyFactory:
             Generates generalized Cliffords strategy from Oszmaniec / Brod.
         :return: Generalized Cliffords strategy.
         """
-        return GeneralizedCliffordsSimulationStrategy(
-            self._experiment_configuration.interferometer_matrix
-        )
+        return GeneralizedCliffordsSimulationStrategy(self.bs_permanent_calculator)
 
     def _generate_lossy_net_generalized_cliffords_strategy(self) \
-            -> LossyNetworksGeneralizedCliffordsSimulationStrategyInterface:
+            -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
         """
             Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
         :return: Generalized Cliffords strategy for lossy networks.
         """
-        return LossyNetworksGeneralizedCliffordsSimulationStrategyInterface(
-            self._experiment_configuration.interferometer_matrix
-        )
+        return LossyNetworksGeneralizedCliffordsSimulationStrategy(self.bs_permanent_calculator)
 
     def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
-        return GeneralizedCliffordsUniformLossesSimulationStrategy(self._experiment_configuration.interferometer_matrix,
+        return GeneralizedCliffordsUniformLossesSimulationStrategy(self._bs_permanent_calculator,
                                                                    self._experiment_configuration.uniform_transmissivity)

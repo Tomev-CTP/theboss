@@ -26,7 +26,7 @@ class PermanentCalculatorType(enum.IntEnum):
     PARALLEL_CHIN_HUH = enum.auto()
 
 
-class PermanentCalculatorFactory:
+class BSPermanentCalculatorFactory:
     def __init__(self, matrix: Optional[ndarray], input_state: Optional[ndarray], output_state: Optional[ndarray],
                  calculator_type: PermanentCalculatorType = PermanentCalculatorType.PARALLEL_CHIN_HUH):
         self._matrix = matrix
