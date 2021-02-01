@@ -23,11 +23,11 @@ class BosonSamplingExperimentConfiguration:
     lossy_modes_number: int = 0
 
 
-class BSExactDistributionCalculatorInterface(abc.ABC):
+class BSDistributionCalculatorInterface(abc.ABC):
     """ Interface for boson sampling exact distribution calculators """
 
     @abc.abstractmethod
-    def calculate_exact_distribution(self) -> List[float]:
+    def calculate_distribution(self) -> List[float]:
         """ One has to be able to calculate exact distribution with it """
         raise NotImplementedError
 

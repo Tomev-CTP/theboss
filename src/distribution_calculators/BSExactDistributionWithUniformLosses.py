@@ -9,7 +9,7 @@ from scipy import special
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
 from src.distribution_calculators.BSDistributionCalculatorWithFixedLosses import \
     BSDistributionCalculatorWithFixedLosses, BSPermanentCalculatorInterface
-from src.distribution_calculators.BSExactDistributionCalculatorInterface import \
+from src.distribution_calculators.BSDistributionCalculatorInterface import \
     BosonSamplingExperimentConfiguration
 
 
@@ -19,7 +19,7 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
                  permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(configuration, permanent_calculator)
 
-    def calculate_exact_distribution(self) -> List[float]:
+    def calculate_distribution(self) -> List[float]:
         """
         This method will be used to calculate the exact distribution of lossy boson sampling experiment.
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
@@ -43,7 +43,7 @@ class BosonSamplingWithUniformLossesExactDistributionCalculator \
             subdistribution_calculator = \
                 BSDistributionCalculatorWithFixedLosses(subconfiguration, self._permanent_calculator)
             possible_outcomes.extend(subdistribution_calculator.get_outcomes_in_proper_order())
-            subdistribution = subdistribution_calculator.calculate_exact_distribution()
+            subdistribution = subdistribution_calculator.calculate_distribution()
             subdistribution_weight = pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)
             subdistribution = [el * subdistribution_weight for el in subdistribution]
 

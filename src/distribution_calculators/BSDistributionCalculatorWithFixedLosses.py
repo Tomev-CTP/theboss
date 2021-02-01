@@ -10,11 +10,11 @@ from scipy import special
 from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_lossy_inputs, generate_possible_outputs
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
     BSPermanentCalculatorInterface
-from src.distribution_calculators.BSExactDistributionCalculatorInterface import BosonSamplingExperimentConfiguration, \
-    BSExactDistributionCalculatorInterface
+from src.distribution_calculators.BSDistributionCalculatorInterface import BosonSamplingExperimentConfiguration, \
+    BSDistributionCalculatorInterface
 
 
-class BSDistributionCalculatorWithFixedLosses(BSExactDistributionCalculatorInterface):
+class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration,
                  permanent_calculator: BSPermanentCalculatorInterface) -> None:
         self.configuration = deepcopy(configuration)
@@ -24,7 +24,7 @@ class BSDistributionCalculatorWithFixedLosses(BSExactDistributionCalculatorInter
         return generate_possible_outputs(self.configuration.number_of_particles_left,
                                          self.configuration.number_of_modes)
 
-    def calculate_exact_distribution(self) -> List[float]:
+    def calculate_distribution(self) -> List[float]:
         """
         This method will be used to calculate the exact distribution of lossy boson sampling experiment.
         The results will be returned as a table of probabilities of obtaining the outcome at i-th index.
