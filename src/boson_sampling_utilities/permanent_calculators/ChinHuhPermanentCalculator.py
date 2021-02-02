@@ -79,9 +79,8 @@ class ChinHuhPermanentCalculator(BSPermanentCalculatorInterface):
             to match.
             :return: Information if the calculation can be performed.
         """
-        return self._matrix.shape[0] == self._matrix.shape[1] \
-               and len(self._output_state) == len(self._input_state) \
-               and len(self._output_state) == self._matrix.shape[0]
+        return self._matrix.shape[0] == self._matrix.shape[1] and len(self._output_state) == len(self._input_state) \
+            and len(self._output_state) == self._matrix.shape[0]
 
     def _calculate_v_vectors(self, input_vector: Optional[ndarray] = None) -> List[ndarray]:
         if input_vector is None:
