@@ -9,10 +9,11 @@ from scipy import special
 
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
     BSPermanentCalculatorInterface
-from src.distribution_calculators.LossyBosonSamplingExactDistributionCalculators import BosonSamplingExperimentConfiguration, \
-    BosonSamplingWithUniformLossesExactDistributionCalculator
+from src.distribution_calculators.BSExactDistributionWithUniformLosses import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
     GeneralizedCliffordsSimulationStrategy
+
+from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
 
 
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
@@ -49,8 +50,8 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
             number_of_particles_left=0
         )
 
-        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(configuration)
-        self._possible_outputs = calculator.get_outcomes_in_proper_order()
+        self._possible_outputs = generate_possible_outputs(configuration.number_of_particles_left,
+                                                           configuration.number_of_modes, consider_loses=True)
         self.distribution = [0 for _ in self._possible_outputs]
 
         # Do note that index is actually equal to number of particles left!
@@ -69,7 +70,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         """
             Fills the r_sample, but it's possible for the photons to be lost.
         """
-        self.r_sample = [0 for _ in self.interferometer_matrix]
+        self.r_sample = [0 for _ in self._bs_permanent_calculator.matrix]
         self.current_key = tuple(self.r_sample)
         self.current_sample_probability = 1
 
