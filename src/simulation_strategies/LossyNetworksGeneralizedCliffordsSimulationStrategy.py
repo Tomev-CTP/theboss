@@ -10,7 +10,7 @@ from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class LossyNetworksGeneralizedCliffordsSimulationStrategyInterface(SimulationStrategyInterface):
+class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(bs_permanent_calculator.matrix)
         self._helper_strategy = GeneralizedCliffordsSimulationStrategy(bs_permanent_calculator)
