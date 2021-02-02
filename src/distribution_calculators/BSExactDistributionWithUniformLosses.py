@@ -13,7 +13,7 @@ from src.distribution_calculators.BSDistributionCalculatorInterface import \
     BosonSamplingExperimentConfiguration
 
 
-class BosonSamplingWithUniformLossesExactDistributionCalculator \
+class BSDistributionCalculatorWithUniformLosses \
             (BSDistributionCalculatorWithFixedLosses):
     def __init__(self, configuration: BosonSamplingExperimentConfiguration,
                  permanent_calculator: BSPermanentCalculatorInterface) -> None:

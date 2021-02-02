@@ -10,7 +10,7 @@ from numpy import asarray, block, eye, ndarray, zeros_like
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import BSPermanentCalculatorFactory
 from src.BosonSamplingSimulator import BosonSamplingSimulator
 from src.distribution_calculators.BSExactDistributionWithUniformLosses import (BosonSamplingExperimentConfiguration,
-                                                                               BosonSamplingWithUniformLossesExactDistributionCalculator)
+                                                                               BSDistributionCalculatorWithUniformLosses)
 from src.distribution_calculators.BSSampleBasedDistributionCalculator import BSSampleBasedDistributionCalculator
 from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
 from src.Quantum_Computations_Utilities import count_total_variation_distance, \
@@ -42,8 +42,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._permanent_calculator = permanent_calculator_factory.generate_calculator()
         self._strategy_factory = SimulationStrategyFactory(self._experiment_configuration, self._permanent_calculator)
 
-        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration,
-                                                                               self._permanent_calculator)
+        calculator = BSDistributionCalculatorWithUniformLosses(self._experiment_configuration,
+                                                               self._permanent_calculator)
         self._possible_outcomes = calculator.get_outcomes_in_proper_order()
         self._possible_outcomes_number = len(self._possible_outcomes)
 
