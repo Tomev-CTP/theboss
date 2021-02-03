@@ -52,5 +52,5 @@ class BSDistributionCalculatorWithUniformLosses \
         return exact_distribution
 
     def get_outcomes_in_proper_order(self) -> List[ndarray]:
-        return generate_possible_outputs(self.configuration.number_of_particles_left,
+        return generate_possible_outputs(self.configuration.initial_number_of_particles,
                                          self.configuration.number_of_modes, consider_loses=True)
