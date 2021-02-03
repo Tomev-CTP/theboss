@@ -6,6 +6,7 @@ from typing import List, Union
 
 import qutip
 from numpy import abs, linalg, log2, ndarray, sqrt
+from math import isinf
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -21,7 +22,8 @@ def count_total_variation_distance(distribution1: Union[List[float], ndarray],
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), "Distributions must have equal lengths!"
+    assert len(distribution1) == len(distribution2), f"Distributions must have equal lengths! Got: {len(distribution1)}" \
+                                                     f"and {len(distribution2)}!"
     total_variation_distance = 0
 
     for i in range(len(distribution1)):
@@ -54,7 +56,11 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
     possibly_huge_number = 2 ** outcomes_number - 2
-    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+    if not isinf(possibly_huge_number):
+        prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+    else:
+        # In case the number is too big for python to process we need to approximate
+        prime_factors_of_the_number = [2] * int(outcomes_number)
 
     error_bound = -log2(error_probability)
 
