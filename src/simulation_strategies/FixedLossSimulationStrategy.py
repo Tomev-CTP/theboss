@@ -12,7 +12,7 @@ from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSim
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class FixedLossSimulationStrategyInterface(SimulationStrategyInterface):
+class FixedLossSimulationStrategy(SimulationStrategyInterface):
 
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_photons_left: int, number_of_observed_modes: int,
@@ -36,8 +36,7 @@ class FixedLossSimulationStrategyInterface(SimulationStrategyInterface):
         samples = []
         while len(samples) < samples_number:
             phi_0 = self._prepare_initial_state(input_state)
-            evolved_state = self._network_simulation_strategy.simulate(phi_0)
-            evolved_state = evolved_state / norm(input_state)
+            evolved_state = self._network_simulation_strategy.simulate(input_state=phi_0)
             probabilities = self._calculate_probabilities(evolved_state)
             samples.append(self._calculate_approximation_of_boson_sampling_outcome(probabilities))
         return samples

@@ -8,7 +8,7 @@ import enum
 
 from src.distribution_calculators.BSDistributionCalculatorInterface import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.CliffordsRSimulationStrategy import CliffordsRSimulationStrategyInterface
-from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategyInterface
+from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimulationStrategy
 from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.GeneralizedCliffordsUniformLossesSimulationStrategy import \
     GeneralizedCliffordsUniformLossesSimulationStrategy
@@ -79,12 +79,12 @@ class SimulationStrategyFactory:
         handler = self._strategy_mapping.get(self._strategy_type, self._generate_fixed_losses_strategy)
         return handler()
 
-    def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategyInterface:
+    def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategy:
         """
             Generates fixed loss strategy.
         :return: Fixed loss strategy.
         """
-        return FixedLossSimulationStrategyInterface(
+        return FixedLossSimulationStrategy(
             interferometer_matrix=self._experiment_configuration.interferometer_matrix,
             number_of_photons_left=self._experiment_configuration.number_of_particles_left,
             number_of_observed_modes=self._experiment_configuration.number_of_modes,
