@@ -50,22 +50,30 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         In case of large outcomes numbers one should consider solutions given here:
         https://math.stackexchange.com/questions/2696344/is-there-a-way-to-find-the-log-of-very-large-numbers
 
+        In the method formally I should compute
+
+            for prime_factor in prime_factors_of_the_large_number:
+                error_bound += log2(prime_factor)
+
+        where the large_number =  2 ** outcomes_number - 2.
+
+        However, by simply approximating large_number =  2 ** outcomes_number I can do the same with just
+
+            error_bound += log2(2) * outcomes_number
+
+        or even
+
+            error_bound += outcomes_number
+
+        without wasting a lot of time for calculating the prime factors or the number.
+
         :param outcomes_number:
         :param samples_number: Number of samples used for estimation.
         :param error_probability: Desired probability of error.
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
-    possibly_huge_number = 2 ** outcomes_number - 2
-    if not isinf(possibly_huge_number):
-        prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
-    else:
-        # In case the number is too big for python to process we need to approximate
-        prime_factors_of_the_number = [2] * int(outcomes_number)
-
     error_bound = -log2(error_probability)
-
-    for prime_factor in prime_factors_of_the_number:
-        error_bound += log2(prime_factor)
+    error_bound += outcomes_number  # APPROXIMATION!
 
     error_bound /= 2 * samples_number
     return sqrt(error_bound)
