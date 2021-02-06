@@ -5,8 +5,7 @@ __author__ = "Tomasz Rybotycki"
 from typing import List, Union
 
 import qutip
-from numpy import abs, linalg, log2, ndarray, sqrt
-from math import isinf
+from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -110,3 +109,23 @@ def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int,
     samples_number /= 2 * pow(accuracy, 2)
 
     return int(samples_number) + 1
+
+
+def compute_qft_matrix(n: int) -> ndarray:
+    """
+        Computes n x n matrix of quantum fourier transform. The formula can be found e.g. on wiki
+
+        https://en.wikipedia.org/wiki/Quantum_Fourier_transform
+
+        :param n: Dimension of the array.
+        :return: n x n ndarray of qft.
+    """
+    values = []
+    omega = exp(2j * pi / n)
+    for i in range(n):
+        for j in range(n):
+            values.append(pow(omega, j * i))
+
+    qft_matrix = asarray(values)
+    qft_matrix = qft_matrix.reshape((n, n)) / sqrt(n)
+    return qft_matrix
