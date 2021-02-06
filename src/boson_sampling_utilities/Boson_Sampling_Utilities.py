@@ -150,7 +150,6 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
 
 
 def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
-    # return diag(1.0 - singular_values_vector)
 
     vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
     for i in range(len(vector_of_squared_expansions)):
