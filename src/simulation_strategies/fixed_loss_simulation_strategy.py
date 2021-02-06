@@ -7,9 +7,9 @@ from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
 from numpy.linalg import norm
 from numpy.random import rand
 
-from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
-from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
-from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
+from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
 class FixedLossSimulationStrategy(SimulationStrategyInterface):

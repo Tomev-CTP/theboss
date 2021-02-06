@@ -7,15 +7,15 @@ from typing import List, Union
 
 from numpy import asarray, block, eye, ndarray, zeros_like
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import BSPermanentCalculatorFactory
-from src.BosonSamplingSimulator import BosonSamplingSimulator
-from src.distribution_calculators.BSExactDistributionWithUniformLosses import (BosonSamplingExperimentConfiguration,
-                                                                               BSDistributionCalculatorWithUniformLosses)
-from src.distribution_calculators.BSSampleBasedDistributionCalculator import BSSampleBasedDistributionCalculator
-from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
-from src.Quantum_Computations_Utilities import count_total_variation_distance, \
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import BSPermanentCalculatorFactory
+from src.boson_sampling_simulator import BosonSamplingSimulator
+from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import (BosonSamplingExperimentConfiguration,
+                                                                                    BSDistributionCalculatorWithUniformLosses)
+from src.distribution_calculators.bs_sample_based_distribution_calculator import BSSampleBasedDistributionCalculator
+from src.network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
+from src.quantum_computations_utilities import count_total_variation_distance, \
     count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
-from src.simulation_strategies.SimulationStrategyFactory import SimulationStrategyFactory, StrategyType
+from src.simulation_strategies.simulation_strategy_factory import SimulationStrategyFactory, StrategyType
 
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):

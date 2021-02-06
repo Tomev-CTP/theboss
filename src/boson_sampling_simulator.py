@@ -8,7 +8,7 @@ from typing import List
 
 from numpy import ndarray
 
-from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
 class BosonSamplingSimulator:

@@ -9,7 +9,7 @@ from typing import List, Optional
 from numpy import array, asarray, complex128, int64, ndarray
 from scipy.special import binom
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorBase import BSPermanentCalculatorBase
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
 
 
 class ChinHuhPermanentCalculator(BSPermanentCalculatorBase):

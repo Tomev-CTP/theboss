@@ -4,10 +4,10 @@ import unittest
 
 from numpy import array, complex128, int64
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorFactory import BSPermanentCalculatorFactory, \
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import BSPermanentCalculatorFactory, \
     PermanentCalculatorType
-from src.distribution_calculators.BSDistributionCalculatorWithFixedLosses import BSDistributionCalculatorWithFixedLosses
-from src.distribution_calculators.BSExactDistributionWithUniformLosses import BosonSamplingExperimentConfiguration, \
+from src.distribution_calculators.bs_distribution_calculator_with_fixed_losses import BSDistributionCalculatorWithFixedLosses
+from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import BosonSamplingExperimentConfiguration, \
     BSDistributionCalculatorWithUniformLosses
 
 

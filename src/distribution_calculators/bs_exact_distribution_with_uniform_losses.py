@@ -6,10 +6,10 @@ from typing import List
 from numpy import ndarray
 from scipy import special
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
-from src.distribution_calculators.BSDistributionCalculatorWithFixedLosses import \
+from src.boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
+from src.distribution_calculators.bs_distribution_calculator_with_fixed_losses import \
     BSDistributionCalculatorWithFixedLosses, BSPermanentCalculatorInterface
-from src.distribution_calculators.BSDistributionCalculatorInterface import \
+from src.distribution_calculators.bs_distribution_calculator_interface import \
     BosonSamplingExperimentConfiguration
 
 

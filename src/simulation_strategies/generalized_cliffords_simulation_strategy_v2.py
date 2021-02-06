@@ -5,10 +5,10 @@ from typing import List
 
 from numpy import append, array, int64, ndarray
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import particle_state_to_modes_state
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+from src.boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import GeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
 
 
 class GeneralizedCliffordsSimulationStrategyInterfaceV2(GeneralizedCliffordsSimulationStrategy):

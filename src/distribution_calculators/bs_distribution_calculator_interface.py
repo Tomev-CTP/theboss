@@ -6,7 +6,7 @@ from typing import List
 
 from numpy import ndarray
 
-from src.network_simulation_strategy import NetworkSimulationStrategy
+from src.network_simulation_strategy import network_simulation_strategy
 
 
 # TODO TR: This class should be placed in separate folder
@@ -19,7 +19,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_lost: int
     number_of_particles_left: int
     uniform_transmissivity: float = 0
-    network_simulation_strategy: NetworkSimulationStrategy = None
+    network_simulation_strategy: network_simulation_strategy = None
     lossy_modes_number: int = 0
 
 

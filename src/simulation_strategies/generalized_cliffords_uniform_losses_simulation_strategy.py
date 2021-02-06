@@ -7,13 +7,13 @@ from typing import List
 from numpy import array, int64, ndarray
 from scipy import special
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-from src.distribution_calculators.BSExactDistributionWithUniformLosses import BosonSamplingExperimentConfiguration
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
+from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import BosonSamplingExperimentConfiguration
+from src.simulation_strategies.generalized_cliffords_simulation_strategy import \
     GeneralizedCliffordsSimulationStrategy
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
+from src.boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
 
 
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):

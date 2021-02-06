@@ -2,12 +2,12 @@ __author__ = "Tomasz Rybotycki"
 
 from numpy import delete, ndarray, vstack, zeros_like
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
+from src.boson_sampling_utilities.boson_sampling_utilities import prepare_interferometer_matrix_in_expanded_space
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-from src.simulation_strategies.GeneralizedCliffordsSimulationStrategy import \
+from src.simulation_strategies.generalized_cliffords_simulation_strategy import \
     GeneralizedCliffordsSimulationStrategy
-from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
 class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):

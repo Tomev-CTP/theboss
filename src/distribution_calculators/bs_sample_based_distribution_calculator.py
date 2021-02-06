@@ -3,13 +3,13 @@ __author__ = "Tomasz Rybotycki"
 from numpy import float64, ndarray, zeros
 
 
-from src.distribution_calculators.BSDistributionCalculatorInterface import \
+from src.distribution_calculators.bs_distribution_calculator_interface import \
     BosonSamplingExperimentConfiguration, BSDistributionCalculatorInterface
 
-from src.boson_sampling_utilities.Boson_Sampling_Utilities import generate_possible_outputs
-from src.BosonSamplingSimulator import BosonSamplingSimulator
+from src.boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
+from src.boson_sampling_simulator import BosonSamplingSimulator
 
-from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 from typing import List
 

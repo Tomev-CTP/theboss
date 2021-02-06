@@ -9,7 +9,7 @@ from typing import Optional
 
 from numpy import complex128, ndarray
 
-from src.boson_sampling_utilities.permanent_calculators.ChinHuhPermanentCalculator import ChinHuhPermanentCalculator
+from src.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
 
 
 class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
