@@ -14,11 +14,8 @@ from typing import List
 
 from numpy import allclose, array
 
-from src.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
-from src.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import ClassicPermanentCalculator
-from src.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import \
-    ParallelChinHuhPermanentCalculator
-from src.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from src_tests import (ChinHuhPermanentCalculator, ClassicPermanentCalculator, ParallelChinHuhPermanentCalculator)
+from src_tests import generate_haar_random_unitary_matrix
 
 
 class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):

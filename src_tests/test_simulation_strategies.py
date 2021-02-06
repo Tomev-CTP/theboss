@@ -16,20 +16,17 @@ from numpy import array, average, ndarray
 from numpy.random import randint
 from scipy.special import binom
 
-from src.boson_sampling_utilities.boson_sampling_utilities import \
-    calculate_number_of_possible_n_particle_m_mode_output_states, calculate_number_of_possible_lossy_n_particle_m_mode_output_states
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
-    BSPermanentCalculatorFactory
-from src.distribution_calculators.bs_distribution_calculator_interface import BosonSamplingExperimentConfiguration, \
-    BSDistributionCalculatorInterface
-from src.distribution_calculators.bs_distribution_calculator_with_fixed_losses import BSDistributionCalculatorWithFixedLosses
-from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import BSDistributionCalculatorWithUniformLosses
-from src.distribution_calculators.bs_sample_based_distribution_calculator import BSSampleBasedDistributionCalculator
-from src.network_simulation_strategy.lossless_network_simulation_strategy import LosslessNetworkSimulationStrategy
-from src.quantum_computations_utilities import count_total_variation_distance, \
-    count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
-from src.simulation_strategies.simulation_strategy_factory import SimulationStrategyFactory, StrategyType
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
+from src_tests import (
+    BSDistributionCalculatorInterface,  BSSampleBasedDistributionCalculator, BSDistributionCalculatorWithFixedLosses,
+    BSDistributionCalculatorWithUniformLosses,
+    BosonSamplingExperimentConfiguration,
+    SimulationStrategyFactory, StrategyType, SimulationStrategyInterface,
+    LosslessNetworkSimulationStrategy,
+    BSPermanentCalculatorFactory,
+    generate_haar_random_unitary_matrix, calculate_number_of_possible_lossy_n_particle_m_mode_output_states,
+    calculate_number_of_possible_n_particle_m_mode_output_states, count_total_variation_distance,
+    count_tv_distance_error_bound_of_experiment_results
+)
 
 
 @dataclass
