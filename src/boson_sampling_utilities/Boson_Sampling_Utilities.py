@@ -137,6 +137,20 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
     return binom(n + m - 1, n)
 
 
+def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m: int) -> int:
+    """
+        Calculates the number of possible output states with N <= n particles placed around m modes.
+
+        :param n: Number of particles.
+        :param m: Number of modes.
+        :return: Dimension of n-particle m-mode bosonic space.
+    """
+    states_number = 0
+    for N in range(n + 1):
+        states_number += binom(N + m - 1, N)
+    return states_number
+
+
 def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
     expansions_zeros = zeros_like(v_matrix)
