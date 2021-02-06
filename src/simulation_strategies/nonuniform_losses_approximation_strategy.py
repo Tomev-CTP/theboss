@@ -7,16 +7,14 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List
 
-from numpy import ndarray, eye, exp, complex128, zeros
+from numpy import complex128, exp, eye, ndarray
 from numpy.random import rand
-
-from src.quantum_computations_utilities import compute_qft_matrix
-
-from src.simulation_strategies.lossy_networks_generalized_cliffords_simulation_strategy import \
-    LossyNetworksGeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
 
 from src.boson_sampling_utilities.boson_sampling_utilities import \
     prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes
+from src.quantum_computations_utilities import compute_qft_matrix
+from src.simulation_strategies.lossy_networks_generalized_cliffords_simulation_strategy import \
+    BSPermanentCalculatorInterface, LossyNetworksGeneralizedCliffordsSimulationStrategy
 
 
 class NonuniformLossesApproximationStrategy(LossyNetworksGeneralizedCliffordsSimulationStrategy):
