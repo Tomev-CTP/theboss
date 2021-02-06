@@ -11,7 +11,7 @@ from src.simulation_strategies.FixedLossSimulationStrategy import FixedLossSimul
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
 
 
-class UniformLossSimulationStrategyInterface(SimulationStrategyInterface):
+class UniformLossSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_modes: int, transmissivity: float) \
             -> None:

@@ -15,7 +15,7 @@ from src.simulation_strategies.GeneralizedCliffordsUniformLossesSimulationStrate
 from src.simulation_strategies.LossyNetworksGeneralizedCliffordsSimulationStrategy import \
     LossyNetworksGeneralizedCliffordsSimulationStrategy
 from src.simulation_strategies.SimulationStrategyInterface import SimulationStrategyInterface
-from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategyInterface
+from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossSimulationStrategy
 
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
     BSPermanentCalculatorInterface
@@ -91,12 +91,12 @@ class SimulationStrategyFactory:
             network_simulation_strategy=self._experiment_configuration.network_simulation_strategy
         )
 
-    def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategyInterface:
+    def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
         """
             Generates uniform losses strategy.
         :return: Uniform losses strategy.
         """
-        return UniformLossSimulationStrategyInterface(
+        return UniformLossSimulationStrategy(
             self._experiment_configuration.interferometer_matrix,
             self._experiment_configuration.number_of_modes,
             self._experiment_configuration.uniform_transmissivity
