@@ -1,11 +1,19 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
+import abc
 from typing import List
 
 from numpy import ndarray
 
 
-class SimulationStrategy:
+class SimulationStrategyInterface(abc.ABC):
+
+    @classmethod
+    def __subclasshook__(cls, subclass):
+        return (hasattr(subclass, "simulate") and
+                callable(subclass.simulate))
+
+    @abc.abstractmethod
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
             Simulate the lossy boson sampling experiment.

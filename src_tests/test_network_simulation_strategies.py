@@ -1,18 +1,20 @@
+__author__ = "Tomasz Rybotycki"
+
 import unittest
 from copy import deepcopy
 from random import uniform
 from typing import List, Union
 
-from numpy import block, eye, ndarray, zeros_like, asarray
+from numpy import asarray, block, eye, ndarray, zeros_like
 
-from src.BosonSamplingSimulator import BosonSamplingSimulator
-from src.LossyBosonSamplingExactDistributionCalculators import (
-    BosonSamplingExperimentConfiguration, BosonSamplingWithUniformLossesExactDistributionCalculator)
-from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
-from src.Quantum_Computations_Utilities import count_total_variation_distance, \
-    count_tv_distance_error_bound_of_experiment_results, generate_haar_random_unitary_matrix
-from src.SimulationStrategyFactory import SimulationStrategyFactory, StrategyTypes
-from src_tests.common_code_for_tests import ApproximateDistributionCalculator
+from src_tests import (
+    BSPermanentCalculatorFactory,
+    BosonSamplingSimulator, BosonSamplingExperimentConfiguration,
+    BSDistributionCalculatorWithUniformLosses, BSSampleBasedDistributionCalculator,
+    SimulationStrategyFactory, StrategyType,
+    LossyNetworkSimulationStrategy,
+    generate_haar_random_unitary_matrix, count_total_variation_distance,
+    count_tv_distance_error_bound_of_experiment_results)
 
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
@@ -31,12 +33,16 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             number_of_modes=len(self._initial_state),
             number_of_particles_lost=0,  # Losses should only come from network.
             number_of_particles_left=sum(self._initial_state),
-            probability_of_uniform_loss=self._probability_of_uniform_loss,
+            uniform_transmissivity=self._probability_of_uniform_loss,
             network_simulation_strategy=LossyNetworkSimulationStrategy(self._lossy_interferometer_matrix)
         )
-        self._strategy_factory = SimulationStrategyFactory(self._experiment_configuration)
 
-        calculator = BosonSamplingWithUniformLossesExactDistributionCalculator(self._experiment_configuration)
+        permanent_calculator_factory = BSPermanentCalculatorFactory(self._lossy_interferometer_matrix, None, None)
+        self._permanent_calculator = permanent_calculator_factory.generate_calculator()
+        self._strategy_factory = SimulationStrategyFactory(self._experiment_configuration, self._permanent_calculator)
+
+        calculator = BSDistributionCalculatorWithUniformLosses(self._experiment_configuration,
+                                                               self._permanent_calculator)
         self._possible_outcomes = calculator.get_outcomes_in_proper_order()
         self._possible_outcomes_number = len(self._possible_outcomes)
 
@@ -46,7 +52,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         particles without the losses. Note that I can be pretty sure it will be lower in large losses
         regime, but in case of lower losses this test may not hold.
         """
-        self._strategy_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
+
+        self._strategy_factory.strategy_type = StrategyType.FIXED_LOSS
 
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
@@ -66,9 +73,9 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         simulation with uniform losses at the input. Given that both approximate the same quantity only
         sampling complexity error is assumed.
         """
-        self._strategy_factory.set_strategy_type(StrategyTypes.UNIFORM_LOSS)
+        self._strategy_factory.strategy_type = StrategyType.UNIFORM_LOSS
 
-        estimated_distribution_calculator = ApproximateDistributionCalculator(
+        estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._experiment_configuration,
             strategy=self._strategy_factory.generate_strategy(),
             outcomes=self._possible_outcomes
@@ -85,13 +92,13 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         :param distribution: Given distribution to compare with lossy distribution.
         """
 
-        self._strategy_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
+        self._strategy_factory.strategy_type = StrategyType.FIXED_LOSS
 
         distance_bound_between_estimated_distributions = \
             self.__calculate_statistical_distance_bound_between_two_approximate_distributions(
                 outcomes_number=self._possible_outcomes_number)
 
-        estimated_distribution_calculator = ApproximateDistributionCalculator(
+        estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._experiment_configuration,
             strategy=self._strategy_factory.generate_strategy(),
             outcomes=self._possible_outcomes
@@ -128,7 +135,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         method.
         :return: Approximate distribution.
         """
-        self._strategy_factory.set_strategy_type(StrategyTypes.GENERALIZED_CLIFFORD)
+        self._strategy_factory.strategy_type = StrategyType.GENERALIZED_CLIFFORD
+        self._permanent_calculator.matrix = self._lossy_interferometer_matrix
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
 
@@ -162,7 +170,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         lossy_input = asarray(self._initial_state, dtype=int)
         for i in range(len(self._initial_state)):
             for _ in range(self._initial_state[i]):
-                if uniform(0, 1) < self._experiment_configuration.probability_of_uniform_loss:
+                if uniform(0, 1) < self._experiment_configuration.uniform_transmissivity:
                     lossy_input[i] -= 1
         return lossy_input
 
@@ -184,10 +192,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         experiment_configuration.interferometer_matrix = updated_interferometer_matrix
 
-        self._strategy_factory.set_strategy_type(StrategyTypes.FIXED_LOSS)
-        self._strategy_factory.set_experiment_configuration(experiment_configuration)
+        self._strategy_factory.strategy_type = StrategyType.FIXED_LOSS
+        self._strategy_factory.experiment_configuration = experiment_configuration
 
-        estimated_distribution_calculator = ApproximateDistributionCalculator(
+        estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._experiment_configuration,
             strategy=self._strategy_factory.generate_strategy(),
             outcomes=self._possible_outcomes
@@ -196,7 +204,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         distribution_with_huge_losses_on_bosonless_modes = \
             estimated_distribution_calculator.calculate_approximate_distribution()
 
-        self._strategy_factory.set_experiment_configuration(self._experiment_configuration)
+        self._strategy_factory.experiment_configuration = self._experiment_configuration
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
             distribution_with_huge_losses_on_bosonless_modes)
 
@@ -220,7 +228,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         method.
         :return: Approximate distribution.
         """
-        self._strategy_factory.set_strategy_type(StrategyTypes.LOSSY_NET_GENERALIZED_CLIFFORD)
+        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         samples = simulator.get_classical_simulation_results(asarray(self._initial_state, dtype=int),

@@ -1,18 +1,18 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from random import random
 from typing import List, Optional
 
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
-from numpy.random import rand
 from numpy.linalg import norm
+from numpy.random import rand
 
-from src.network_simulation_strategy.LossyNetworkSimulationStrategy import LossyNetworkSimulationStrategy
-from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
+from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
-class FixedLossSimulationStrategy(SimulationStrategy):
+class FixedLossSimulationStrategy(SimulationStrategyInterface):
 
     def __init__(self, interferometer_matrix: ndarray,
                  number_of_photons_left: int, number_of_observed_modes: int,
@@ -36,10 +36,8 @@ class FixedLossSimulationStrategy(SimulationStrategy):
         samples = []
         while len(samples) < samples_number:
             phi_0 = self._prepare_initial_state(input_state)
-            evolved_state = self._network_simulation_strategy.simulate(phi_0)
-            evolved_state = evolved_state / norm(input_state)
+            evolved_state = self._network_simulation_strategy.simulate(input_state=phi_0)
             probabilities = self._calculate_probabilities(evolved_state)
-            print(probabilities)
             samples.append(self._calculate_approximation_of_boson_sampling_outcome(probabilities))
         return samples
 

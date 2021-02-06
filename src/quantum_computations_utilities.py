@@ -1,11 +1,12 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 # TODO TR: Consider releasing this file as a separate package.
 
 from typing import List, Union
 
-from numpy import abs, linalg, log2, ndarray, sqrt
 import qutip
+from numpy import abs, linalg, log2, ndarray, sqrt
+from math import isinf
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -21,7 +22,8 @@ def count_total_variation_distance(distribution1: Union[List[float], ndarray],
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), "Distributions must have equal lengths!"
+    assert len(distribution1) == len(distribution2), f"Distributions must have equal lengths! Got: {len(distribution1)}" \
+                                                     f"and {len(distribution2)}!"
     total_variation_distance = 0
 
     for i in range(len(distribution1)):
@@ -48,18 +50,30 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         In case of large outcomes numbers one should consider solutions given here:
         https://math.stackexchange.com/questions/2696344/is-there-a-way-to-find-the-log-of-very-large-numbers
 
+        In the method formally I should compute
+
+            for prime_factor in prime_factors_of_the_large_number:
+                error_bound += log2(prime_factor)
+
+        where the large_number =  2 ** outcomes_number - 2.
+
+        However, by simply approximating large_number =  2 ** outcomes_number I can do the same with just
+
+            error_bound += log2(2) * outcomes_number
+
+        or even
+
+            error_bound += outcomes_number
+
+        without wasting a lot of time for calculating the prime factors or the number.
+
         :param outcomes_number:
         :param samples_number: Number of samples used for estimation.
         :param error_probability: Desired probability of error.
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
-    possibly_huge_number = 2 ** outcomes_number - 2
-    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
-
-    error_bound = log2(error_probability)
-
-    for prime_factor in prime_factors_of_the_number:
-        error_bound += log2(prime_factor)
+    error_bound = -log2(error_probability)
+    error_bound += outcomes_number  # APPROXIMATION!
 
     error_bound /= 2 * samples_number
     return sqrt(error_bound)
@@ -77,4 +91,22 @@ def get_prime_factors(number: int) -> List[int]:
             prime_factors.append(i)
             number = number / i
 
+    prime_factors.append(number)
+
     return prime_factors
+
+
+def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
+                                                           accuracy: float) -> int:
+
+    possibly_huge_number = 2 ** outcomes_number - 2
+    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+
+    samples_number = -log2(error_probability)
+
+    for prime_factor in prime_factors_of_the_number:
+        samples_number += log2(prime_factor)
+
+    samples_number /= 2 * pow(accuracy, 2)
+
+    return int(samples_number) + 1

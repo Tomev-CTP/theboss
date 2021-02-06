@@ -1,8 +1,8 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
 from numpy import dot, ndarray
 
-from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
+from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
 
 
 class LosslessNetworkSimulationStrategy(NetworkSimulationStrategy):

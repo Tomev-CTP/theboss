@@ -1,21 +1,22 @@
-__author__ = 'Tomasz Rybotycki'
+__author__ = "Tomasz Rybotycki"
 
-# One should note, that R is required to use this module, as original Clifford's program is written in R.
-# On my Windows 10, I am using anaconda and I had to add R_HOME env variable and R_path\bin, R_path\bin\x64 to the path.
-# https://cran.r-project.org/web/packages/BosonSampling/index.html
-
+"""
+    One should note, that R is required to use this module, as original Clifford's program is written in R. On my
+    Windows 10, I am using anaconda and I had to add R_HOME env variable and R_path\bin, R_path\bin\x64 to the path. 
+    https://cran.r-project.org/web/packages/BosonSampling/index.html
+"""
 
 from typing import List
 
 from numpy import arange, array, array_split, int64, ndarray
 from rpy2.robjects import packages
 
-from src.Boson_Sampling_Utilities import particle_state_to_modes_state
+from src.boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
 from src.rpy2_utilities import numpy_array_to_r_matrix
-from src.simulation_strategies.SimulationStrategy import SimulationStrategy
+from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
-class CliffordsRSimulationStrategy(SimulationStrategy):
+class CliffordsRSimulationStrategyInterface(SimulationStrategyInterface):
     def __init__(self, interferometer_matrix: ndarray) -> None:
         self.interferometer_matrix = interferometer_matrix
 

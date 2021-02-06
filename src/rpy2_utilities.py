@@ -1,5 +1,11 @@
-from rpy2 import robjects
+__author__ = "Tomasz Rybotycki"
+
+"""
+    This file holds utility methods for Cliffords R implementation of their algorithm.
+"""
+
 from numpy import ndarray
+from rpy2 import robjects
 
 
 def numpy_array_to_r_matrix(numpy_array: ndarray) -> robjects.r.matrix:

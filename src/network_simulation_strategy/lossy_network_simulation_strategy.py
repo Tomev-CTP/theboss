@@ -1,7 +1,9 @@
-from numpy import delete, ndarray, vstack, zeros_like, complex128
+__author__ = "Tomasz Rybotycki"
 
-from src.Boson_Sampling_Utilities import prepare_interferometer_matrix_in_expanded_space
-from src.network_simulation_strategy.NetworkSimulationStrategy import NetworkSimulationStrategy
+from numpy import complex128, delete, ndarray, vstack, zeros_like
+
+from src.boson_sampling_utilities.boson_sampling_utilities import prepare_interferometer_matrix_in_expanded_space
+from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
 
 
 class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
@@ -27,7 +29,7 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
         # Trim the resultant state
         while evolved_state.shape[0] > input_state.shape[0]:
             evolved_state = delete(evolved_state, evolved_state.shape[0] - 1)
-        # Reshape to usual states and result.
+        # Reshape to usual space and return.
         evolved_state = evolved_state.flatten()
 
         return evolved_state
