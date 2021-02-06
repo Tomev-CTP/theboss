@@ -9,11 +9,10 @@ from typing import List, Optional
 from numpy import array, asarray, complex128, int64, ndarray
 from scipy.special import binom
 
-from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
-    BSPermanentCalculatorInterface
+from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorBase import BSPermanentCalculatorBase
 
 
-class ChinHuhPermanentCalculator(BSPermanentCalculatorInterface):
+class ChinHuhPermanentCalculator(BSPermanentCalculatorBase):
     """
         This class is designed to calculate permanent of effective scattering matrix of a boson sampling instance.
         Note, that it can be used to calculate permanent of given matrix. All that is required that input and output
@@ -22,37 +21,7 @@ class ChinHuhPermanentCalculator(BSPermanentCalculatorInterface):
 
     def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
                  output_state: Optional[ndarray] = None) -> None:
-        if output_state is None:
-            output_state = array([], dtype=int64)
-        if input_state is None:
-            input_state = array([], dtype=int64)
-        self._matrix = matrix
-        self._input_state = input_state
-        self._output_state = output_state
-
-    @property
-    def matrix(self) -> ndarray:
-        return self._matrix
-
-    @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
-        self._matrix = matrix
-
-    @property
-    def input_state(self) -> ndarray:
-        return self._input_state
-
-    @input_state.setter
-    def input_state(self, input_state: ndarray) -> None:
-        self._input_state = asarray(input_state, dtype=int64)
-
-    @property
-    def output_state(self) -> ndarray:
-        return self._output_state
-
-    @output_state.setter
-    def output_state(self, output_state: ndarray) -> None:
-        self._output_state = asarray(output_state, dtype=int64)
+        super().__init__(matrix, input_state, output_state)
 
     def compute_permanent(self) -> complex128:
         """
