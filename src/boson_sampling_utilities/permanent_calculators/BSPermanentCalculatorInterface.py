@@ -14,17 +14,6 @@ from numpy import complex128, ndarray
 
 class BSPermanentCalculatorInterface(abc.ABC):
 
-    @classmethod
-    def __subclasshook__(cls, subclass):
-        return (hasattr(subclass, "compute_permanent") and
-                callable(subclass.compute_permanent) and
-                hasattr(subclass, "matrix") and
-                callable(subclass.matrix) and
-                hasattr(subclass, "input_state") and
-                callable(subclass.input_state) and
-                hasattr(subclass, "output_state") and
-                callable(subclass.output_state))
-
     @abc.abstractmethod
     def compute_permanent(self) -> complex128:
         """Computes permanent of a matrix given before."""
