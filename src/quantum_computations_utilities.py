@@ -120,6 +120,8 @@ def compute_qft_matrix(n: int) -> ndarray:
         :param n: Dimension of the array.
         :return: n x n ndarray of qft.
     """
+    if n == 0:
+        return asarray([])
     values = []
     omega = exp(2j * pi / n)
     for i in range(n):
