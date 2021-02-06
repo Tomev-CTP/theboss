@@ -210,9 +210,9 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._distributions_distance_experiment_configuration.number_of_particles_lost = 0
         self._distributions_distance_experiment_configuration.number_of_particles_left = initial_number_of_particles
 
-    def __continue_with_common_part_of_generalized_cliffords_strategy_tests(self) -> None:
+    def __continue_with_common_part_of_generalized_cliffords_strategy_tests(self, strategy: StrategyType = StrategyType.GENERALIZED_CLIFFORD) -> None:
         self._strategies_factory.experiment_configuration = self._distributions_distance_experiment_configuration
-        self._strategies_factory.strategy_type = StrategyType.GENERALIZED_CLIFFORD
+        self._strategies_factory.strategy_type = strategy
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
             # This exact calculator, when there are no losses, will do the work just fine.
             exact_calculator=BSDistributionCalculatorWithFixedLosses(
@@ -240,6 +240,16 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._distributions_distance_experiment_configuration.initial_number_of_particles = initial_number_of_particles
         self._distributions_distance_experiment_configuration.number_of_particles_lost = 0
         self._distributions_distance_experiment_configuration.number_of_particles_left = initial_number_of_particles
+
+    def test_distribution_accuracy_for_lossy_network_generalized_cliffords_strategy_without_losses(self):
+        self.__prepare_lossless_distance_experiment_settings()
+        self.__continue_with_common_part_of_generalized_cliffords_strategy_tests(
+            StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
+
+    def test_distribution_accuracy_for_lossy_network_generalized_cliffords_strategy_without_losses_with_binned_input(self):
+        self.__prepare_lossless_distance_experiments_settings_with_binned_inputs()
+        self.__continue_with_common_part_of_generalized_cliffords_strategy_tests(
+            StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
 
     def test_distribution_accuracy_for_uniform_losses_strategy(self) -> None:
         self.__prepare_lossy_distance_experiment_settings()

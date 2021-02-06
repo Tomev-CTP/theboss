@@ -20,6 +20,7 @@ from src.simulation_strategies.UniformLossSimulationStrategy import UniformLossS
 from src.boson_sampling_utilities.permanent_calculators.BSPermanentCalculatorInterface import \
     BSPermanentCalculatorInterface
 
+from copy import deepcopy
 
 class StrategyType(enum.IntEnum):
     FIXED_LOSS = enum.auto()
@@ -37,7 +38,7 @@ class SimulationStrategyFactory:
                  strategy_type: StrategyType = StrategyType.FIXED_LOSS) -> None:
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
-        self._bs_permanent_calculator = bs_permanent_calculator
+        self._bs_permanent_calculator = deepcopy(bs_permanent_calculator)
         self._strategy_mapping = {
             StrategyType.FIXED_LOSS: self._generate_fixed_losses_strategy,
             StrategyType.UNIFORM_LOSS: self._generate_uniform_losses_strategy,
@@ -69,7 +70,7 @@ class SimulationStrategyFactory:
 
     @bs_permanent_calculator.setter
     def bs_permanent_calculator(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
-        self._bs_permanent_calculator = bs_permanent_calculator
+        self._bs_permanent_calculator = deepcopy(bs_permanent_calculator)
 
     def generate_strategy(self) -> SimulationStrategyInterface:
         """
@@ -114,7 +115,7 @@ class SimulationStrategyFactory:
             Generates generalized Cliffords strategy from Oszmaniec / Brod.
         :return: Generalized Cliffords strategy.
         """
-        return GeneralizedCliffordsSimulationStrategy(self.bs_permanent_calculator)
+        return GeneralizedCliffordsSimulationStrategy(deepcopy(self.bs_permanent_calculator))
 
     def _generate_lossy_net_generalized_cliffords_strategy(self) \
             -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
@@ -122,8 +123,8 @@ class SimulationStrategyFactory:
             Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
         :return: Generalized Cliffords strategy for lossy networks.
         """
-        return LossyNetworksGeneralizedCliffordsSimulationStrategy(self.bs_permanent_calculator)
+        return LossyNetworksGeneralizedCliffordsSimulationStrategy(deepcopy(self.bs_permanent_calculator))
 
     def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
-        return GeneralizedCliffordsUniformLossesSimulationStrategy(self._bs_permanent_calculator,
+        return GeneralizedCliffordsUniformLossesSimulationStrategy(deepcopy(self.bs_permanent_calculator),
                                                                    self._experiment_configuration.uniform_transmissivity)

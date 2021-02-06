@@ -16,7 +16,6 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
         self._helper_strategy = GeneralizedCliffordsSimulationStrategy(bs_permanent_calculator)
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> [ndarray]:
-        input_state = input_state.reshape(len(input_state), )  # Divide by two, coz we have 2N x 2N matrix
         expansion_zeros = zeros_like(input_state)
         expanded_state = vstack([input_state, expansion_zeros])
         expanded_state = expanded_state.reshape(2 * len(input_state), )
