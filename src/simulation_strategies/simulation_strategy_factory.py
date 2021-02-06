@@ -5,7 +5,10 @@ __author__ = "Tomasz Rybotycki"
 """
 
 import enum
+from copy import deepcopy
 
+from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
+    BSPermanentCalculatorInterface
 from src.distribution_calculators.bs_distribution_calculator_interface import BosonSamplingExperimentConfiguration
 from src.simulation_strategies.cliffords_t_simulation_strategy import CliffordsRSimulationStrategyInterface
 from src.simulation_strategies.fixed_loss_simulation_strategy import FixedLossSimulationStrategy
@@ -14,13 +17,10 @@ from src.simulation_strategies.generalized_cliffords_uniform_losses_simulation_s
     GeneralizedCliffordsUniformLossesSimulationStrategy
 from src.simulation_strategies.lossy_networks_generalized_cliffords_simulation_strategy import \
     LossyNetworksGeneralizedCliffordsSimulationStrategy
+from src.simulation_strategies.nonuniform_losses_approximation_strategy import NonuniformLossesApproximationStrategy
 from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 from src.simulation_strategies.uniform_loss_simulation_strategy import UniformLossSimulationStrategy
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
-
-from copy import deepcopy
 
 class StrategyType(enum.IntEnum):
     FIXED_LOSS = enum.auto()
@@ -30,6 +30,7 @@ class StrategyType(enum.IntEnum):
     LOSSY_NET_GENERALIZED_CLIFFORD = enum.auto()
     LOSSLESS_MODES_STRATEGY = enum.auto()
     GENERALIZED_U_LOSSY_CLIFFORD = enum.auto()
+    NONUNIFORM_APPROXIMATED = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -45,7 +46,8 @@ class SimulationStrategyFactory:
             StrategyType.CLIFFORD_R: self._generate_r_cliffords_strategy,
             StrategyType.GENERALIZED_CLIFFORD: self._generate_generalized_cliffords_strategy,
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD: self._generate_lossy_net_generalized_cliffords_strategy,
-            StrategyType.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy
+            StrategyType.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy,
+            StrategyType.NONUNIFORM_APPROXIMATED: self._generate_nonuniform_approximating_strategy
         }
 
     @property
@@ -128,3 +130,7 @@ class SimulationStrategyFactory:
     def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
         return GeneralizedCliffordsUniformLossesSimulationStrategy(deepcopy(self.bs_permanent_calculator),
                                                                    self._experiment_configuration.uniform_transmissivity)
+
+    def _generate_nonuniform_approximating_strategy(self) -> NonuniformLossesApproximationStrategy:
+        return NonuniformLossesApproximationStrategy(deepcopy(self.bs_permanent_calculator),
+                                                     self._experiment_configuration.approximated_modes_number)

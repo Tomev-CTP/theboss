@@ -20,7 +20,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_left: int
     uniform_transmissivity: float = 0
     network_simulation_strategy: network_simulation_strategy = None
-    lossy_modes_number: int = 0
+    approximated_modes_number: int = 0
 
 
 class BSDistributionCalculatorInterface(abc.ABC):
