@@ -151,6 +151,11 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m
     return states_number
 
 
+def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> List[float]:
+    v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
+    return [i ** 2 for i in singular_values]
+
+
 def prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes(interferometer_matrix: ndarray,
                                                                                 k: int) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
