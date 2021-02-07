@@ -40,18 +40,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         n = sum(input_state)
         eta = self._transmissivity
 
-        configuration = BosonSamplingExperimentConfiguration(
-            interferometer_matrix=self._bs_permanent_calculator.matrix,
-            initial_state=input_state,
-            initial_number_of_particles=n,
-            number_of_modes=len(input_state),
-            uniform_transmissivity=eta,
-            number_of_particles_lost=0,
-            number_of_particles_left=0
-        )
-
-        self._possible_outputs = generate_possible_outputs(configuration.number_of_particles_left,
-                                                           configuration.number_of_modes, consider_loses=True)
+        self._possible_outputs = generate_possible_outputs(sum(input_state), len(input_state), consider_loses=True)
         self.distribution = [0 for _ in self._possible_outputs]
 
         # Do note that index is actually equal to number of particles left!
