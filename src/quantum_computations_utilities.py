@@ -98,13 +98,9 @@ def get_prime_factors(number: int) -> List[int]:
 def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
                                                            accuracy: float) -> int:
 
-    possibly_huge_number = 2 ** outcomes_number - 2
-    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
-
     samples_number = -log2(error_probability)
 
-    for prime_factor in prime_factors_of_the_number:
-        samples_number += log2(prime_factor)
+    samples_number += outcomes_number
 
     samples_number /= 2 * pow(accuracy, 2)
 
