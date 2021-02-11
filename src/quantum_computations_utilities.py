@@ -96,13 +96,13 @@ def get_prime_factors(number: int) -> List[int]:
 
 
 def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
-                                                           accuracy: float) -> int:
+                                                           expected_distance: float) -> int:
 
     samples_number = -log2(error_probability)
 
     samples_number += outcomes_number
 
-    samples_number /= 2 * pow(accuracy, 2)
+    samples_number /= 2 * pow(expected_distance, 2)
 
     return int(samples_number) + 1
 
