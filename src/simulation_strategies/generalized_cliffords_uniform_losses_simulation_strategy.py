@@ -41,7 +41,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         eta = self._transmissivity
 
         self._possible_outputs = generate_possible_outputs(sum(input_state), len(input_state), consider_loses=True)
-        self.distribution = [0 for _ in self._possible_outputs]
+        self.distribution = [-1 for _ in self._possible_outputs] # -1 to indicate missing spots
 
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights =\
