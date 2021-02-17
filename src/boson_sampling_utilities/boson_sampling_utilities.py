@@ -6,7 +6,7 @@ import itertools
 from typing import List, Optional
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
-    zeros_like
+    zeros_like, square
 from numpy.linalg import svd
 from scipy.special import binom
 
@@ -153,17 +153,15 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m
 
 def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> List[float]:
     v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
-    return [i ** 2 for i in singular_values]
+    return square(singular_values)
 
 
 def prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes(interferometer_matrix: ndarray,
                                                                                 k: int) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
 
-    if k > len(singular_values):
-        k = len(singular_values)
-    for i in range(k):
-        singular_values[i] = 1
+    k = min(k, len(singular_values))
+    singular_values[:k] = 1
 
     expansions_zeros = zeros_like(v_matrix)
     expansions_ones = eye(len(v_matrix))
