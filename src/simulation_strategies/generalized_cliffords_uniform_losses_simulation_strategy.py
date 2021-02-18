@@ -42,6 +42,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
 
         self._possible_outputs = generate_possible_outputs(sum(input_state), len(input_state), consider_loses=True)
         self.distribution = [-1 for _ in self._possible_outputs] # -1 to indicate missing spots
+        self.unweighted_distribution = [-1 for _ in self._possible_outputs] # -1 to indicate missing spots
 
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights =\
@@ -90,9 +91,11 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
                 pmf[-1] += probability
             for i in range(len(self._possible_outputs)):
                 if all(output == self._possible_outputs[i]):
-                    self.distribution[i] = pmf[-1] * self._binomial_weights[sum(output)]
+                    self.distribution[i] = pmf[-1]
                     self.distribution[i] *= factorial(sum(output))
                     for val in output:
                         self.distribution[i] /= factorial(val)
+                    self.unweighted_distribution[i] = self.distribution[i]
+                    self.distribution[i] *= self._binomial_weights[sum(output)]
 
         self.pmfs[self.current_key] = pmf
