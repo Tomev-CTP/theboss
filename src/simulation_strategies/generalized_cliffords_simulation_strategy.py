@@ -26,6 +26,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
         self.current_key = tuple(self.r_sample)
         self.current_sample_probability = 1
 
+    def set_new_matrix(self, new_matrix: ndarray) -> None:
+        self._bs_permanent_calculator.matrix = new_matrix
+
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
             Returns sample from linear optics experiments given output state.

@@ -56,6 +56,10 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_binned_initial_state = [2, 1, 1, 0, 0]
         self._distance_calculation_number_of_particles_lost = 2
         self._uniform_transmissivity = 0.8
+
+        self._nonuniform_strategy_initial_state = [0, 2, 1, 1, 0]
+        self._approximated_modes_number = 2
+
         distance_calculation_initial_number_of_particles = sum(self._distance_calculation_initial_state)
 
         self._distributions_distance_experiment_configuration = BosonSamplingExperimentConfiguration(
@@ -195,7 +199,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_generalized_cliffords_strategy(self) -> None:
         self.__prepare_lossless_distance_experiment_settings()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests()
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests()
 
     def __prepare_lossless_distance_experiment_settings(self) -> None:
         self._distributions_distance_experiment_configuration.initial_state = self._distance_calculation_initial_state
@@ -205,8 +209,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._distributions_distance_experiment_configuration.number_of_particles_left = initial_number_of_particles
         self._distributions_distance_experiment_configuration.uniform_transmissivity = 1
 
-    def __continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests(self,
-                                                                                     strategy: StrategyType = StrategyType.GENERALIZED_CLIFFORD) -> None:
+    def __continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(self,
+                                                                                           strategy: StrategyType = StrategyType.GENERALIZED_CLIFFORD) -> None:
         self._strategies_factory.experiment_configuration = self._distributions_distance_experiment_configuration
         self._strategies_factory.strategy_type = strategy
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
@@ -227,7 +231,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_generalized_cliffords_strategy_with_binned_input(self) -> None:
         self.__prepare_lossless_distance_experiments_settings_with_binned_inputs()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests()
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests()
 
     def __prepare_lossless_distance_experiments_settings_with_binned_inputs(self) -> None:
         self._distributions_distance_experiment_configuration.initial_state = \
@@ -240,24 +244,34 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_lossy_network_generalized_cliffords_strategy_without_losses(self):
         self.__prepare_lossless_distance_experiment_settings()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
 
     def test_distribution_accuracy_for_lossy_network_generalized_cliffords_strategy_without_losses_with_binned_input(
             self):
         self.__prepare_lossless_distance_experiments_settings_with_binned_inputs()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
 
     def test_distribution_accuracy_for_uniform_losses_generalized_cliffords_without_losses(self):
         self.__prepare_lossless_distance_experiment_settings()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
             StrategyType.GENERALIZED_U_LOSSY_CLIFFORD)
 
     def test_distribution_accuracy_for_uniform_losses_generalized_cliffords_without_losses_with_binned_input(self):
         self.__prepare_lossless_distance_experiments_settings_with_binned_inputs()
-        self.__continue_with_common_part_of_lossless_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
             StrategyType.GENERALIZED_U_LOSSY_CLIFFORD)
+
+    def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_without_approximated_modes_or_loses(self):
+        self.__prepare_lossless_distance_experiment_settings()
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
+            StrategyType.NONUNIFORM_APPROXIMATED)
+
+    def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_without_approximated_modes_or_loses_with_binned_input(self):
+        self.__prepare_lossless_distance_experiments_settings_with_binned_inputs()
+        self.__continue_with_common_part_of_lossless_generalized_cliffords_based_strategy_tests(
+            StrategyType.NONUNIFORM_APPROXIMATED)
 
     def test_distribution_accuracy_for_uniform_losses_strategy(self) -> None:
         self.__prepare_lossy_distance_experiment_settings()
@@ -299,16 +313,16 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_u_lossy_generalized_cliffords_strategy_with_losses(self):
         self.__prepare_lossy_distance_experiment_settings()
-        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_strategy_tests(StrategyType.GENERALIZED_U_LOSSY_CLIFFORD)
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(StrategyType.GENERALIZED_U_LOSSY_CLIFFORD)
 
-    def __continue_with_common_part_of_uniformly_lossy_generalized_cliffords_strategy_tests(self,
-                                                                                            strategy: StrategyType = StrategyType.GENERALIZED_U_LOSSY_CLIFFORD) -> None:
+    def __continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(self,
+                                                                                                  strategy: StrategyType = StrategyType.GENERALIZED_U_LOSSY_CLIFFORD) -> None:
         self._strategies_factory.experiment_configuration = self._distributions_distance_experiment_configuration
         self._strategies_factory.strategy_type = strategy
         exact_calculator = BSDistributionCalculatorWithUniformLosses(
             self._distributions_distance_experiment_configuration, self._bs_permanent_calculator)
 
-        if strategy == StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD:
+        if strategy == StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD or strategy == StrategyType.NONUNIFORM_APPROXIMATED:
             self._strategies_factory.bs_permanent_calculator.matrix *= pow(self._uniform_transmissivity, 0.5)
 
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
@@ -328,12 +342,12 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_net_lossy_generalized_cliffords_strategy_with_losses(self):
         self.__prepare_lossy_distance_experiment_settings()
-        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
 
     def test_distribution_accuracy_for_u_lossy_generalized_cliffords_strategy_with_losses_and_binned_input(self):
         self.__prepare_lossy_distance_experiment_settings_with_binned_input()
-        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(
             StrategyType.GENERALIZED_U_LOSSY_CLIFFORD)
 
     def __prepare_lossy_distance_experiment_settings_with_binned_input(self):
@@ -349,8 +363,58 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
     def test_distribution_accuracy_for_net_lossy_generalized_cliffords_strategy_with_losses_and_binned_input(self):
         self.__prepare_lossy_distance_experiment_settings_with_binned_input()
-        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_strategy_tests(
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD)
+
+    def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_without_approximated_modes(self):
+        self.__prepare_lossy_distance_experiment_settings()
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(StrategyType.NONUNIFORM_APPROXIMATED)
+
+    def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_without_approximated_modes_with_binned_input(self):
+        self.__prepare_lossy_distance_experiment_settings_with_binned_input()
+        self.__continue_with_common_part_of_uniformly_lossy_generalized_cliffords_based_strategy_tests(StrategyType.NONUNIFORM_APPROXIMATED)
+
+    def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_with_approximated_modes(self):
+        self.__prepare_lossy_distance_experiment_settings()
+        self._distributions_distance_experiment_configuration.approximated_modes_number = \
+            self._approximated_modes_number
+        self.__continue_with_common_part_of_uniformly_lossy_nonuniform_losses_approximated_strategy_tests()
+
+    def __continue_with_common_part_of_uniformly_lossy_nonuniform_losses_approximated_strategy_tests(self) -> None:
+
+        self._strategies_factory.experiment_configuration = self._distributions_distance_experiment_configuration
+        self._strategies_factory.strategy_type = StrategyType.NONUNIFORM_APPROXIMATED
+        exact_calculator = BSDistributionCalculatorWithUniformLosses(
+            self._distributions_distance_experiment_configuration, self._bs_permanent_calculator)
+
+        self._distributions_distance_experiment_configuration.initial_state = \
+            self._nonuniform_strategy_initial_state
+        self._strategies_factory.bs_permanent_calculator.matrix *= pow(self._uniform_transmissivity, 0.5)
+
+        distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
+            # This exact calculator, when there are no losses, will do the work just fine.
+            exact_calculator=exact_calculator,
+            estimation_calculator=self.__generate_estimated_distribution_calculator(
+                self._strategies_factory.generate_strategy(),
+                outcomes=exact_calculator.get_outcomes_in_proper_order()
+            ),
+            outcomes_number=calculate_number_of_possible_lossy_n_particle_m_mode_output_states(
+                n=self._distributions_distance_experiment_configuration.number_of_particles_left,
+                m=self._distributions_distance_experiment_configuration.number_of_modes
+            ),
+            approximation_distance_bound=self.__calculate_nonuniform_losses_distance_bound_from_exact_to_experimental()
+        )
+        self.__perform_distance_of_approximate_distribution_from_ideal(distance_experiment_configuration)
+
+    def __calculate_nonuniform_losses_distance_bound_from_exact_to_experimental(self):
+
+        eta_eff = self._uniform_transmissivity
+
+        bound = pow(eta_eff, 2) / 2
+        bound *= (self._distributions_distance_experiment_configuration.initial_number_of_particles -
+                  self._distributions_distance_experiment_configuration.approximated_modes_number)
+        bound += eta_eff * (1 - eta_eff) / 2
+        return bound
 
     def test_haar_random_interferometers_distance_for_fixed_losses_strategy(self) -> None:
         self.__set_experiment_configuration_for_standard_haar_random()

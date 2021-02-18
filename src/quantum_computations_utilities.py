@@ -5,8 +5,7 @@ __author__ = "Tomasz Rybotycki"
 from typing import List, Union
 
 import qutip
-from numpy import abs, linalg, log2, ndarray, sqrt
-from math import isinf
+from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, complex128, tile, power
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -97,16 +96,33 @@ def get_prime_factors(number: int) -> List[int]:
 
 
 def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
-                                                           accuracy: float) -> int:
-
-    possibly_huge_number = 2 ** outcomes_number - 2
-    prime_factors_of_the_number = get_prime_factors(possibly_huge_number)
+                                                           expected_distance: float) -> int:
 
     samples_number = -log2(error_probability)
 
-    for prime_factor in prime_factors_of_the_number:
-        samples_number += log2(prime_factor)
+    samples_number += outcomes_number
 
-    samples_number /= 2 * pow(accuracy, 2)
+    samples_number /= 2 * pow(expected_distance, 2)
 
     return int(samples_number) + 1
+
+
+def compute_qft_matrix(n: int) -> ndarray:
+    """
+        Computes n x n matrix of quantum fourier transform. The formula can be found e.g. on wiki
+
+        https://en.wikipedia.org/wiki/Quantum_Fourier_transform
+
+        :param n: Dimension of the array.
+        :return: n x n ndarray of qft.
+    """
+    if n == 0:
+        return asarray([])
+    omega = exp(2j * pi / n)
+
+    horizontal_range = tile(range(n), n).reshape(n, n)
+    vertical_range = horizontal_range.transpose()
+    full_range = horizontal_range * vertical_range
+    qft_matrix = power(omega, full_range) / sqrt(n)
+
+    return qft_matrix
