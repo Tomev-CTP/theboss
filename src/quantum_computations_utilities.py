@@ -5,7 +5,7 @@ __author__ = "Tomasz Rybotycki"
 from typing import List, Union
 
 import qutip
-from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray
+from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, complex128, tile, power
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -118,12 +118,11 @@ def compute_qft_matrix(n: int) -> ndarray:
     """
     if n == 0:
         return asarray([])
-    values = []
     omega = exp(2j * pi / n)
-    for i in range(n):
-        for j in range(n):
-            values.append(pow(omega, j * i))
 
-    qft_matrix = asarray(values)
-    qft_matrix = qft_matrix.reshape((n, n)) / sqrt(n)
+    horizontal_range = tile(range(n), n).reshape(n, n)
+    vertical_range = horizontal_range.transpose()
+    full_range = horizontal_range * vertical_range
+    qft_matrix = power(omega, full_range) / sqrt(n)
+
     return qft_matrix

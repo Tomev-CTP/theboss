@@ -8,7 +8,7 @@ __author__ = "Tomasz Rybotycki"
 from typing import List
 from copy import deepcopy
 
-from numpy import complex128, exp, eye, ndarray
+from numpy import complex128, exp, eye, ndarray, ones, diag
 from numpy.random import rand
 from random import uniform
 
@@ -68,16 +68,13 @@ class NonuniformLossesApproximationStrategy(LossyNetworksGeneralizedCliffordsSim
         small_qft_matrix = compute_qft_matrix(self._approximated_modes_number)
         qft_matrix = eye(self._initial_matrix.shape[0], dtype=complex128)
 
-        for i in range(self._approximated_modes_number):
-            for j in range(self._approximated_modes_number):
-                qft_matrix[i][j] = small_qft_matrix[i][j]
+        qft_matrix[0:self._approximated_modes_number, 0:self._approximated_modes_number] = small_qft_matrix
 
         return qft_matrix
 
     def _get_random_phases_matrix(self) -> ndarray:
-        random_phases_matrix = eye(self._initial_matrix.shape[0], dtype=complex128)
+        random_phases = ones(self._initial_matrix.shape[0], dtype=complex128)
 
-        for i in range(self._approximated_modes_number):
-            random_phases_matrix[i][i] = exp(1j * rand())
+        random_phases[0: self._approximated_modes_number] = exp(1j * rand(self._approximated_modes_number))
 
-        return random_phases_matrix
+        return diag(random_phases)
