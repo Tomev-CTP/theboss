@@ -5,18 +5,18 @@ __author__ = "Tomasz Rybotycki"
     well used to approximate boson sampling experiments with non-balanced network. More details can be found in [2].
 """
 
-from typing import List
 from copy import deepcopy
+from random import uniform
+from typing import List
 
 from numpy import complex128, exp, eye, ndarray, ones, diag
 from numpy.random import rand
-from random import uniform
 
-from src.boson_sampling_utilities.boson_sampling_utilities import get_modes_transmissivity_values_from_matrix, \
+from .lossy_networks_generalized_cliffords_simulation_strategy import BSPermanentCalculatorInterface, \
+    LossyNetworksGeneralizedCliffordsSimulationStrategy
+from ..boson_sampling_utilities.boson_sampling_utilities import get_modes_transmissivity_values_from_matrix, \
     prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes
-from src.quantum_computations_utilities import compute_qft_matrix
-from src.simulation_strategies.lossy_networks_generalized_cliffords_simulation_strategy import \
-    BSPermanentCalculatorInterface, LossyNetworksGeneralizedCliffordsSimulationStrategy
+from ..quantum_computations_utilities import compute_qft_matrix
 
 
 class NonuniformLossesApproximationStrategy(LossyNetworksGeneralizedCliffordsSimulationStrategy):
@@ -30,7 +30,7 @@ class NonuniformLossesApproximationStrategy(LossyNetworksGeneralizedCliffordsSim
 
         self._approximated_modes_number = approximated_modes_number
         self._modes_transmissivity_values = get_modes_transmissivity_values_from_matrix(bs_permanent_calculator.matrix)
-        self._initial_matrix = prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes\
+        self._initial_matrix = prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes \
             (bs_permanent_calculator.matrix, self._approximated_modes_number)
         super().__init__(bs_permanent_calculator)
 

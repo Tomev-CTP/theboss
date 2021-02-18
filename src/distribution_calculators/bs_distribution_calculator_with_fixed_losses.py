@@ -7,10 +7,10 @@ from typing import List
 from numpy import ndarray
 from scipy import special
 
-from src.boson_sampling_utilities.boson_sampling_utilities import generate_lossy_inputs, generate_possible_outputs
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_inputs, generate_possible_outputs
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-from src.distribution_calculators.bs_distribution_calculator_interface import BosonSamplingExperimentConfiguration, \
+from ..distribution_calculators.bs_distribution_calculator_interface import BosonSamplingExperimentConfiguration, \
     BSDistributionCalculatorInterface
 
 

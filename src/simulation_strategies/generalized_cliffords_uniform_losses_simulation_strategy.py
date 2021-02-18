@@ -7,13 +7,10 @@ from typing import List
 from numpy import array, int64, ndarray
 from scipy import special
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
+from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import BosonSamplingExperimentConfiguration
-from src.simulation_strategies.generalized_cliffords_simulation_strategy import \
-    GeneralizedCliffordsSimulationStrategy
-
-from src.boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
 
 
 class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
@@ -41,10 +38,10 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         eta = self._transmissivity
 
         self._possible_outputs = generate_possible_outputs(sum(input_state), len(input_state), consider_loses=True)
-        self.distribution = [-1 for _ in self._possible_outputs] # -1 to indicate missing spots
+        self.distribution = [-1 for _ in self._possible_outputs]  # -1 to indicate missing spots
 
         # Do note that index is actually equal to number of particles left!
-        self._binomial_weights =\
+        self._binomial_weights = \
             [pow(self._transmissivity, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
         self.distribution[0] = self._binomial_weights[0]
 

@@ -8,10 +8,9 @@ from typing import List
 from numpy import array, delete, float64, insert, int64, ndarray
 from numpy.random import random
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
+from .simulation_strategy_interface import SimulationStrategyInterface
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
     BSPermanentCalculatorInterface
-
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
 class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):

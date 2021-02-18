@@ -174,7 +174,6 @@ def prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes(
 
 
 def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
-
     vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
     for i in range(len(vector_of_squared_expansions)):
         if vector_of_squared_expansions[i] < 0:
@@ -235,7 +234,7 @@ class EffectiveScatteringMatrixCalculator:
 
         for index_of_column_to_insert in range(len(self.__input_state)):
             helper_mtx += [transposed_input_matrix[index_of_column_to_insert]] * \
-                int(self.__input_state[index_of_column_to_insert])
+                          int(self.__input_state[index_of_column_to_insert])
 
         helper_mtx = transpose(array(helper_mtx, dtype=complex128))
 
@@ -243,6 +242,6 @@ class EffectiveScatteringMatrixCalculator:
 
         for index_of_row_to_insert in range(len(self.__output_state)):
             effective_scattering_matrix += [helper_mtx[index_of_row_to_insert]] * \
-                int(self.__output_state[index_of_row_to_insert])
+                                           int(self.__output_state[index_of_row_to_insert])
 
         return array(effective_scattering_matrix, dtype=complex128)

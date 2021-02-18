@@ -8,8 +8,7 @@ __author__ = "Tomasz Rybotycki"
 from numpy import complex128, ndarray, int64, array, asarray
 from typing import Optional
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
+from ..permanent_calculators.bs_permanent_calculator_interface import BSPermanentCalculatorInterface
 
 
 class BSPermanentCalculatorBase(BSPermanentCalculatorInterface):

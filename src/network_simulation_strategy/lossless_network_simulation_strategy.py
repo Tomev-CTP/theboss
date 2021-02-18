@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 from numpy import dot, ndarray
 
-from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
+from .network_simulation_strategy import NetworkSimulationStrategy
 
 
 class LosslessNetworkSimulationStrategy(NetworkSimulationStrategy):

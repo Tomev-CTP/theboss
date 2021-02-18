@@ -1,17 +1,14 @@
 __author__ = "Tomasz Rybotycki"
 
+from typing import List
+
 from numpy import float64, ndarray, zeros
 
-
-from src.distribution_calculators.bs_distribution_calculator_interface import \
+from ..boson_sampling_simulator import BosonSamplingSimulator
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
+from ..distribution_calculators.bs_distribution_calculator_interface import \
     BosonSamplingExperimentConfiguration, BSDistributionCalculatorInterface
-
-from src.boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
-from src.boson_sampling_simulator import BosonSamplingSimulator
-
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
-
-from typing import List
+from ..simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
 
 
 class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):

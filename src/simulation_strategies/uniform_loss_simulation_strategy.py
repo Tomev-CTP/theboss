@@ -6,9 +6,9 @@ from numpy import arange, ndarray
 from numpy.random import choice
 from scipy import special
 
-from src.boson_sampling_simulator import BosonSamplingSimulator
-from src.simulation_strategies.fixed_loss_simulation_strategy import FixedLossSimulationStrategy
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
+from ..boson_sampling_simulator import BosonSamplingSimulator
+from .fixed_loss_simulation_strategy import FixedLossSimulationStrategy
+from .simulation_strategy_interface import SimulationStrategyInterface
 
 
 class UniformLossSimulationStrategy(SimulationStrategyInterface):

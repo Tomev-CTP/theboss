@@ -6,10 +6,10 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Optional
 
-from numpy import array, asarray, complex128, int64, ndarray
+from numpy import complex128, ndarray
 from scipy.special import binom
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
+from ..permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
 
 
 class ChinHuhPermanentCalculator(BSPermanentCalculatorBase):
@@ -49,7 +49,7 @@ class ChinHuhPermanentCalculator(BSPermanentCalculatorBase):
             :return: Information if the calculation can be performed.
         """
         return self._matrix.shape[0] == self._matrix.shape[1] and len(self._output_state) == len(self._input_state) \
-            and len(self._output_state) == self._matrix.shape[0]
+               and len(self._output_state) == self._matrix.shape[0]
 
     def _calculate_v_vectors(self, input_vector: Optional[ndarray] = None) -> List[ndarray]:
         if input_vector is None:

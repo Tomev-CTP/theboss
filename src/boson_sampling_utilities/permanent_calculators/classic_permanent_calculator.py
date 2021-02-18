@@ -7,10 +7,10 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Optional
 
-from numpy import array, asarray, complex128, int64, ndarray
+from numpy import complex128, ndarray
 
-from src.boson_sampling_utilities.boson_sampling_utilities import EffectiveScatteringMatrixCalculator
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
+from ..boson_sampling_utilities import EffectiveScatteringMatrixCalculator
+from ...boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
 
 
 class ClassicPermanentCalculator(BSPermanentCalculatorBase):

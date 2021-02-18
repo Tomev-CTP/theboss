@@ -4,12 +4,11 @@ from random import random
 from typing import List, Optional
 
 from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
-from numpy.linalg import norm
 from numpy.random import rand
 
-from src.network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
-from src.network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
+from .simulation_strategy_interface import SimulationStrategyInterface
+from ..network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
+from ..network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
 
 
 class FixedLossSimulationStrategy(SimulationStrategyInterface):

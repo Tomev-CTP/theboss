@@ -5,7 +5,7 @@ __author__ = "Tomasz Rybotycki"
 from typing import List, Union
 
 import qutip
-from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, complex128, tile, power
+from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, tile, power
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
@@ -85,7 +85,7 @@ def get_prime_factors(number: int) -> List[int]:
         prime_factors.append(2)
         number = number / 2
 
-    for i in range(3,int(sqrt(number)) + 1,2):
+    for i in range(3, int(sqrt(number)) + 1, 2):
         while number % i == 0:
             prime_factors.append(i)
             number = number / i
@@ -97,7 +97,6 @@ def get_prime_factors(number: int) -> List[int]:
 
 def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
                                                            expected_distance: float) -> int:
-
     samples_number = -log2(error_probability)
 
     samples_number += outcomes_number

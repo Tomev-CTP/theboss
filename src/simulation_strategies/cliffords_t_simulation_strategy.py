@@ -11,9 +11,9 @@ from typing import List
 from numpy import arange, array, array_split, int64, ndarray
 from rpy2.robjects import packages
 
-from src.boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
-from src.rpy2_utilities import numpy_array_to_r_matrix
-from src.simulation_strategies.simulation_strategy_interface import SimulationStrategyInterface
+from .simulation_strategy_interface import SimulationStrategyInterface
+from ..boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
+from ..rpy2_utilities import numpy_array_to_r_matrix
 
 
 class CliffordsRSimulationStrategyInterface(SimulationStrategyInterface):

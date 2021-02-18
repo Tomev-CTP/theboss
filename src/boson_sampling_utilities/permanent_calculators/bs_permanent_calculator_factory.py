@@ -10,14 +10,10 @@ from typing import Optional
 
 from numpy import ndarray
 
-from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
-from src.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import \
-    ChinHuhPermanentCalculator
-from src.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import \
-    ClassicPermanentCalculator
-from src.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import \
-    ParallelChinHuhPermanentCalculator
+from ..permanent_calculators.bs_permanent_calculator_interface import BSPermanentCalculatorInterface
+from ..permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
+from ..permanent_calculators.classic_permanent_calculator import ClassicPermanentCalculator
+from ..permanent_calculators.parallel_chin_huh_permanent_calculator import ParallelChinHuhPermanentCalculator
 
 
 class PermanentCalculatorType(enum.IntEnum):
