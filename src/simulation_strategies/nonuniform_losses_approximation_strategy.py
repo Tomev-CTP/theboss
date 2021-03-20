@@ -47,6 +47,8 @@ class NonuniformLossesApproximationStrategy(LossyNetworksGeneralizedCliffordsSim
 
     def _compute_lossy_input(self, input_state: ndarray) -> ndarray:
 
+        # TR TODO: Think what to do with the order in which singular values are returned!! This may cause a lot of
+        # problems!
         if self._approximated_modes_number < 1:
             return input_state
 
