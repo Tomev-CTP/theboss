@@ -156,23 +156,6 @@ def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: nda
     return square(flip(singular_values))
 
 
-def prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes(interferometer_matrix: ndarray,
-                                                                                k: int) -> ndarray:
-    v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
-
-    k = min(k, len(singular_values))
-    singular_values[:k] = 1
-
-    expansions_zeros = zeros_like(v_matrix)
-    expansions_ones = eye(len(v_matrix))
-    expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
-    expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
-    singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
-    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
-                                             [singular_values_matrix_expansion, diag(singular_values)]])
-    return expanded_v @ singular_values_expanded_matrix @ expanded_u
-
-
 def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
     vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
     for i in range(len(vector_of_squared_expansions)):
@@ -185,7 +168,16 @@ def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray)
 
 
 def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
-    return prepare_interferometer_matrix_in_expanded_space_with_first_k_lossless_modes(interferometer_matrix, 0)
+    v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
+
+    expansions_zeros = zeros_like(v_matrix)
+    expansions_ones = eye(len(v_matrix))
+    expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
+    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
+                                             [singular_values_matrix_expansion, diag(singular_values)]])
+    return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
 class EffectiveScatteringMatrixCalculator:
