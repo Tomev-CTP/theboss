@@ -28,3 +28,6 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
             samples.append(output_state)
 
         return samples
+
+    def set_new_matrix(self, matrix: ndarray) -> None:
+        self._helper_strategy.set_new_matrix(matrix)
