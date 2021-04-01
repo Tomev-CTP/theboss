@@ -11,6 +11,7 @@ from copy import deepcopy
 from itertools import repeat
 from math import sqrt
 from typing import List
+from multiprocessing import cpu_count
 
 from numpy import complex128, exp, eye, ndarray, ones, diag, ones_like
 from numpy.random import rand, choice
@@ -25,7 +26,7 @@ from ..quantum_computations_utilities import compute_qft_matrix
 class NonuniformLossesApproximationStrategy():
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, approximated_modes_number: int,
-                 modes_transsmisivity: float, threads_number: int = 1) -> None:
+                 modes_transsmisivity: float, threads_number: int = -1) -> None:
 
         self._approximated_modes_number = self._get_proper_approximated_modes_number(bs_permanent_calculator,
                                                                                      approximated_modes_number)
@@ -35,7 +36,7 @@ class NonuniformLossesApproximationStrategy():
 
         self._binom_weights = self._compute_binom_weights()
 
-        self._threads_number = threads_number
+        self._threads_number = self._get_proper_threads_number(threads_number)
 
         self._permanent_calculator = bs_permanent_calculator
 
@@ -50,13 +51,13 @@ class NonuniformLossesApproximationStrategy():
 
     def _prepare_initial_matrix(self, bs_permanent_calculator: BSPermanentCalculatorInterface):
 
-        initial_matrix = prepare_interferometer_matrix_in_expanded_space(bs_permanent_calculator.matrix)
-
-        loss_removing_matrix = ones_like(initial_matrix[0])
+        loss_removing_matrix = ones_like(bs_permanent_calculator.matrix[0])
         loss_removing_matrix[:self._approximated_modes_number] = 1.0 / sqrt(self._modes_transmissivity)
         loss_removing_matrix = diag(loss_removing_matrix)
 
-        initial_matrix = initial_matrix @ loss_removing_matrix
+        initial_matrix = bs_permanent_calculator.matrix @ loss_removing_matrix
+
+        initial_matrix = prepare_interferometer_matrix_in_expanded_space(initial_matrix)
 
         return initial_matrix
 
@@ -73,6 +74,12 @@ class NonuniformLossesApproximationStrategy():
 
         return binom_weights
 
+    def _get_proper_threads_number(self, threads_number: int) -> int:
+        if threads_number < 1 or threads_number > cpu_count():
+            return cpu_count()
+        else:
+            return threads_number
+
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
 
         if samples_number < 1:
@@ -83,13 +90,7 @@ class NonuniformLossesApproximationStrategy():
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
-        args = []
-
-        for _ in range(self._threads_number):
-            args.append((input_state, samples_per_thread))
-
-        with Pool(max_workers=self._threads_number) as p:
-            # samples_lists = p.starmap(self._simulate_in_pararell, args)
+        with Pool() as p:
             samples_lists = p.map(self._simulate_in_pararell, repeat(input_state), samples_for_threads)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
