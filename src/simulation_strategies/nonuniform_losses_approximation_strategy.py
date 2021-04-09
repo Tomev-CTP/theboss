@@ -5,7 +5,7 @@ __author__ = "Tomasz Rybotycki"
     well used to approximate boson sampling experiments with non-balanced network. More details can be found in [2].
 """
 
-# from multiprocessing.pool import Pool
+import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
 from copy import deepcopy
 from itertools import repeat
@@ -21,7 +21,6 @@ from .lossy_networks_generalized_cliffords_simulation_strategy import BSPermanen
     LossyNetworksGeneralizedCliffordsSimulationStrategy
 from ..boson_sampling_utilities.boson_sampling_utilities import prepare_interferometer_matrix_in_expanded_space
 from ..quantum_computations_utilities import compute_qft_matrix
-
 
 class NonuniformLossesApproximationStrategy():
 
@@ -90,7 +89,11 @@ class NonuniformLossesApproximationStrategy():
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
-        with Pool() as p:
+        # Context is required on Linux systems, as the default (fork) produces undesired results! Spawn is default
+        # on osX and Windows and works as expected.
+        multiprocessing_context = multiprocessing.get_context("spawn")
+
+        with Pool(mp_context=multiprocessing_context) as p:
             samples_lists = p.map(self._simulate_in_pararell, repeat(input_state), samples_for_threads)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
