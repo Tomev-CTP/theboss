@@ -3,7 +3,7 @@ __author__ = "Tomasz Rybotycki"
 from random import random
 from typing import List, Optional
 
-from numpy import conjugate, exp, ndarray, ones, sqrt, zeros
+from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, pi
 from numpy.random import rand
 
 from .simulation_strategy_interface import SimulationStrategyInterface
@@ -61,7 +61,7 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
             :param state_in_modes_basis: A given state in modes basis.
             :return: Given mode state with randomized phases.
         """
-        return exp(1j * rand(len(state_in_modes_basis))) * state_in_modes_basis
+        return exp(1j * 2 * pi * rand(len(state_in_modes_basis))) * state_in_modes_basis
 
     @staticmethod
     def _calculate_probabilities(state: ndarray) -> ndarray:

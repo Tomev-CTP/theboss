@@ -13,7 +13,7 @@ from math import sqrt
 from typing import List
 from multiprocessing import cpu_count
 
-from numpy import complex128, exp, eye, ndarray, ones, diag, ones_like
+from numpy import complex128, exp, eye, ndarray, ones, diag, ones_like, array_equal, pi
 from numpy.random import rand, choice
 from scipy import special
 
@@ -107,7 +107,16 @@ class NonuniformLossesApproximationStrategy():
 
         for _ in range(samples_number):
             lossy_input = self._compute_lossy_input(input_state)
-            helper_strategy.set_new_matrix(self._get_matrix_for_approximate_sampling())
+
+            #if not array_equal(lossy_input, input_state):
+            #    print(f"Got {lossy_input.__str__()}, expected: {input_state.__str__()}") # For k = # modes
+
+            approximate_sampling_matrix = self._get_matrix_for_approximate_sampling()
+
+            #if not array_equal(approximate_sampling_matrix, self._initial_matrix):
+                #print(f"Got {approximate_sampling_matrix.__str__()}, expected: {self._initial_matrix.__str__()}")  # For k = # modes
+
+            helper_strategy.set_new_matrix(approximate_sampling_matrix)
             samples.append(helper_strategy.simulate(lossy_input)[0])
 
         return samples
@@ -138,8 +147,8 @@ class NonuniformLossesApproximationStrategy():
         return qft_matrix
 
     def _get_random_phases_matrix(self) -> ndarray:
-        random_phases = ones(self._initial_matrix.shape[0], dtype=complex128)
+        random_phases = ones(self._initial_matrix.shape[0], dtype=complex128)  # [1, 1,1 ,1,1,1]
 
-        random_phases[0: self._approximated_modes_number] = exp(1j * rand(self._approximated_modes_number))
+        random_phases[0: self._approximated_modes_number] = exp(1j * 2 * pi * rand(self._approximated_modes_number))
 
         return diag(random_phases)
