@@ -180,6 +180,31 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
+def compute_state_types(n: int, m: int, losses: bool = False) -> List[tuple]:
+
+    # Partitions generating code.
+    # Taken from https://stackoverflow.com/questions/10035752/elegant-python-code-for-integer-partitioning/10036764
+    def partitions(n, I=1):
+        yield (n,)
+        for i in range(I, n // 2 + 1):
+            for p in partitions(n - i, i):
+                yield (i,) + p
+
+    all_partitions = list(partitions(n))
+
+    if losses:
+        for i in range(n):
+            all_partitions += list(partitions(i))
+
+    state_types = []
+
+    for partition in all_partitions:
+        if len(partition) > m:
+            continue
+        state_types.append(partition)
+
+    return state_types
+
 class EffectiveScatteringMatrixCalculator:
     """
         In many methods of Boson Sampling simulations an effective scattering matrix has to be calculated. Therefore
