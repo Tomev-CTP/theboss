@@ -134,7 +134,7 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
         :param m: Number of modes.
         :return: Dimension of n-particle m-mode bosonic space.
     """
-    return binom(n + m - 1, n)
+    return round(binom(n + m - 1, n))
 
 
 def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m: int) -> int:
