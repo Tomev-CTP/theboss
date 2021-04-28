@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
     zeros_like, square, flip
-from numpy.linalg import svd, eigvals
+from numpy.linalg import svd
 from scipy.special import binom
 
 
@@ -181,7 +181,6 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
 
 
 def compute_state_types(n: int, m: int, losses: bool = False) -> List[tuple]:
-
     # Partitions generating code.
     # Taken from https://stackoverflow.com/questions/10035752/elegant-python-code-for-integer-partitioning/10036764
     def partitions(n, I=1):
@@ -204,6 +203,7 @@ def compute_state_types(n: int, m: int, losses: bool = False) -> List[tuple]:
         state_types.append(partition)
 
     return state_types
+
 
 class EffectiveScatteringMatrixCalculator:
     """
