@@ -180,7 +180,7 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
-def compute_state_types(n: int, m: int, losses: bool = False) -> List[tuple]:
+def compute_state_types(modes_number: int, particles_number: int, losses: bool = False) -> List[List[int]]:
     # Partitions generating code.
     # Taken from https://stackoverflow.com/questions/10035752/elegant-python-code-for-integer-partitioning/10036764
     def partitions(n, I=1):
@@ -189,20 +189,33 @@ def compute_state_types(n: int, m: int, losses: bool = False) -> List[tuple]:
             for p in partitions(n - i, i):
                 yield (i,) + p
 
-    all_partitions = list(partitions(n))
+    all_partitions = list(partitions(particles_number))
 
     if losses:
-        for i in range(n):
+        for i in range(particles_number):
             all_partitions += list(partitions(i))
 
     state_types = []
 
     for partition in all_partitions:
-        if len(partition) > m:
+        if len(partition) > modes_number:
             continue
-        state_types.append(partition)
+        # We describe state type by a vector in descending order.
+        state_type = sorted(partition, reverse=True)
+        state_types.append(state_type)
 
     return state_types
+
+
+def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> List[List[int]]:
+    maximally_unbalanced_types = []
+    all_types = compute_state_types(particles_number=particles_number, modes_number=modes_number)
+
+    for state_type in all_types:
+        if state_type.count(1) == len(state_type) - 1 or state_type.count(1) == len(state_type):
+            maximally_unbalanced_types.append(state_type)
+
+    return maximally_unbalanced_types
 
 
 class EffectiveScatteringMatrixCalculator:
