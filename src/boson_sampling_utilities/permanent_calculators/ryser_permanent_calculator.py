@@ -82,7 +82,15 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
 
         # Product calculation
         product = 1
-        for j in range(sum(self._input_state)):
+
+        considered_columns_indices = []
+
+        for mode_index in range(len(self._input_state)):
+            for _ in range(self._input_state[mode_index]):
+                considered_columns_indices.append(mode_index)
+
+        # for j in range(sum(self._input_state)):
+        for j in considered_columns_indices:
             # Otherwise we calculate the sum
             product_part = 0
 
