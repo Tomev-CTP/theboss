@@ -14,7 +14,8 @@ from typing import List
 
 from numpy import allclose, array
 
-from src_tests import (ChinHuhPermanentCalculator, ClassicPermanentCalculator, ParallelChinHuhPermanentCalculator)
+from src_tests import (ChinHuhPermanentCalculator, ClassicPermanentCalculator, ParallelChinHuhPermanentCalculator,
+                       RyserPermanentCalculator)
 from src_tests import generate_haar_random_unitary_matrix
 
 
@@ -26,34 +27,52 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix, input_state=array([]),
                                                                    output_state=array([]))
         self._pch_permanent_calculator = ParallelChinHuhPermanentCalculator(self._matrix, array([]), array([]))
+        self._r_permanent_calculator = RyserPermanentCalculator(self._matrix, array([]), array([]))
 
     def __set_input_and_output_states(self, input_state: List[int], output_state: List[int]) -> None:
+
         self._ch_permanent_calculator.input_state = input_state
         self._ch_permanent_calculator.output_state = output_state
+
         self._cl_permanent_calculator.input_state = input_state
         self._cl_permanent_calculator.output_state = output_state
+
         self._pch_permanent_calculator.input_state = input_state
         self._pch_permanent_calculator.output_state = output_state
 
+        self._r_permanent_calculator.input_state = input_state
+        self._r_permanent_calculator.output_state = output_state
+
+
     def test_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 1], [1, 1, 1, 1])
-        self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.compute_permanent()))
+
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
 
     def test_not_full_input_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [1, 0, 1, 1])
-        self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.compute_permanent()))
+
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
 
     def test_binned_input_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 0, 0], [0, 1, 1, 1])
-        self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.compute_permanent()))
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
 
     def test_binned_output_case(self) -> None:
         self.__set_input_and_output_states([1, 1, 1, 0], [2, 1, 0, 0])
-        self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._ch_permanent_calculator.compute_permanent()))
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
 
     def test_binned_input_binned_output_case(self) -> None:
         self.__set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])

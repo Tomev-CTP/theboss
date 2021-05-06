@@ -1,7 +1,9 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This file holds the implementation of Ryser method of permanent calculation, as presented in [Cliffords2020].
+    This file holds the implementation of Ryser method of permanent calculation, as presented in [Cliffords2020]. I've
+    modified it slightly, so that the permanent can be used for computing permanents for bunched and not-continuous
+    (like [1, 1, 0, 1, 0]) inputs.
 """
 
 from typing import List, Optional
@@ -84,19 +86,16 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         product = 1
 
         considered_columns_indices = []
-
         for mode_index in range(len(self._input_state)):
-            for _ in range(self._input_state[mode_index]):
-                considered_columns_indices.append(mode_index)
+            if self._input_state[mode_index] != 0:
+                considered_columns_indices.append(mode_index)  # Consider non-standard inputs
 
-        # for j in range(sum(self._input_state)):
         for j in considered_columns_indices:
-            # Otherwise we calculate the sum
             product_part = 0
 
             for nu in range(len(self._input_state)):
                 product_part += r_vector[nu] * self._matrix[nu][j]
 
-            product *= product_part
+            product *= pow(product_part, self._input_state[j])  # Take into account bunching in the input
         addend *= product
         return addend
