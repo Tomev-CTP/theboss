@@ -6,6 +6,7 @@ from src.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_perman
 from src.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import *
 from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import *
 from src.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import *
+from src.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import *
 
 from src.distribution_calculators.bs_distribution_calculator_with_fixed_losses import *
 from src.distribution_calculators.bs_exact_distribution_with_uniform_losses import *
