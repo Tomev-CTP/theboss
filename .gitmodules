@@ -1,0 +1,3 @@
+[submodule "GuanCodes"]
+	path = GuanCodes
+	url = git@github.com:Tomev/GuanCodes.git
