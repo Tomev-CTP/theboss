@@ -11,7 +11,6 @@ from functools import reduce
 from typing import List, Optional
 
 from numpy import complex128, ndarray
-from scipy.special import binom
 
 from ..permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
 from ...GuanCodes.src.GuanCodeGenerator import GuanCodeGenerator
@@ -42,7 +41,7 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         r_vectors = self._calculate_r_vectors()
 
         permanent = complex128(0)
-        sums = []
+        sums = dict()
 
         considered_columns_indices = []
         for mode_index in range(len(self._input_state)):
@@ -62,14 +61,14 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
                     for nu in range(len(self._input_state)):
                         right_sum += r_vector[nu] * self._matrix[nu][j]
 
-                    sums.append(right_sum)
+                    sums[j] = right_sum
             else:  # Update binomial product and sum
                 multiplier = -multiplier
                 last_r_vector = r_vectors[i - 1]
                 change_index = self._find_change_index(r_vector, last_r_vector)
 
                 # Sums update
-                for j in range(len(sums)):
+                for j in sums:
                     sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * self.matrix[change_index][j]
 
                 # Binoms update
@@ -102,29 +101,3 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
 
     def _calculate_r_vectors(self) -> List[List[int]]:
         return GuanCodeGenerator.generate_guan_codes(self._output_state)
-
-    def _compute_permanent_addend(self, r_vector: ndarray) -> complex128:
-
-        addend = pow(-1, sum(r_vector))
-
-        # Binomials calculation
-        for i in range(len(r_vector)):
-            addend *= binom(self._output_state[i], r_vector[i])
-
-        # Product calculation
-        product = 1
-
-        considered_columns_indices = []
-        for mode_index in range(len(self._input_state)):
-            if self._input_state[mode_index] != 0:
-                considered_columns_indices.append(mode_index)  # Consider non-standard inputs
-
-        for j in considered_columns_indices:
-            product_part = 0
-
-            for nu in range(len(self._input_state)):
-                product_part += r_vector[nu] * self._matrix[nu][j]
-
-            product *= pow(product_part, self._input_state[j])  # Take into account bunching in the input
-        addend *= product
-        return addend

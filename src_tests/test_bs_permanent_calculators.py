@@ -90,6 +90,30 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
         self.assertTrue(allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
 
+    def test_skipping_input_case(self) -> None:
+        self.__set_input_and_output_states([0, 0, 4, 0], [1, 1, 0, 2])
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
+
+    def test_skipping_output_case(self) -> None:
+        self.__set_input_and_output_states([1, 1, 0, 2], [0, 0, 4, 0])
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
+
+    def test_skipping_input_skipping_output_case(self) -> None:
+        self.__set_input_and_output_states([0, 2, 0, 2], [0, 0, 4, 0])
+        cl_permanent = self._cl_permanent_calculator.compute_permanent()
+
+        self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
+        self.assertTrue(allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
+
     # Given that the only difference between Chin-Huh and Parallel Chin-Huh is the parallelization in the main
     # method, the only thing I believe I need to check is if it works. Results are expected to be the same in
     # every case.
