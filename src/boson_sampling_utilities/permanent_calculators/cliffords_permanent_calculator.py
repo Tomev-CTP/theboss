@@ -60,8 +60,10 @@ class CliffordsPermanentCalculator(BSPermanentCalculatorBase):
         # and the products, as I will be using forward/backward cumulative products
         # as in Cliffords2020.
         for input_state in new_inputs:
+            pass
 
-    def _compute_submatrix_permanent
+    def _compute_submatrix_permanent(self):
+        pass
 
     def _get_new_output(self) -> ndarray:
         new_output = self._output_state
