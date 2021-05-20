@@ -99,7 +99,7 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self.assertTrue(allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
 
     def test_skipping_output_case(self) -> None:
-        self.__set_input_and_output_states([1, 1, 0, 2], [0, 0, 4, 0])
+        self.__set_input_and_output_states([1, 1, 0, 2], [0, 1, 3, 0])
         cl_permanent = self._cl_permanent_calculator.compute_permanent()
 
         self.assertTrue(allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))

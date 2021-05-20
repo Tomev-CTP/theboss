@@ -12,7 +12,8 @@ from typing import List, Optional
 
 from numpy import complex128, ndarray
 
-from ..permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
+from ..permanent_calculators.bs_permanent_calculator_base import \
+    BSPermanentCalculatorBase
 from ...GuanCodes.src.GuanCodeGenerator import GuanCodeGenerator
 
 
@@ -46,7 +47,8 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         considered_columns_indices = []
         for mode_index in range(len(self._input_state)):
             if self._input_state[mode_index] != 0:
-                considered_columns_indices.append(mode_index)  # Consider non-standard inputs
+                considered_columns_indices.append(
+                    mode_index)  # Consider non-standard inputs
 
         multiplier = 1
         binomials_product = 1
@@ -69,18 +71,28 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
 
                 # Sums update
                 for j in sums:
-                    sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * self.matrix[change_index][j]
+                    sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * \
+                               self.matrix[change_index][j]
 
                 # Binoms update
                 if r_vector[change_index] > last_r_vector[change_index]:
-                    binomials_product *= (self._output_state[change_index] - last_r_vector[change_index]) / r_vector[
-                        change_index]
+                    binomials_product *= (self._output_state[change_index] -
+                                          last_r_vector[change_index]) / r_vector[
+                                             change_index]
                 else:
-                    binomials_product *= r_vector[change_index] + 1 / (self._output_state[change_index] - r_vector[change_index])
+                    binomials_product *= last_r_vector[change_index] / (
+                                self._output_state[change_index] - r_vector[
+                            change_index])
+
+                    if (int(binomials_product) != binomials_product):
+                        print("here")
 
             permanent += multiplier * binomials_product * reduce(operator.mul,
-                                             [pow(sums[j], self._input_state[j]) for j in considered_columns_indices],
-                                             1)
+                                                                 [pow(sums[j],
+                                                                      self._input_state[
+                                                                          j]) for j in
+                                                                  considered_columns_indices],
+                                                                 1)
 
         permanent *= pow(-1, sum(self._input_state))
         return permanent
@@ -96,7 +108,8 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
             to match.
             :return: Information if the calculation can be performed.
         """
-        return self._matrix.shape[0] == self._matrix.shape[1] and len(self._output_state) == len(self._input_state) \
+        return self._matrix.shape[0] == self._matrix.shape[1] and len(
+            self._output_state) == len(self._input_state) \
                and len(self._output_state) == self._matrix.shape[0]
 
     def _calculate_r_vectors(self) -> List[List[int]]:
