@@ -86,7 +86,10 @@ def generate_possible_n_particle_outputs(number_of_particles: int, number_of_mod
 
         outputs.append(output)
 
-    return outputs
+    sorted_outputs = sorted([tuple(output) for output in outputs])
+
+    return [array(output) for output in sorted_outputs]
+
 
 
 def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[ndarray]:

@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 import unittest
 
-from numpy import array, complex128, int64
+from numpy import array, complex128, int64, allclose
 
 from src_tests import (BSPermanentCalculatorFactory, PermanentCalculatorType, BosonSamplingExperimentConfiguration,
                        BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses)
@@ -55,3 +55,21 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
                                                       self._permanent_calculator)
         exact_distribution = exact_distribution_calculator.calculate_distribution()
         self.assertAlmostEqual(sum(exact_distribution), 1.0, delta=1e-4)
+
+    def test_probabilities(self) -> None:
+        exact_distribution_calculator = \
+            BSDistributionCalculatorWithUniformLosses(self.experiment_configuration,
+                                                      self._permanent_calculator)
+        exact_distribution = exact_distribution_calculator.calculate_distribution()
+        self.assertTrue(
+            allclose(
+                exact_distribution,
+                [
+                    0.008, 0.032, 0.0, 0.0, 0.032, 0.032, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.128, 0.0, 0.0, 0.0, 0.128, 0.0, 0.0, 0.128, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.512, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                ],
+            )
+        )
