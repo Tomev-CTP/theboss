@@ -1,4 +1,4 @@
-from bs_permanent_calculator_base import BSPermanentCalculatorBase
+from .bs_permanent_calculator_base import BSPermanentCalculatorBase
 from numpy import ndarray, complex128, nonzero
 from typing import Optional, List
 
