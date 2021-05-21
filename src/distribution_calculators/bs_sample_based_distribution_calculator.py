@@ -1,6 +1,6 @@
 __author__ = "Tomasz Rybotycki"
 
-from typing import List
+from typing import List, Iterable
 
 from numpy import float64, ndarray, zeros
 
@@ -52,6 +52,10 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
         self._samples_number = new_samples_number
 
     def calculate_distribution(self) -> List[float]:
+        return self.calculate_approximate_distribution()
+
+    def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]]) -> List[float]:
+        self._outcomes = outcomes
         return self.calculate_approximate_distribution()
 
     def calculate_approximate_distribution(self, samples_number: int = 5000) -> List[float]:

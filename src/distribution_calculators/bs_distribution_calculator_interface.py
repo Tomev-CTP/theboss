@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 import abc
 from dataclasses import dataclass
-from typing import List
+from typing import List, Iterable
 
 from numpy import ndarray
 
@@ -29,6 +29,11 @@ class BSDistributionCalculatorInterface(abc.ABC):
     @abc.abstractmethod
     def calculate_distribution(self) -> List[float]:
         """ One has to be able to calculate exact distribution with it """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]]) -> List[float]:
+        """ This method allows one to compute probabilities of only selected outcomes. """
         raise NotImplementedError
 
     @abc.abstractmethod
