@@ -23,10 +23,6 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface):
         self._input_state = input_state
         self._output_state = output_state
 
-    def compute_permanent(self) -> complex128:
-        """Computes permanent of a matrix given before."""
-        raise NotImplementedError
-
     @property
     def matrix(self) -> ndarray:
         return self._matrix
@@ -50,3 +46,4 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface):
     @output_state.setter
     def output_state(self, output_state: ndarray) -> None:
         self._output_state = asarray(output_state, dtype=int64)
+        

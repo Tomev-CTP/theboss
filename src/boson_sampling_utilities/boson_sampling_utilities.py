@@ -86,7 +86,10 @@ def generate_possible_n_particle_outputs(number_of_particles: int, number_of_mod
 
         outputs.append(output)
 
-    return outputs
+    sorted_outputs = sorted([tuple(output) for output in outputs])
+
+    return [array(output) for output in sorted_outputs]
+
 
 
 def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[ndarray]:
@@ -134,7 +137,7 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
         :param m: Number of modes.
         :return: Dimension of n-particle m-mode bosonic space.
     """
-    return binom(n + m - 1, n)
+    return round(binom(n + m - 1, n))
 
 
 def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m: int) -> int:
