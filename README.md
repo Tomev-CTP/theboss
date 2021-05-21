@@ -50,15 +50,17 @@ See the [LICENSE.md](LICENSE.md) file for details.
 
 ## Acknowledgments
 
-  - Daniel Brod and Michał Oszmaniec, 
   - [CTP PAS](http://www.cft.edu.pl/new/public/pl),
-  - [sisco0](https://github.com/sisco0) - some minor bugs pointed out,
-  - Poór Boldizsár - major code review.
+  - Daniel Brod and Michał Oszmaniec,
+  - [Poór Boldizsár](https://github.com/boldar99) - major code review,
+  - [Kolarovszki Zoltán](https://github.com/Kolarovszki) - output states _lexicographicalization_, 
+  - [sisco0](https://github.com/sisco0) - some minor bugs pointed out.
+  
   
   
 ## References
 
-The work will follow the ideas presented in following works:
+This project follows / uses the ideas presented in following papers:
 
 [0] Clifford P., Clifford R., [arXiv:1706.01260](https://arxiv.org/abs/1706.01260) [quant-ph].
 
@@ -68,6 +70,6 @@ The work will follow the ideas presented in following works:
 
 [3] Maciejewski F. B., Zimboras Z., Oszmaniec M., [arXiv:1907.08518](https://arxiv.org/abs/1907.08518) [quant-ph].
 
-[4] Lal Mehta M., Random Matrices, Academic Press, ISBN: 9780080474113, 2004.
+[4] Mezzadri F., [arXiv:math-ph/0609050](https://arxiv.org/abs/math-ph/0609050) [math-ph].
 
 
