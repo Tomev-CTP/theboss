@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 import math
 from copy import deepcopy
-from typing import List
+from typing import List, Iterable
 
 from numpy import ndarray
 from scipy import special
@@ -33,7 +33,13 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
         possible_outcomes = self.get_outcomes_in_proper_order()
 
-        outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for outcome in possible_outcomes]
+        return self.calculate_probabilities_of_outcomes(possible_outcomes)
+
+
+
+    def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]] ) -> List[float]:
+        outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for
+                                  outcome in outcomes]
 
         return outcomes_probabilities
 

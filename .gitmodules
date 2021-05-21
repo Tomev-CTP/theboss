@@ -1,0 +1,4 @@
+[submodule "src/GuanCodes"]
+	path = src/GuanCodes
+	url = git@github.com:Tomev-CTP/GuanCodes.git
+
