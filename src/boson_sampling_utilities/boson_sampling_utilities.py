@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
     zeros_like, square, flip
-from numpy.linalg import svd, eigvals
+from numpy.linalg import svd
 from scipy.special import binom
 
 
@@ -134,7 +134,7 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
         :param m: Number of modes.
         :return: Dimension of n-particle m-mode bosonic space.
     """
-    return binom(n + m - 1, n)
+    return round(binom(n + m - 1, n))
 
 
 def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m: int) -> int:
@@ -178,6 +178,44 @@ def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarr
     singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
                                              [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
+
+
+def compute_state_types(modes_number: int, particles_number: int, losses: bool = False) -> List[List[int]]:
+    # Partitions generating code.
+    # Taken from https://stackoverflow.com/questions/10035752/elegant-python-code-for-integer-partitioning/10036764
+    def partitions(n, I=1):
+        yield (n,)
+        for i in range(I, n // 2 + 1):
+            for p in partitions(n - i, i):
+                yield (i,) + p
+
+    all_partitions = list(partitions(particles_number))
+
+    if losses:
+        for i in range(particles_number):
+            all_partitions += list(partitions(i))
+
+    state_types = []
+
+    for partition in all_partitions:
+        if len(partition) > modes_number:
+            continue
+        # We describe state type by a vector in descending order.
+        state_type = sorted(partition, reverse=True)
+        state_types.append(state_type)
+
+    return state_types
+
+
+def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> List[List[int]]:
+    maximally_unbalanced_types = []
+    all_types = compute_state_types(particles_number=particles_number, modes_number=modes_number)
+
+    for state_type in all_types:
+        if state_type.count(1) == len(state_type) - 1 or state_type.count(1) == len(state_type):
+            maximally_unbalanced_types.append(state_type)
+
+    return maximally_unbalanced_types
 
 
 class EffectiveScatteringMatrixCalculator:
