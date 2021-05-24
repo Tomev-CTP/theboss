@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
 import enum
 from copy import deepcopy
 
-from .cliffords_t_simulation_strategy import CliffordsRSimulationStrategyInterface
+from .cliffords_r_simulation_strategy import CliffordsRSimulationStrategyInterface
 from .fixed_loss_simulation_strategy import FixedLossSimulationStrategy
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
 from .generalized_cliffords_uniform_losses_simulation_strategy import \
