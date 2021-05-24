@@ -5,13 +5,17 @@ __author__ = "Tomasz Rybotycki"
 import itertools
 from typing import List, Optional
 
-from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, sqrt, transpose, zeros, \
-    zeros_like, square, flip
+from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, \
+    sqrt, transpose, zeros, zeros_like, square, flip, pi, ones, exp
 from numpy.linalg import svd
 from scipy.special import binom
+from numpy.random import rand
+
+from ..quantum_computations_utilities import compute_qft_matrix
 
 
-def particle_state_to_modes_state(particle_state: ndarray, observed_modes_number: int) -> ndarray:
+def particle_state_to_modes_state(particle_state: ndarray,
+                                  observed_modes_number: int) -> ndarray:
     modes_state = zeros(observed_modes_number)
 
     # Adding the particle to it's mode.
@@ -21,7 +25,8 @@ def particle_state_to_modes_state(particle_state: ndarray, observed_modes_number
     return modes_state
 
 
-def modes_state_to_particle_state(mode_state: ndarray, particles_number: int) -> ndarray:
+def modes_state_to_particle_state(mode_state: ndarray,
+                                  particles_number: int) -> ndarray:
     """
         Return given mode-basis state in particle basis.
 
@@ -47,7 +52,8 @@ def modes_state_to_particle_state(mode_state: ndarray, particles_number: int) ->
     return particles_state
 
 
-def generate_possible_outputs(number_of_particles: int, number_of_modes: int, consider_loses: bool = False) \
+def generate_possible_outputs(number_of_particles: int, number_of_modes: int,
+                              consider_loses: bool = False) \
         -> List[ndarray]:
     if number_of_particles < 0 or number_of_modes < 1:
         return []
@@ -66,7 +72,8 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int, co
     return outputs
 
 
-def generate_possible_n_particle_outputs(number_of_particles: int, number_of_modes: int) -> List[ndarray]:
+def generate_possible_n_particle_outputs(number_of_particles: int,
+                                         number_of_modes: int) -> List[ndarray]:
     outputs = []
 
     output = zeros(number_of_modes)
@@ -91,8 +98,8 @@ def generate_possible_n_particle_outputs(number_of_particles: int, number_of_mod
     return [array(output) for output in sorted_outputs]
 
 
-
-def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> List[ndarray]:
+def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> \
+List[ndarray]:
     """
         From initial state generate all possible input states after losses application.
         :param initial_state: The state we start with.
@@ -112,10 +119,13 @@ def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int)
         return [initial_state]
 
     # Symmetrization.
-    for combination in itertools.combinations(list(range(initial_number_of_particles)), number_of_particles_left):
-        lossy_input_in_particle_basis = array([x0[el] for el in combination], dtype=int64)
+    for combination in itertools.combinations(list(range(initial_number_of_particles)),
+                                              number_of_particles_left):
+        lossy_input_in_particle_basis = array([x0[el] for el in combination],
+                                              dtype=int64)
 
-        lossy_input = particle_state_to_modes_state(lossy_input_in_particle_basis, number_of_modes)
+        lossy_input = particle_state_to_modes_state(lossy_input_in_particle_basis,
+                                                    number_of_modes)
 
         # Check if calculated lossy input is already in the list. If not, add it.
         lossy_input_hash = hash(tuple(lossy_input))
@@ -140,7 +150,8 @@ def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int)
     return round(binom(n + m - 1, n))
 
 
-def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m: int) -> int:
+def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int,
+                                                                       m: int) -> int:
     """
         Calculates the number of possible output states with N <= n particles placed around m modes.
 
@@ -154,12 +165,14 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int, m
     return states_number
 
 
-def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> List[float]:
+def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> \
+List[float]:
     v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
     return square(flip(singular_values))
 
 
-def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray) -> ndarray:
+def _calculate_singular_values_matrix_expansion(
+        singular_values_vector: ndarray) -> ndarray:
     vector_of_squared_expansions = 1.0 - power(singular_values_vector, 2)
     for i in range(len(vector_of_squared_expansions)):
         if vector_of_squared_expansions[i] < 0:
@@ -170,20 +183,26 @@ def _calculate_singular_values_matrix_expansion(singular_values_vector: ndarray)
     return diag(expansion_values)
 
 
-def prepare_interferometer_matrix_in_expanded_space(interferometer_matrix: ndarray) -> ndarray:
+def prepare_interferometer_matrix_in_expanded_space(
+        interferometer_matrix: ndarray) -> ndarray:
     v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
 
     expansions_zeros = zeros_like(v_matrix)
     expansions_ones = eye(len(v_matrix))
-    expanded_v = block([[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
-    expanded_u = block([[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
-    singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(singular_values)
-    singular_values_expanded_matrix = block([[diag(singular_values), singular_values_matrix_expansion],
-                                             [singular_values_matrix_expansion, diag(singular_values)]])
+    expanded_v = block(
+        [[v_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    expanded_u = block(
+        [[u_matrix, expansions_zeros], [expansions_zeros, expansions_ones]])
+    singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(
+        singular_values)
+    singular_values_expanded_matrix = block(
+        [[diag(singular_values), singular_values_matrix_expansion],
+         [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
 
-def compute_state_types(modes_number: int, particles_number: int, losses: bool = False) -> List[List[int]]:
+def compute_state_types(modes_number: int, particles_number: int,
+                        losses: bool = False) -> List[List[int]]:
     # Partitions generating code.
     # Taken from https://stackoverflow.com/questions/10035752/elegant-python-code-for-integer-partitioning/10036764
     def partitions(n, I=1):
@@ -210,15 +229,32 @@ def compute_state_types(modes_number: int, particles_number: int, losses: bool =
     return state_types
 
 
-def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> List[List[int]]:
+def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> \
+List[List[int]]:
     maximally_unbalanced_types = []
-    all_types = compute_state_types(particles_number=particles_number, modes_number=modes_number)
+    all_types = compute_state_types(particles_number=particles_number,
+                                    modes_number=modes_number)
 
     for state_type in all_types:
-        if state_type.count(1) == len(state_type) - 1 or state_type.count(1) == len(state_type):
+        if state_type.count(1) == len(state_type) - 1 or state_type.count(1) == len(
+                state_type):
             maximally_unbalanced_types.append(state_type)
 
     return maximally_unbalanced_types
+
+
+def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndarray:
+    small_qft_matrix = compute_qft_matrix(m)
+    qft_matrix = eye(all_modes_number, dtype=complex128)
+    qft_matrix[0:m, 0:m] = small_qft_matrix
+    return qft_matrix
+
+
+def generate_random_phases_matrix_for_first_m_modes(m: int, all_modes_number: int) \
+        -> ndarray:
+    random_phases = ones(all_modes_number, dtype=complex128)  # [1, 1, 1, 1, 1, 1]
+    random_phases[0:m] = exp(1j * 2 * pi * rand(m))
+    return diag(random_phases)
 
 
 class EffectiveScatteringMatrixCalculator:
@@ -275,6 +311,7 @@ class EffectiveScatteringMatrixCalculator:
 
         for index_of_row_to_insert in range(len(self.__output_state)):
             effective_scattering_matrix += [helper_mtx[index_of_row_to_insert]] * \
-                                           int(self.__output_state[index_of_row_to_insert])
+                                           int(self.__output_state[
+                                                   index_of_row_to_insert])
 
         return array(effective_scattering_matrix, dtype=complex128)
