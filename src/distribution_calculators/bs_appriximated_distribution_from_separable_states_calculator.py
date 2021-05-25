@@ -8,7 +8,7 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import Iterable, List
 
-from numpy import ndarray, ones_like, sqrt, diag, zeros
+from numpy import ndarray, ones_like, sqrt, diag, zeros, hstack
 
 from .bs_distribution_calculator_interface import BSDistributionCalculatorInterface, \
     BosonSamplingExperimentConfiguration
@@ -76,7 +76,6 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
 
         return initial_state
 
-
     def calculate_distribution(self) -> List[float]:
         """
             Computes whole distribution basing on configuration.
@@ -121,17 +120,39 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
         # outputs), so I may use one of the distribution calculators that I've got.
         subproblem_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=matrix,
-            initial_state=,
+            initial_state=self._initial_state,
             initial_number_of_particles=self._configuration.initial_number_of_particles,
-            number_of_modes=
+            number_of_modes=2*self._configuration.number_of_modes,
+            number_of_particles_lost=0,
+            number_of_particles_left=self._configuration.initial_number_of_particles
         )
-        prepare_subproblem_configuration
-        generate_calculator
-        compute_probabilities_of_outcomes
+        subdistribution_calculator = BSDistributionCalculatorWithFixedLosses(
+            permanent_calculator=self._permanent_calculator,
+            configuration=subproblem_configuration
+        )
+        probabilities_of_outcomes = subdistribution_calculator.calculate_probabilities_of_outcomes(
+            outcomes=considered_outputs
+        )
         return sum(probabilities_of_outcomes)
 
     def _get_2m_outcomes_corresponding_to_the_outcome(self, outcome: Iterable[int]) -> List[Iterable[int]]:
-        raise NotImplementedError
+        """
+            This method returns 2m outcomes for given particle number, such that
+            in the first m modes we've got exactly output state. Assuming that there
+            are n particles total and k particles in the given outcome, we compute
+            all m-mode (n-k)-particles states and just hstack them with output.
+        """
+        considered_outcomes = []
+        possible_m_mode_outputs_with_less_particles = \
+            generate_possible_outputs(
+                number_of_particles=self._configuration.initial_number_of_particles - sum(outcome),
+                number_of_modes=self._configuration.number_of_modes
+            )
+
+        for possible_output in possible_m_mode_outputs_with_less_particles:
+            considered_outcomes.append(hstack([outcome, possible_output]))
+
+        return considered_outcomes
 
 
     def get_outcomes_in_proper_order(self) -> List[ndarray]:
@@ -139,5 +160,5 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
             Returns states in the same order that distribution probabilities were
             calculated in.
         """
-        return generate_possible_outputs(self.configuration.number_of_particles_left,
-                                         self.configuration.number_of_modes)
+        return generate_possible_outputs(self._configuration.number_of_particles_left,
+                                         self._configuration.number_of_modes)
