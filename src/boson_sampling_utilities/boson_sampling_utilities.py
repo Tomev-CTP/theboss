@@ -256,7 +256,6 @@ def generate_random_phases_matrix_for_first_m_modes(m: int, all_modes_number: in
     random_phases[0:m] = exp(1j * 2 * pi * rand(m))
     return diag(random_phases)
 
-
 class EffectiveScatteringMatrixCalculator:
     """
         In many methods of Boson Sampling simulations an effective scattering matrix has to be calculated. Therefore

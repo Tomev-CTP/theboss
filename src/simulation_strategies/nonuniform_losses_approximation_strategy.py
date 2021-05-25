@@ -39,7 +39,7 @@ class NonuniformLossesApproximationStrategy():
 
         self._initial_matrix = self._prepare_initial_matrix(bs_permanent_calculator)
 
-        self._binom_weights = self._compute_binom_weights()
+        self._binom_weights = self._compute_binomial_weights()
 
         self._threads_number = self._get_proper_threads_number(threads_number)
 
@@ -60,7 +60,7 @@ class NonuniformLossesApproximationStrategy():
 
         loss_removing_matrix = ones_like(bs_permanent_calculator.matrix[0])
         loss_removing_matrix[:self._approximated_modes_number] = 1.0 / sqrt(
-            self._modes_transmissivity)
+            self._modes_transmissivity) # This here assumes uniform losses
         loss_removing_matrix = diag(loss_removing_matrix)
 
         initial_matrix = bs_permanent_calculator.matrix @ loss_removing_matrix
@@ -69,7 +69,7 @@ class NonuniformLossesApproximationStrategy():
 
         return initial_matrix
 
-    def _compute_binom_weights(self):
+    def _compute_binomial_weights(self):
 
         eta = self._modes_transmissivity
         k = self._approximated_modes_number
@@ -111,7 +111,7 @@ class NonuniformLossesApproximationStrategy():
 
         return samples
 
-    def _simulate_in_pararell(self, input_state: ndarray, samples_number: int = 1):
+    def _simulate_in_parallel(self, input_state: ndarray, samples_number: int = 1):
         samples = []
 
         helper_strategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(
