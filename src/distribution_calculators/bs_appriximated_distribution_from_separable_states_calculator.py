@@ -89,6 +89,7 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
             List[float]:
         probabilities = []
 
+        # TODO TR: We could probably make this parallel.
         for _ in range(self._matrices_number):
             effective_matrix = self._generate_effective_matrix()
             for outcome in outcomes:
