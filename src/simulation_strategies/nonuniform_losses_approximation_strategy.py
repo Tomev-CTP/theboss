@@ -89,8 +89,9 @@ class NonuniformLossesApproximationStrategy():
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
-        # Context is required on Linux systems, as the default (fork) produces undesired results! Spawn is default
-        # on osX and Windows and works as expected.
+        # Context is required on Linux systems, as the default (fork) produces undesired
+        # results! Spawn is default on osX and Windows and works as expected.
+        # TODO TR: Check if that still holds (PROBABLY NOT)!
         multiprocessing_context = multiprocessing.get_context("spawn")
 
         with Pool(mp_context=multiprocessing_context) as p:
@@ -108,13 +109,7 @@ class NonuniformLossesApproximationStrategy():
         for _ in range(samples_number):
             lossy_input = self._compute_lossy_input(input_state)
 
-            #if not array_equal(lossy_input, input_state):
-            #    print(f"Got {lossy_input.__str__()}, expected: {input_state.__str__()}") # For k = # modes
-
             approximate_sampling_matrix = self._get_matrix_for_approximate_sampling()
-
-            #if not array_equal(approximate_sampling_matrix, self._initial_matrix):
-                #print(f"Got {approximate_sampling_matrix.__str__()}, expected: {self._initial_matrix.__str__()}")  # For k = # modes
 
             helper_strategy.set_new_matrix(approximate_sampling_matrix)
             samples.append(helper_strategy.simulate(lossy_input)[0])
