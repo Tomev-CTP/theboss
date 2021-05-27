@@ -215,3 +215,5 @@ cython_debug/
 
 quick_tests/*
 .idea/
+
+*quick_tests.py
