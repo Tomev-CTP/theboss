@@ -86,9 +86,11 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         )
         self._not_approximated_lossy_mixed_state_parts_weights = []
 
+        n = sum(self._not_approximated_lossy_mixed_state_parts[-1])
+
         for state_part in self._not_approximated_lossy_mixed_state_parts:
             self._not_approximated_lossy_mixed_state_parts_weights.append(
-                possible_weights[int(sum(state_part))]
+                possible_weights[int(sum(state_part))] / binom(n, sum(state_part))
             )
 
     def _get_possible_lossy_inputs_weights(
@@ -160,11 +162,16 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         print(self._not_approximated_lossy_mixed_state_parts_weights)
         print(sum(self._not_approximated_lossy_mixed_state_parts_weights))
 
+        for i in range(len(self._not_approximated_lossy_mixed_state_parts)):
+            print(f""
+                  f"{self._not_approximated_lossy_mixed_state_parts[i]}:"
+                  f" {self._not_approximated_lossy_mixed_state_parts_weights[i]}")
+
         not_approximated_part = self._not_approximated_lossy_mixed_state_parts[choice(
             range(len(self._not_approximated_lossy_mixed_state_parts)),
             p=self._not_approximated_lossy_mixed_state_parts_weights
         )]
-        return hstack(approximated_part, not_approximated_part)
+        return hstack([approximated_part, not_approximated_part])
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         # TODO TR: THIS WILL BE REWRITTEN AFTER MERGING WITH BRUTE-FORCE BRANCH
