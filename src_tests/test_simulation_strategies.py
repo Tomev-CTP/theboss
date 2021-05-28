@@ -29,6 +29,9 @@ from src_tests import (
 )
 
 
+# TODO TR: These tests has to be though through and refactored.
+# TODO TR: Add tests for lossy state approximation strategy
+
 @dataclass
 class DistributionAccuracyExperimentConfiguration:
     exact_calculator: BSDistributionCalculatorInterface

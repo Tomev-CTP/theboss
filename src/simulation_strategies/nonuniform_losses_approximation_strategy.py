@@ -25,15 +25,15 @@ from ..quantum_computations_utilities import compute_qft_matrix
 class NonuniformLossesApproximationStrategy():
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, approximated_modes_number: int,
-                 modes_transsmisivity: float, threads_number: int = -1) -> None:
+                 modes_transmissivity: float, threads_number: int = -1) -> None:
 
         self._approximated_modes_number = self._get_proper_approximated_modes_number(bs_permanent_calculator,
                                                                                      approximated_modes_number)
-        self._modes_transmissivity = modes_transsmisivity
+        self._modes_transmissivity = modes_transmissivity
 
         self._initial_matrix = self._prepare_initial_matrix(bs_permanent_calculator)
 
-        self._binom_weights = self._compute_binom_weights()
+        self._binomial_weights = self._compute_binomial_weights()
 
         self._threads_number = self._get_proper_threads_number(threads_number)
 
@@ -60,7 +60,7 @@ class NonuniformLossesApproximationStrategy():
 
         return initial_matrix
 
-    def _compute_binom_weights(self):
+    def _compute_binomial_weights(self):
 
         eta = self._modes_transmissivity
         k = self._approximated_modes_number
@@ -89,18 +89,19 @@ class NonuniformLossesApproximationStrategy():
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
-        # Context is required on Linux systems, as the default (fork) produces undesired results! Spawn is default
-        # on osX and Windows and works as expected.
+        # Context is required on Linux systems, as the default (fork) produces undesired
+        # results! Spawn is default on osX and Windows and works as expected.
+        # TODO TR: Check if that still holds (PROBABLY NOT)!
         multiprocessing_context = multiprocessing.get_context("spawn")
 
         with Pool(mp_context=multiprocessing_context) as p:
-            samples_lists = p.map(self._simulate_in_pararell, repeat(input_state), samples_for_threads)
+            samples_lists = p.map(self._simulate_in_parallel, repeat(input_state), samples_for_threads)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
 
         return samples
 
-    def _simulate_in_pararell(self, input_state: ndarray, samples_number: int = 1):
+    def _simulate_in_parallel(self, input_state: ndarray, samples_number: int = 1):
         samples = []
 
         helper_strategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(deepcopy(self._permanent_calculator))
@@ -108,13 +109,7 @@ class NonuniformLossesApproximationStrategy():
         for _ in range(samples_number):
             lossy_input = self._compute_lossy_input(input_state)
 
-            #if not array_equal(lossy_input, input_state):
-            #    print(f"Got {lossy_input.__str__()}, expected: {input_state.__str__()}") # For k = # modes
-
             approximate_sampling_matrix = self._get_matrix_for_approximate_sampling()
-
-            #if not array_equal(approximate_sampling_matrix, self._initial_matrix):
-                #print(f"Got {approximate_sampling_matrix.__str__()}, expected: {self._initial_matrix.__str__()}")  # For k = # modes
 
             helper_strategy.set_new_matrix(approximate_sampling_matrix)
             samples.append(helper_strategy.simulate(lossy_input)[0])
@@ -129,7 +124,7 @@ class NonuniformLossesApproximationStrategy():
         lossy_input = deepcopy(input_state)
 
         binned_input_index = self._approximated_modes_number - 1
-        lossy_input[binned_input_index] = choice(range(self._approximated_modes_number + 1), p=self._binom_weights)
+        lossy_input[binned_input_index] = choice(range(self._approximated_modes_number + 1), p=self._binomial_weights)
 
         return lossy_input
 
