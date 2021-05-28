@@ -143,5 +143,5 @@ class SimulationStrategyFactory:
         return LossyStateApproximationSimulationStrategy(
             bs_permanent_calculator=self._bs_permanent_calculator,
             uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,
-            approximated_modes_number=self._experiment_configuration.approximated_modes_numberk
+            approximated_modes_number=self._experiment_configuration.approximated_modes_number
         )

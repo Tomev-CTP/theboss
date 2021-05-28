@@ -164,15 +164,6 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             p=self._approximated_input_state_part_possibilities_weights
         )]
 
-        print(self._not_approximated_lossy_mixed_state_parts)
-        print(self._not_approximated_lossy_mixed_state_parts_weights)
-        print(sum(self._not_approximated_lossy_mixed_state_parts_weights))
-
-        for i in range(len(self._not_approximated_lossy_mixed_state_parts)):
-            print(f""
-                  f"{self._not_approximated_lossy_mixed_state_parts[i]}:"
-                  f" {self._not_approximated_lossy_mixed_state_parts_weights[i]}")
-
         not_approximated_part = self._not_approximated_lossy_mixed_state_parts[choice(
             range(len(self._not_approximated_lossy_mixed_state_parts)),
             p=self._not_approximated_lossy_mixed_state_parts_weights
