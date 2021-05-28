@@ -108,6 +108,12 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
 
     def _prepare_approximated_input_state(
             self, approximated_input_state_part: ndarray) -> None:
+
+        if not self._approximated_modes_number:
+            self._approximated_input_state_part_possibilities = [[]]
+            self._approximated_input_state_part_possibilities_weights = [1]
+            return
+
         self._prepare_approximated_input_state_parts(approximated_input_state_part)
         self._prepare_approximated_input_state_parts_weights()
 
