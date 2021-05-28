@@ -32,7 +32,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         self._approximated_modes_number = approximated_modes_number
         self._uniform_transmissivity = uniform_transmissivity
         self._threads_number = self._get_proper_threads_number(threads_number)
-        self._permanent_calculator = bs_permanent_calculator  # Should contain unitary (no losses here!)
+        self._permanent_calculator = bs_permanent_calculator  # Should contain an UNITARY (no losses here!)
 
     def _get_proper_threads_number(self, threads_number: int) -> int:
         if threads_number < 1 or threads_number > cpu_count():

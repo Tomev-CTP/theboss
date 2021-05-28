@@ -14,6 +14,7 @@ from .generalized_cliffords_uniform_losses_simulation_strategy import \
     GeneralizedCliffordsUniformLossesSimulationStrategy
 from .lossy_networks_generalized_cliffords_simulation_strategy import \
     LossyNetworksGeneralizedCliffordsSimulationStrategy
+from .lossy_state_approximated_simulation_strategy import LossyStateApproximationSimulationStrategy
 from .nonuniform_losses_approximation_strategy import NonuniformLossesApproximationStrategy
 from .simulation_strategy_interface import SimulationStrategyInterface
 from .uniform_loss_simulation_strategy import UniformLossSimulationStrategy
@@ -31,6 +32,7 @@ class StrategyType(enum.IntEnum):
     LOSSLESS_MODES_STRATEGY = enum.auto()
     GENERALIZED_U_LOSSY_CLIFFORD = enum.auto()
     NONUNIFORM_APPROXIMATED = enum.auto()
+    UNIFORM_LOSSY_STATE_APPROXIMATED = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -47,7 +49,8 @@ class SimulationStrategyFactory:
             StrategyType.GENERALIZED_CLIFFORD: self._generate_generalized_cliffords_strategy,
             StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD: self._generate_lossy_net_generalized_cliffords_strategy,
             StrategyType.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy,
-            StrategyType.NONUNIFORM_APPROXIMATED: self._generate_nonuniform_approximating_strategy
+            StrategyType.NONUNIFORM_APPROXIMATED: self._generate_nonuniform_approximating_strategy,
+            StrategyType.UNIFORM_LOSSY_STATE_APPROXIMATED: self._generate_uniform_lossy_state_approximating_strategy
         }
 
     @property
@@ -135,3 +138,10 @@ class SimulationStrategyFactory:
         return NonuniformLossesApproximationStrategy(deepcopy(self.bs_permanent_calculator),
                                                      self._experiment_configuration.approximated_modes_number,
                                                      self._experiment_configuration.uniform_transmissivity)
+
+    def _generate_uniform_lossy_state_approximating_strategy(self) -> LossyStateApproximationSimulationStrategy:
+        return LossyStateApproximationSimulationStrategy(
+            bs_permanent_calculator=self._bs_permanent_calculator,
+            uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,
+            approximated_modes_number=self._experiment_configuration.approximated_modes_numberk
+        )
