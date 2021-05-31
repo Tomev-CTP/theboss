@@ -3,13 +3,13 @@ __author__ = "Tomasz Rybotycki"
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
-from typing import List, Optional
+from typing import List, Optional, Iterable
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, \
     sqrt, transpose, zeros, \
     zeros_like, square, flip
 from numpy.linalg import svd
-from scipy.special import binom
+from scipy.special import binom, factorial
 
 
 def particle_state_to_modes_state(particle_state: ndarray,
@@ -224,7 +224,32 @@ def compute_state_types(modes_number: int, particles_number: int,
         state_type = sorted(partition, reverse=True)
         state_types.append(state_type)
 
+    for state_type in state_types:
+        while len(state_type) < modes_number:
+            state_type.append(0)
+
     return state_types
+
+def compute_number_of_states_of_given_type(state_type: Iterable[int]) -> int:
+    modes_number = len(state_type)
+
+    counts = []
+    vals = set(state_type)
+
+    for val in vals:
+        counts.append(state_type.count(val))
+
+    type_count = factorial(modes_number)
+
+    for count in counts:
+        type_count /= factorial(count)
+
+    number_of_states_of_given_type = factorial(modes_number)
+
+    for count in counts:
+        number_of_states_of_given_type //= factorial(count)
+
+    return number_of_states_of_given_type
 
 
 def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> \
@@ -245,6 +270,9 @@ def compute_number_of_state_types(modes_number: int, particles_number: int,
                                   consider_losses: bool = False) -> int:
     # TR TODO: This is not the optimal way to do that, but it's the fastest.
     return len(compute_state_types(modes_number, particles_number, consider_losses))
+
+
+
 
 
 class EffectiveScatteringMatrixCalculator:
