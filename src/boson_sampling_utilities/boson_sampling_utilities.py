@@ -194,7 +194,7 @@ def prepare_interferometer_matrix_in_expanded_space(
     singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(
         singular_values)
     singular_values_expanded_matrix = block(
-        [[diag(singular_values), singular_values_matrix_expansion],
+        [[diag(singular_values), -singular_values_matrix_expansion],
          [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
