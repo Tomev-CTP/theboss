@@ -21,7 +21,7 @@ from ..quantum_computations_utilities import compute_qft_matrix
 
 class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, uniform_transmissivity: float,
-                 approximated_modes_number: int, threads_number: int = -1):
+                 hierarchy_level: int, threads_number: int = -1):
         # Required for lossy approximated state preparation
         self._approximated_input_state_part_possibilities = None
         self._approximated_input_state_part_possibilities_weights = None
@@ -29,7 +29,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         self._not_approximated_lossy_mixed_state_parts_weights = None
 
         # Required for general simulation
-        self._approximated_modes_number = approximated_modes_number
+        self._hierarchy_level = hierarchy_level
         self._uniform_transmissivity = uniform_transmissivity
         self._threads_number = self._get_proper_threads_number(threads_number)
         self._permanent_calculator = bs_permanent_calculator  # Should contain an UNITARY (no losses here!)
@@ -47,11 +47,11 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             return []
 
         self._prepare_not_approximated_lossy_mixed_state(
-            input_state[self._approximated_modes_number:]  # Not approximated state part
+            input_state[:self._hierarchy_level]  # Not approximated state part
         )
 
         self._prepare_approximated_input_state(
-            input_state[:self._approximated_modes_number]  # Approximated state part
+            input_state[self._hierarchy_level:]  # Approximated state part
         )
 
         number_of_samples_for_each_thread = \
@@ -109,7 +109,8 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
     def _prepare_approximated_input_state(
             self, approximated_input_state_part: ndarray) -> None:
 
-        if not self._approximated_modes_number:
+        # Assume exact simulation if hierarchy level is not specified.
+        if not self._hierarchy_level:
             self._approximated_input_state_part_possibilities = [[]]
             self._approximated_input_state_part_possibilities_weights = [1]
             return
@@ -143,10 +144,14 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
 
         return number_of_samples_for_each_thread
 
-    def _simulate_in_parallel(self, samples_number: int = 1):
+    def _simulate_in_parallel(self, samples_number: int = 1) -> List[ndarray]:
+        """ This method produces given number of samples from lossy approximated
+        (separable) state. It's meant to be run in parallel.
+        """
         samples = []
 
-        helper_strategy = GeneralizedCliffordsSimulationStrategy(deepcopy(self._permanent_calculator))
+        helper_strategy = \
+            GeneralizedCliffordsSimulationStrategy(deepcopy(self._permanent_calculator))
 
         for _ in range(samples_number):
             lossy_input = self._get_input_state_for_sampling()
@@ -177,19 +182,22 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         return self._permanent_calculator.matrix @ random_phases_matrix @ qft_matrix
 
     def _get_qft_matrix(self):
-        small_qft_matrix = compute_qft_matrix(self._approximated_modes_number)
-        qft_matrix = eye(self._permanent_calculator.matrix.shape[0], dtype=complex128)
+        modes_number = self._permanent_calculator.matrix.shape[0]
+        small_qft_matrix = compute_qft_matrix(modes_number - self._hierarchy_level)
+        qft_matrix = eye(modes_number, dtype=complex128)
 
-        qft_matrix[0:self._approximated_modes_number,
-        0:self._approximated_modes_number] = small_qft_matrix
+        qft_matrix[self._hierarchy_level:modes_number,
+                   self._hierarchy_level:modes_number] = small_qft_matrix
 
         return qft_matrix
 
     def _get_random_phases_matrix(self) -> ndarray:
-        random_phases = ones(self._permanent_calculator.matrix.shape[0],
-                             dtype=complex128)  # [1, 1,1 ,1,1,1]
+        modes_number = self._permanent_calculator.matrix.shape[0]
+        random_phases = ones(modes_number, dtype=complex128)
 
-        random_phases[0: self._approximated_modes_number] = exp(
-            1j * 2 * pi * rand(self._approximated_modes_number))
+        random_phases[self._hierarchy_level: modes_number] = \
+            exp(1j * 2 * pi * rand(modes_number - self._hierarchy_level))
 
         return diag(random_phases)
+
+

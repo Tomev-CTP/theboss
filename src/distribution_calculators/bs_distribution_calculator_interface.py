@@ -9,7 +9,7 @@ from numpy import ndarray
 from ..network_simulation_strategy import network_simulation_strategy
 
 
-# TODO TR: This class should be placed in separate folder
+# TODO TR: MO doesn't approve of this class. It should be changed somehow.
 @dataclass
 class BosonSamplingExperimentConfiguration:
     interferometer_matrix: ndarray  # A matrix describing interferometer.
@@ -20,7 +20,10 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_left: int
     uniform_transmissivity: float = 0
     network_simulation_strategy: network_simulation_strategy = None
-    approximated_modes_number: int = 0
+    # TODO TR:  Previously we've used the number of approximated modes instead of the
+    #           the hierarchy level. There may be some errors after the changes, that
+    #           we should fix.
+    hierarchy_level: int = 0  # This is k from papers [1] and [2]
 
 
 class BSDistributionCalculatorInterface(abc.ABC):
