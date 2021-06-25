@@ -3,13 +3,15 @@ __author__ = "Tomasz Rybotycki"
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
-from typing import List, Optional, Iterable
+from typing import List, Optional
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, \
-    sqrt, transpose, zeros, \
-    zeros_like, square, flip
+    sqrt, transpose, zeros, zeros_like, square, flip, pi, ones, exp
 from numpy.linalg import svd
-from scipy.special import binom, factorial
+from scipy.special import binom
+from numpy.random import rand
+
+from ..quantum_computations_utilities import compute_qft_matrix
 
 
 def particle_state_to_modes_state(particle_state: ndarray,
@@ -97,7 +99,7 @@ def generate_possible_n_particle_outputs(number_of_particles: int,
 
 
 def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> \
-        List[ndarray]:
+List[ndarray]:
     """
         From initial state generate all possible input states after losses application.
         :param initial_state: The state we start with.
@@ -164,7 +166,7 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int,
 
 
 def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> \
-        List[float]:
+List[float]:
     v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
     return square(flip(singular_values))
 
@@ -194,7 +196,7 @@ def prepare_interferometer_matrix_in_expanded_space(
     singular_values_matrix_expansion = _calculate_singular_values_matrix_expansion(
         singular_values)
     singular_values_expanded_matrix = block(
-        [[diag(singular_values), -singular_values_matrix_expansion],
+        [[diag(singular_values), singular_values_matrix_expansion],
          [singular_values_matrix_expansion, diag(singular_values)]])
     return expanded_v @ singular_values_expanded_matrix @ expanded_u
 
@@ -224,36 +226,11 @@ def compute_state_types(modes_number: int, particles_number: int,
         state_type = sorted(partition, reverse=True)
         state_types.append(state_type)
 
-    for state_type in state_types:
-        while len(state_type) < modes_number:
-            state_type.append(0)
-
     return state_types
-
-def compute_number_of_states_of_given_type(state_type: Iterable[int]) -> int:
-    modes_number = len(state_type)
-
-    counts = []
-    vals = set(state_type)
-
-    for val in vals:
-        counts.append(state_type.count(val))
-
-    type_count = factorial(modes_number)
-
-    for count in counts:
-        type_count /= factorial(count)
-
-    number_of_states_of_given_type = factorial(modes_number)
-
-    for count in counts:
-        number_of_states_of_given_type //= factorial(count)
-
-    return number_of_states_of_given_type
 
 
 def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> \
-        List[List[int]]:
+List[List[int]]:
     maximally_unbalanced_types = []
     all_types = compute_state_types(particles_number=particles_number,
                                     modes_number=modes_number)
@@ -266,14 +243,18 @@ def compute_maximally_unbalanced_types(modes_number: int, particles_number: int)
     return maximally_unbalanced_types
 
 
-def compute_number_of_state_types(modes_number: int, particles_number: int,
-                                  consider_losses: bool = False) -> int:
-    # TR TODO: This is not the optimal way to do that, but it's the fastest.
-    return len(compute_state_types(modes_number, particles_number, consider_losses))
+def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndarray:
+    small_qft_matrix = compute_qft_matrix(m)
+    qft_matrix = eye(all_modes_number, dtype=complex128)
+    qft_matrix[0:m, 0:m] = small_qft_matrix
+    return qft_matrix
 
 
-
-
+def generate_random_phases_matrix_for_first_m_modes(m: int, all_modes_number: int) \
+        -> ndarray:
+    random_phases = ones(all_modes_number, dtype=complex128)  # [1, 1, 1, 1, 1, 1]
+    random_phases[0:m] = exp(1j * 2 * pi * rand(m))
+    return diag(random_phases)
 
 class EffectiveScatteringMatrixCalculator:
     """
