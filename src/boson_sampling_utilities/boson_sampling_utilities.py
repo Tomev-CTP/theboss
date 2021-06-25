@@ -277,6 +277,27 @@ List[List[int]]:
 
     return maximally_unbalanced_types
 
+def compute_number_of_states_of_given_type(state_type: Iterable[int]) -> int:
+    modes_number = len(state_type)
+
+    counts = []
+    vals = set(state_type)
+
+    for val in vals:
+        counts.append(state_type.count(val))
+
+    type_count = factorial(modes_number)
+
+    for count in counts:
+        type_count /= factorial(count)
+
+    number_of_states_of_given_type = factorial(modes_number)
+
+    for count in counts:
+        number_of_states_of_given_type //= factorial(count)
+
+    return number_of_states_of_given_type
+
 
 def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndarray:
     small_qft_matrix = compute_qft_matrix(m)
