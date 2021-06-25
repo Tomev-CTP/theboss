@@ -3,12 +3,12 @@ __author__ = "Tomasz Rybotycki"
 # TR TODO: Consider making this file a package along with exact distribution calculator.
 
 import itertools
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, \
     sqrt, transpose, zeros, zeros_like, square, flip, pi, ones, exp
 from numpy.linalg import svd
-from scipy.special import binom
+from scipy.special import binom, factorial
 from numpy.random import rand
 
 from ..quantum_computations_utilities import compute_qft_matrix
@@ -277,7 +277,7 @@ List[List[int]]:
 
     return maximally_unbalanced_types
 
-def compute_number_of_states_of_given_type(state_type: Iterable[int]) -> int:
+def compute_number_of_states_of_given_type(state_type: Sequence[int]) -> int:
     modes_number = len(state_type)
 
     counts = []
