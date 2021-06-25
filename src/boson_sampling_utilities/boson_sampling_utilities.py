@@ -229,6 +229,41 @@ def compute_state_types(modes_number: int, particles_number: int,
     return state_types
 
 
+def compute_number_of_state_types(modes_number: int,
+                                  particles_number: int,
+                                  losses = False) -> int:
+    state_types_number = 0
+
+    for k in range(1, modes_number + 1):
+        state_types_number += \
+            compute_number_of_k_element_integer_n_partitions(k, particles_number)
+
+    if not losses:
+        return state_types_number
+
+    for particles_num in range(particles_number):
+        for k in range(1, modes_number + 1):
+            state_types_number += \
+                compute_number_of_k_element_integer_n_partitions(k, particles_num)
+
+    return state_types_number
+
+def compute_number_of_k_element_integer_n_partitions(k: int, n: int) -> int:
+
+    if k == 1:
+        return 1
+
+    if k > n or n == 0 or k < 1:
+        return 0
+
+    integer_partitions_number = \
+        compute_number_of_k_element_integer_n_partitions(k, n - k)
+    integer_partitions_number += \
+        compute_number_of_k_element_integer_n_partitions(k - 1, n - 1)
+
+    return integer_partitions_number
+
+
 def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> \
 List[List[int]]:
     maximally_unbalanced_types = []
