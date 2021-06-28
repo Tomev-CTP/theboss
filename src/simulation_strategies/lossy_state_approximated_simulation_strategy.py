@@ -110,7 +110,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             self, approximated_input_state_part: ndarray) -> None:
 
         # Assume exact simulation if hierarchy level is not specified.
-        if not self._hierarchy_level:
+        if not 0 <= self._hierarchy_level < self._permanent_calculator.matrix.shape[0]:
             self._approximated_input_state_part_possibilities = [[]]
             self._approximated_input_state_part_possibilities_weights = [1]
             return
@@ -123,7 +123,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         self._approximated_input_state_part_possibilities = []
         for number_of_particles_left in range(int(sum(approximated_input_state_part)) + 1):
             state_part_possibility = zeros_like(approximated_input_state_part)
-            state_part_possibility[-1] = number_of_particles_left
+            state_part_possibility[0] = number_of_particles_left
             self._approximated_input_state_part_possibilities.append(
                 state_part_possibility
             )
@@ -156,7 +156,6 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         for _ in range(samples_number):
             lossy_input = self._get_input_state_for_sampling()
             approximate_sampling_matrix = self._get_matrix_for_approximate_sampling()
-
             helper_strategy.set_new_matrix(approximate_sampling_matrix)
             samples.append(helper_strategy.simulate(lossy_input)[0])
 
@@ -173,7 +172,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             range(len(self._not_approximated_lossy_mixed_state_parts)),
             p=self._not_approximated_lossy_mixed_state_parts_weights
         )]
-        return hstack([approximated_part, not_approximated_part])
+        return hstack([not_approximated_part, approximated_part])
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         # TODO TR: THIS WILL BE REWRITTEN AFTER MERGING WITH BRUTE-FORCE BRANCH
