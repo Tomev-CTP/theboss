@@ -226,6 +226,10 @@ def compute_state_types(modes_number: int, particles_number: int,
         state_type = sorted(partition, reverse=True)
         state_types.append(state_type)
 
+    for i in range(len(state_types)):
+        while len(state_types[i]) < modes_number:
+            state_types[i].append(0)
+
     return state_types
 
 
