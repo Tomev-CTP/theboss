@@ -15,6 +15,7 @@ from typing import Dict, List
 from scipy.special import binom
 from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_inputs
 from multiprocessing import cpu_count
+import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
 from copy import deepcopy
 from ..quantum_computations_utilities import compute_qft_matrix
@@ -57,7 +58,11 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         number_of_samples_for_each_thread = \
             self._compute_number_of_samples_for_each_thread(samples_number)
 
-        with Pool() as p:
+        # Context is required on Linux systems, as the default (fork) produces undesired results! Spawn is default
+        # on osX and Windows and works as expected.
+        multiprocessing_context = multiprocessing.get_context("spawn")
+
+        with Pool(mp_context=multiprocessing_context) as p:
             samples_lists = p.map(self._simulate_in_parallel,
                                   number_of_samples_for_each_thread)
 
