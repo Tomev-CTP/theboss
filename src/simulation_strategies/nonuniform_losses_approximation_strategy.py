@@ -104,7 +104,7 @@ class NonuniformLossesApproximationStrategy():
         multiprocessing_context = multiprocessing.get_context("spawn")
 
         with Pool(mp_context=multiprocessing_context) as p:
-            samples_lists = p.map(self._simulate_in_pararell, repeat(input_state),
+            samples_lists = p.map(self._simulate_in_parallel, repeat(input_state),
                                   samples_for_threads)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
