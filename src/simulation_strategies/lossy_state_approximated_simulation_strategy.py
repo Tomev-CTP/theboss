@@ -34,6 +34,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         self._uniform_transmissivity = uniform_transmissivity
         self._threads_number = self._get_proper_threads_number(threads_number)
         self._permanent_calculator = bs_permanent_calculator  # Should contain an UNITARY (no losses here!)
+        self._qft_matrix = self._get_qft_matrix()
 
     def _get_proper_threads_number(self, threads_number: int) -> int:
         if threads_number < 1 or threads_number > cpu_count():
@@ -181,9 +182,8 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         # TODO TR: THIS WILL BE REWRITTEN AFTER MERGING WITH BRUTE-FORCE BRANCH
-        qft_matrix = self._get_qft_matrix()
         random_phases_matrix = self._get_random_phases_matrix()
-        return self._permanent_calculator.matrix @ random_phases_matrix @ qft_matrix
+        return self._permanent_calculator.matrix @ random_phases_matrix @ self._qft_matrix
 
     def _get_qft_matrix(self):
         modes_number = self._permanent_calculator.matrix.shape[0]
