@@ -4,12 +4,23 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Union
 
-import qutip
-from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, tile, power
+from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, tile, power, diag, dot
+from numpy.random import randn
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
-    return qutip.rand_unitary_haar(d).full()
+    '''
+        This method generates and returns a random, complex unitary matrix, according
+        to the haar measure.
+    '''
+    z = randn(d, d + 1j * randn(d, d)) / sqrt(2)
+
+    q, r = linalg.qr(z)
+    r = diag(r)
+    lamb = diag(r / abs(r))
+    qprime = dot(q, lamb)
+
+    return qprime.T @ qprime
 
 
 def count_total_variation_distance(distribution1: Union[List[float], ndarray],
