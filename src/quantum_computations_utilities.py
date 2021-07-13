@@ -9,18 +9,23 @@ from numpy.random import randn
 
 
 def generate_haar_random_unitary_matrix(d: int) -> ndarray:
-    '''
+    """
         This method generates and returns a random, complex unitary matrix, according
         to the haar measure.
-    '''
-    z = randn(d, d + 1j * randn(d, d)) / sqrt(2)
 
-    q, r = linalg.qr(z)
+        Note: FBM also gave me a version of that method that generates real matrices,
+        not the complex ones.
+
+        :param n: Dimension of the matrix to generate.
+        :return: A Haar random unitary matrix.
+    """
+    random_complex_number = randn(d, d + 1j * randn(d, d)) / sqrt(2)
+    q, r = linalg.qr(random_complex_number)
     r = diag(r)
     lamb = diag(r / abs(r))
-    qprime = dot(q, lamb)
+    q_prime = dot(q, lamb)
 
-    return qprime.T @ qprime
+    return q_prime.T @ q_prime
 
 
 def count_total_variation_distance(distribution1: Union[List[float], ndarray],
