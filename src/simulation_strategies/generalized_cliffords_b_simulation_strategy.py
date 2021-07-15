@@ -11,7 +11,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
-from numpy import array, ndarray, int64
+from numpy import array, ndarray, int64, array_equal
 from typing import List
 from scipy.special import factorial
 from numpy.random import choice
@@ -40,42 +40,47 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
         while len(samples) < samples_number:
             self._current_input = [0 for _ in self.input_state]
-            self._working_input_state = input_state
+            self._working_input_state = list(input_state)
             self._fill_r_sample()
             samples.append(array(self.r_sample, dtype=int64))
         return samples
 
     def _calculate_new_layer_of_pmfs(self) -> None:
 
-        number_of_particle_to_sample = sum(self.r_sample) + 1
+        number_of_particle_to_sample = sum(self._current_input)
 
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
 
+        self._bs_permanent_calculator.input_state = self._current_input
+
         for output in self.possible_outputs[self.current_key]:
             pmf.append(0)
 
-            self._bs_permanent_calculator.input_state = self._current_input
             self._bs_permanent_calculator.output_state = output
             probability = abs(self._bs_permanent_calculator.compute_permanent())**2
-            probability *= factorial(number_of_particle_to_sample)
+            probability /= factorial(number_of_particle_to_sample)
             pmf[-1] += probability
 
         self.pmfs[self.current_key] = pmf
 
     def _fill_r_sample(self) -> None:
+        self.pmfs.clear()
         self.r_sample = [0 for _ in self.input_state]
         self.current_key = tuple(self.r_sample)
         self.current_sample_probability = 1
 
         while self.number_of_input_photons > sum(self.r_sample):
             self._update_current_input()
+
             if self.current_key not in self.pmfs:
                 self._calculate_new_layer_of_pmfs()
+
             self._sample_from_latest_pmf()
 
     def _update_current_input(self):
-        next_particle_mode = choice(self._working_input_state, p=self._working_input_state / sum(self._working_input_state))
+        next_particle_mode = choice(range(len(self._working_input_state)),
+                                    p=self._working_input_state / sum(self._working_input_state))
         self._working_input_state[next_particle_mode] -= 1
         self._current_input[next_particle_mode] += 1
