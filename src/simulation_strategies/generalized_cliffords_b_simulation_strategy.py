@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 """
     This script contains the implementation of the Generalized Cliffords version B
-    algorithm. It differs from the original version  in two places:
+    algorithm. It differs from the original version in two places:
         -   In the k-th step, instead of computing k x k permanents, we compute a set of 
             k-1 x k-1 permanents. From that, we calculate the required k x k permanents
             in O(k) time each.
@@ -11,17 +11,17 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
-from numpy import array, ndarray, int64
+from numpy import array, ndarray, int64, zeros_like
 from typing import List
 from numpy.random import choice
-from copy import deepcopy
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
+        super().__init__(bs_permanent_calculator)
         self._current_input = []
         self._working_input_state = None
-        super().__init__(bs_permanent_calculator)
+
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -38,7 +38,7 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         samples = []
 
         while len(samples) < samples_number:
-            self._current_input = [0 for _ in self.input_state]
+            self._current_input = zeros_like(input_state)
             self._working_input_state = list(input_state)
             self._fill_r_sample()
             samples.append(array(self.r_sample, dtype=int64))
