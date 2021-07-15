@@ -9,6 +9,7 @@ __author__ = "Tomasz Rybotycki"
 
 from .simulation_strategy_interface import SimulationStrategyInterface
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
+from .generalized_cliffords_b_simulation_strategy import GeneralizedCliffordsBSimulationStrategy
 from numpy import ndarray, hstack, zeros_like, complex128, eye, pi, ones, exp, diag
 from numpy.random import choice, rand
 from typing import Dict, List
@@ -156,8 +157,12 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         """
         samples = []
 
+        '''
         helper_strategy = \
             GeneralizedCliffordsSimulationStrategy(deepcopy(self._permanent_calculator))
+        '''
+        helper_strategy = \
+            GeneralizedCliffordsBSimulationStrategy(deepcopy(self._permanent_calculator))
 
         for _ in range(samples_number):
             lossy_input = self._get_input_state_for_sampling()
