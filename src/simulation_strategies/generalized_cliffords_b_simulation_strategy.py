@@ -14,6 +14,7 @@ from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimul
 from numpy import array, ndarray, int64
 from typing import List
 from numpy.random import choice
+from copy import deepcopy
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
 
@@ -49,14 +50,49 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
         pmf = []
 
+        submatrices_permanents = self._get_permanents_of_submatrices()
+
         self._bs_permanent_calculator.input_state = self._current_input
 
+        # New particle can come in any new mode
+        for m in range(len(self.r_sample)):
+            permanent = 0
+
+            for i in range(len(self._current_input)):
+                permanent_added = self._current_input[i] * submatrices_permanents[i]
+                permanent_added *= self._bs_permanent_calculator.matrix[m][i]
+                permanent += permanent_added
+
+            pmf.append(abs(permanent)**2)
+
+        '''
         for output in self.possible_outputs[self.current_key]:
             self._bs_permanent_calculator.output_state = output
             probability = abs(self._bs_permanent_calculator.compute_permanent())**2
             pmf.append(probability)
+        '''
 
         self.pmfs[self.current_key] = pmf
+
+    def _get_permanents_of_submatrices(self):
+        permanents = []
+
+        self._bs_permanent_calculator.output_state = self.r_sample
+
+        for i in range(len(self._current_input)):
+
+            if self._current_input[i] == 0:
+                permanents.append(0)
+                continue
+
+            self._current_input[i] -= 1
+
+            self._bs_permanent_calculator.input_state = self._current_input
+            permanents.append(self._bs_permanent_calculator.compute_permanent())
+
+            self._current_input[i] += 1
+
+        return permanents
 
     def _fill_r_sample(self) -> None:
         self.pmfs.clear()
