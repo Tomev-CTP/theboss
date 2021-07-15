@@ -19,7 +19,7 @@ def generate_haar_random_unitary_matrix(d: int) -> ndarray:
         :param n: Dimension of the matrix to generate.
         :return: A Haar random unitary matrix.
     """
-    random_complex_number = randn(d, d + 1j * randn(d, d)) / sqrt(2)
+    random_complex_number = randn(d, d) + 1j * randn(d, d) / sqrt(2)
     q, r = linalg.qr(random_complex_number)
     r = diag(r)
     lamb = diag(r / abs(r))
