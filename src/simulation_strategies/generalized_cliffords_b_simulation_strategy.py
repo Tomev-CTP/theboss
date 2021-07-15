@@ -57,20 +57,12 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         # New particle can come in any new mode
         for m in range(len(self.r_sample)):
             permanent = 0
-
             for i in range(len(self._current_input)):
                 permanent_added = self._current_input[i] * submatrices_permanents[i]
                 permanent_added *= self._bs_permanent_calculator.matrix[m][i]
                 permanent += permanent_added
 
             pmf.append(abs(permanent)**2)
-
-        '''
-        for output in self.possible_outputs[self.current_key]:
-            self._bs_permanent_calculator.output_state = output
-            probability = abs(self._bs_permanent_calculator.compute_permanent())**2
-            pmf.append(probability)
-        '''
 
         self.pmfs[self.current_key] = pmf
 
