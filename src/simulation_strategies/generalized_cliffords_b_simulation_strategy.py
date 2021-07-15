@@ -11,9 +11,8 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
-from numpy import array, ndarray, int64, array_equal
+from numpy import array, ndarray, int64
 from typing import List
-from scipy.special import factorial
 from numpy.random import choice
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
@@ -22,7 +21,6 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         self._current_input = []
         self._working_input_state = None
         super().__init__(bs_permanent_calculator)
-
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -47,8 +45,6 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
     def _calculate_new_layer_of_pmfs(self) -> None:
 
-        number_of_particle_to_sample = sum(self._current_input)
-
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
         pmf = []
@@ -56,12 +52,9 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         self._bs_permanent_calculator.input_state = self._current_input
 
         for output in self.possible_outputs[self.current_key]:
-            pmf.append(0)
-
             self._bs_permanent_calculator.output_state = output
             probability = abs(self._bs_permanent_calculator.compute_permanent())**2
-            probability /= factorial(number_of_particle_to_sample)
-            pmf[-1] += probability
+            pmf.append(probability)
 
         self.pmfs[self.current_key] = pmf
 
