@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
 import enum
 from copy import deepcopy
 
-from .cliffords_r_simulation_strategy import CliffordsRSimulationStrategyInterface
+from .cliffords_r_simulation_strategy import CliffordsRSimulationStrategy
 from .fixed_loss_simulation_strategy import FixedLossSimulationStrategy
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
 from .generalized_cliffords_uniform_losses_simulation_strategy import \
@@ -108,12 +108,12 @@ class SimulationStrategyFactory:
             self._experiment_configuration.uniform_transmissivity
         )
 
-    def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategyInterface:
+    def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
         """
             Generates Cliffords algorithm strategy using their code implemented in R.
         :return: Cliffords strategy in R.
         """
-        return CliffordsRSimulationStrategyInterface(self._experiment_configuration.interferometer_matrix)
+        return CliffordsRSimulationStrategy(self._experiment_configuration.interferometer_matrix)
 
     def _generate_generalized_cliffords_strategy(self) -> GeneralizedCliffordsSimulationStrategy:
         """

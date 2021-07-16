@@ -16,7 +16,7 @@ from ..boson_sampling_utilities.boson_sampling_utilities import particle_state_t
 from ..rpy2_utilities import numpy_array_to_r_matrix
 
 
-class CliffordsRSimulationStrategyInterface(SimulationStrategyInterface):
+class CliffordsRSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, interferometer_matrix: ndarray) -> None:
         self.interferometer_matrix = interferometer_matrix
 
@@ -35,7 +35,7 @@ class CliffordsRSimulationStrategyInterface(SimulationStrategyInterface):
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
 
     def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[ndarray]:
-        number_of_bosons = sum(initial_state)
+        number_of_bosons = int(sum(initial_state))
 
         boson_sampler_input_matrix = numpy_array_to_r_matrix(self.interferometer_matrix[:, arange(number_of_bosons)])
 
