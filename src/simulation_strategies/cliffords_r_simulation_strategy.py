@@ -34,6 +34,9 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         boson_sampling_package = packages.importr('BosonSampling')
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
 
+    def set_matrix(self, interferometer_matrix: ndarray) -> None:
+        self.interferometer_matrix = interferometer_matrix
+
     def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         number_of_bosons = int(sum(initial_state))
 
