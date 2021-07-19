@@ -25,8 +25,7 @@ def particle_state_to_modes_state(particle_state: ndarray,
     return modes_state
 
 
-def modes_state_to_particle_state(mode_state: ndarray,
-                                  particles_number: int) -> ndarray:
+def modes_state_to_particle_state(mode_state: ndarray) -> ndarray:
     """
         Return given mode-basis state in particle basis.
 
@@ -35,9 +34,10 @@ def modes_state_to_particle_state(mode_state: ndarray,
         :return: Given mode-basis state in particle basis.
     """
 
+    particles_number = int(sum(mode_state))
     number_of_observed_modes = len(mode_state)
     modes = mode_state.copy()
-    particles_state = zeros(particles_number)
+    particles_state = zeros(particles_number, dtype=int)
 
     i = k = 0
     while i < number_of_observed_modes:
