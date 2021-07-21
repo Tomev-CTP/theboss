@@ -11,6 +11,7 @@ from ..distribution_calculators.bs_distribution_calculator_interface import \
     BosonSamplingExperimentConfiguration
 from ..distribution_calculators.bs_distribution_calculator_with_fixed_losses import \
     BSDistributionCalculatorWithFixedLosses, BSPermanentCalculatorInterface
+from multiprocessing import cpu_count, Pool
 
 
 class BSDistributionCalculatorWithUniformLosses \
@@ -39,12 +40,14 @@ class BSDistributionCalculatorWithUniformLosses \
     def calculate_probabilities_of_outcomes(self,
                                             outcomes: Iterable[Iterable[int]]) -> \
     List[float]:
-        outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for
-                                  outcome in outcomes]
+
+        with Pool(processes=cpu_count()) as pool:
+            outcomes_probabilities = pool.map(self._calculate_probability_of_outcome,
+                                              outcomes)
 
         return outcomes_probabilities
 
-    def __calculate_probability_of_outcome(self, outcome: ndarray) -> float:
+    def _calculate_probability_of_outcome(self, outcome: ndarray) -> float:
 
         number_of_particles_left = int(sum(outcome))
         l = number_of_particles_left
