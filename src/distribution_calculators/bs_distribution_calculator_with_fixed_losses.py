@@ -35,8 +35,6 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
         return self.calculate_probabilities_of_outcomes(possible_outcomes)
 
-
-
     def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]] ) -> List[float]:
         outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for
                                   outcome in outcomes]
@@ -45,10 +43,11 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
     def __calculate_probability_of_outcome(self, outcome: ndarray) -> float:
         """
-        Given input state and losses as described in the constants of this file calculate the probability
-        of obtaining the outcome given as a parameter, after traversing lossy linear-optical channel.
-        :param outcome: An outcome which probability of obtaining will be calculated.
-        :return: Probability of obtaining given outcome in situation presented by by the
+        Given input state and losses as described in the BS experiment configuration
+        compute the probability of obtaining the outcome given as a parameter, after
+        traversing a lossy linear-optical channel.
+        :param outcome: A Fock state for which the probability will be computed.
+        :return: Probability of obtaining given state in current experiment config.
         """
         outcome_probability = self.__calculate_probability_of_outcome_state_for_indistinguishable_photons(outcome)
 
