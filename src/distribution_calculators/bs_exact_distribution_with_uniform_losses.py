@@ -20,6 +20,15 @@ class BSDistributionCalculatorWithUniformLosses \
                  permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(configuration, permanent_calculator)
         self.weights = self._initialize_weights()
+        self.weightless = False
+
+    def set_weightless(self, weightless: bool) -> None:
+        if not weightless:
+            self.weights = self._initialize_weights()
+        else:
+            self.weights = [1 for _ in self.weights]
+
+        self.weightless = weightless
 
     def _initialize_weights(self) -> List[float]:
 
