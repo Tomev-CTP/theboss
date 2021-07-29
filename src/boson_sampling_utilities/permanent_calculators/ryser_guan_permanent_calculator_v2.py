@@ -10,14 +10,14 @@ import operator
 from functools import reduce
 from typing import List, Optional
 
-from numpy import complex128, ndarray, nonzero
+from numpy import complex128, ndarray, nonzero, zeros, ones
 
 from ..permanent_calculators.bs_permanent_calculator_base import \
     BSPermanentCalculatorBase
 from ...GuanCodes.src.GuanCodeGenerator import GuanCodeGenerator
 
 
-class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
+class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
     """
         This class is designed to calculate permanent of effective scattering matrix of a boson sampling instance.
         Note, that it can be used to calculate permanent of given matrix. All that is required that input and output
@@ -39,7 +39,9 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         if not self._can_calculation_be_performed():
             raise AttributeError
 
-        r_vectors = self._calculate_r_vectors()
+        r_vector = zeros(len(self.input_state), dtype=int)  # g
+        code_update_information = ones(len(self.input_state), dtype=int)  # u
+        position_limits = list(self.input_state)  # n
 
         permanent = complex128(0)
         sums = dict()
@@ -49,39 +51,49 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         multiplier = 1
         binomials_product = 1
 
-        for i in range(len(r_vectors)):
+        for j in considered_columns_indices:
+            sums[j] = 0
+
+        while (r_vector[-1] <= position_limits[-1]):
+
+            # UPDATE R VECTOR
+            index_to_update = 0  # i
+            updated_value_at_index = r_vector[0] + code_update_information[0]  # k
+            while updated_value_at_index > position_limits[
+                index_to_update] or updated_value_at_index < 0:
+                code_update_information[index_to_update] = -code_update_information[
+                    index_to_update]
+                index_to_update += 1
+
+                if index_to_update == len(r_vector):
+                    print("May have a problem!")
+                    permanent *= pow(-1, sum(self._input_state))
+                    return permanent
+
+                updated_value_at_index = r_vector[index_to_update] + \
+                                         code_update_information[index_to_update]
 
 
+            last_value_at_index = r_vector[index_to_update]
+            r_vector[index_to_update] = updated_value_at_index
+            # END UPDATE
 
-            r_vector = r_vectors[i]
+            # START PERMANENT UPDATE
+            multiplier = -multiplier
 
-            if i == 0:  # Initialize sums
-                for j in considered_columns_indices:
-                    right_sum = 0
+            # Sums update
+            for j in sums:
+                sums[j] += (r_vector[index_to_update] - last_value_at_index) * \
+                           self.matrix[index_to_update][j]
 
-                    for nu in range(len(self._input_state)):
-                        right_sum += r_vector[nu] * self._matrix[nu][j]
-
-                    sums[j] = right_sum
-            else:  # Update binomial product and sum
-                multiplier = -multiplier
-                last_r_vector = r_vectors[i - 1]
-                change_index = self._find_change_index(r_vector, last_r_vector)
-
-                # Sums update
-                for j in sums:
-                    sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * \
-                               self.matrix[change_index][j]
-
-                # Binoms update
-                if r_vector[change_index] > last_r_vector[change_index]:
-                    binomials_product *= (self._output_state[change_index] -
-                                          last_r_vector[change_index]) / r_vector[
-                                             change_index]
-                else:
-                    binomials_product *= last_r_vector[change_index] / (
-                            self._output_state[change_index] - r_vector[
-                        change_index])
+            # Binoms update
+            if r_vector[index_to_update] > last_value_at_index:
+                binomials_product *= (self._output_state[index_to_update] -
+                                      last_value_at_index) / r_vector[index_to_update]
+            else:
+                binomials_product *= last_value_at_index / (
+                        self._output_state[index_to_update] - r_vector[
+                    index_to_update])
 
             permanent += multiplier * binomials_product * reduce(operator.mul,
                                                                  [pow(sums[j],
@@ -93,10 +105,6 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         permanent *= pow(-1, sum(self._input_state))
         return permanent
 
-    def _find_change_index(self, r_vector: List[int], last_r_vector: List[int]) -> int:
-        for index, (first, second) in enumerate(zip(r_vector, last_r_vector)):
-            if first != second:
-                return index  # Guan codes assure that the change occurs on only one index
 
     def _can_calculation_be_performed(self) -> bool:
         """
@@ -107,6 +115,3 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         return self._matrix.shape[0] == self._matrix.shape[1] and len(
             self._output_state) == len(self._input_state) \
                and len(self._output_state) == self._matrix.shape[0]
-
-    def _calculate_r_vectors(self) -> List[List[int]]:
-        return GuanCodeGenerator.generate_guan_codes(self._output_state)
