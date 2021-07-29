@@ -10,7 +10,7 @@ import operator
 from functools import reduce
 from typing import List, Optional
 
-from numpy import complex128, ndarray
+from numpy import complex128, ndarray, nonzero
 
 from ..permanent_calculators.bs_permanent_calculator_base import \
     BSPermanentCalculatorBase
@@ -44,11 +44,7 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         permanent = complex128(0)
         sums = dict()
 
-        considered_columns_indices = []
-        for mode_index in range(len(self._input_state)):
-            if self._input_state[mode_index] != 0:
-                considered_columns_indices.append(
-                    mode_index)  # Consider non-standard inputs
+        considered_columns_indices = nonzero(self._input_state)[0]
 
         multiplier = 1
         binomials_product = 1
@@ -81,11 +77,8 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
                                              change_index]
                 else:
                     binomials_product *= last_r_vector[change_index] / (
-                                self._output_state[change_index] - r_vector[
-                            change_index])
-
-                    if (int(binomials_product) != binomials_product):
-                        print("here")
+                            self._output_state[change_index] - r_vector[
+                        change_index])
 
             permanent += multiplier * binomials_product * reduce(operator.mul,
                                                                  [pow(sums[j],
