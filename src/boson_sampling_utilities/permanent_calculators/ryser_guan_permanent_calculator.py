@@ -49,39 +49,32 @@ class RyserGuanPermanentCalculator(BSPermanentCalculatorBase):
         multiplier = 1
         binomials_product = 1
 
-        for i in range(len(r_vectors)):
+        for j in considered_columns_indices:
+            sums[j] = 0
 
-
+        for i in range(1, len(r_vectors)):
 
             r_vector = r_vectors[i]
 
-            if i == 0:  # Initialize sums
-                for j in considered_columns_indices:
-                    right_sum = 0
+            # Update binomial product and sum
+            multiplier = -multiplier
+            last_r_vector = r_vectors[i - 1]
+            change_index = self._find_change_index(r_vector, last_r_vector)
 
-                    for nu in range(len(self._input_state)):
-                        right_sum += r_vector[nu] * self._matrix[nu][j]
+            # Sums update
+            for j in sums:
+                sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * \
+                           self.matrix[change_index][j]
 
-                    sums[j] = right_sum
-            else:  # Update binomial product and sum
-                multiplier = -multiplier
-                last_r_vector = r_vectors[i - 1]
-                change_index = self._find_change_index(r_vector, last_r_vector)
-
-                # Sums update
-                for j in sums:
-                    sums[j] += (r_vector[change_index] - last_r_vector[change_index]) * \
-                               self.matrix[change_index][j]
-
-                # Binoms update
-                if r_vector[change_index] > last_r_vector[change_index]:
-                    binomials_product *= (self._output_state[change_index] -
-                                          last_r_vector[change_index]) / r_vector[
-                                             change_index]
-                else:
-                    binomials_product *= last_r_vector[change_index] / (
-                            self._output_state[change_index] - r_vector[
-                        change_index])
+            # Binoms update
+            if r_vector[change_index] > last_r_vector[change_index]:
+                binomials_product *= (self._output_state[change_index] -
+                                      last_r_vector[change_index]) / r_vector[
+                                         change_index]
+            else:
+                binomials_product *= last_r_vector[change_index] / (
+                        self._output_state[change_index] - r_vector[
+                    change_index])
 
             permanent += multiplier * binomials_product * reduce(operator.mul,
                                                                  [pow(sums[j],

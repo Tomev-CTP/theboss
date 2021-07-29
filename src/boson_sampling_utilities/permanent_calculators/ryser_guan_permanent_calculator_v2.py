@@ -39,14 +39,14 @@ class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
         if not self._can_calculation_be_performed():
             raise AttributeError
 
-        r_vector = zeros(len(self.input_state), dtype=int)  # g
-        code_update_information = ones(len(self.input_state), dtype=int)  # u
-        position_limits = list(self.input_state)  # n
+        r_vector = zeros(len(self._output_state), dtype=int)  # g
+        code_update_information = ones(len(self._output_state), dtype=int)  # u
+        position_limits = list(self._output_state)  # n
 
         permanent = complex128(0)
         sums = dict()
 
-        considered_columns_indices = nonzero(self._input_state)[0]
+        considered_columns_indices = nonzero(self.input_state)[0]
 
         multiplier = 1
         binomials_product = 1
@@ -66,7 +66,6 @@ class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
                 index_to_update += 1
 
                 if index_to_update == len(r_vector):
-                    print("May have a problem!")
                     permanent *= pow(-1, sum(self._input_state))
                     return permanent
 
@@ -91,9 +90,7 @@ class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
                 binomials_product *= (self._output_state[index_to_update] -
                                       last_value_at_index) / r_vector[index_to_update]
             else:
-                binomials_product *= last_value_at_index / (
-                        self._output_state[index_to_update] - r_vector[
-                    index_to_update])
+                binomials_product *= last_value_at_index / (self._output_state[index_to_update] - r_vector[index_to_update])
 
             permanent += multiplier * binomials_product * reduce(operator.mul,
                                                                  [pow(sums[j],
