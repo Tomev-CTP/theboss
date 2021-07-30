@@ -14,7 +14,7 @@ from typing import List
 
 from numpy import allclose, array
 
-from src_tests import (ChinHuhPermanentCalculator, ClassicPermanentCalculator,
+from src_tests import (ChinHuhPermanentCalculator_v2, ClassicPermanentCalculator,
                        ParallelChinHuhPermanentCalculator,
                        RyserPermanentCalculator, RyserGuanPermanentCalculator,
                        RyserGuanPermanentCalculator_v2)
@@ -25,8 +25,8 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
     def setUp(self) -> None:
         self._matrix = generate_haar_random_unitary_matrix(4)
-        self._ch_permanent_calculator = ChinHuhPermanentCalculator(self._matrix,
-                                                                   array([]), array([]))
+        self._ch_permanent_calculator = ChinHuhPermanentCalculator_v2(self._matrix,
+                                                                      array([]), array([]))
         self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix,
                                                                    input_state=array(
                                                                        []),
