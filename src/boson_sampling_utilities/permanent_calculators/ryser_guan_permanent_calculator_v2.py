@@ -8,13 +8,12 @@ __author__ = "Tomasz Rybotycki"
 
 import operator
 from functools import reduce
-from typing import List, Optional
+from typing import Optional
 
 from numpy import complex128, ndarray, nonzero, zeros, ones
 
 from ..permanent_calculators.bs_permanent_calculator_base import \
     BSPermanentCalculatorBase
-from ...GuanCodes.src.GuanCodeGenerator import GuanCodeGenerator
 
 
 class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
