@@ -6,7 +6,7 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Optional
 
-from numpy import complex128, ndarray, nonzero, ones, zeros, allclose
+from numpy import complex128, ndarray, nonzero, ones, zeros, allclose, isinf, power
 from scipy.special import binom
 from functools import reduce
 import operator
@@ -72,7 +72,10 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
                 index_to_update += 1
 
                 if index_to_update == len(v_vector):
-                    permanent /= pow(2, sum(self._input_state))
+
+                    for _ in range(sum(self._input_state)):
+                        permanent /= 2
+
                     return permanent
 
                 updated_value_at_index = v_vector[index_to_update] + \
@@ -102,8 +105,9 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
             permanent += multiplier * binomials_product * \
                          reduce(operator.mul, [pow(sums[j], self._output_state[j]) for j in considered_columns_indices], 1)
 
-        permanent /= pow(2, sum(self._input_state))
-        print(permanent)
+        for _ in range(sum(self._input_state)):
+            permanent /= 2
+
         return permanent
 
     def _can_calculation_be_performed(self) -> bool:
