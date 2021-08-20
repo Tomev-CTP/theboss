@@ -9,8 +9,8 @@ __author__ = "Tomasz Rybotycki"
 
 from .simulation_strategy_interface import SimulationStrategyInterface
 from .generalized_cliffords_b_simulation_strategy import GeneralizedCliffordsBSimulationStrategy, BSPermanentCalculatorInterface
-from numpy import ndarray, hstack, zeros_like, complex128, eye, pi, ones, exp, diag
-from numpy.random import choice, rand
+from numpy import ndarray, hstack, zeros_like, complex128, eye, pi, ones, exp, diag, arange
+from numpy.random import choice, rand, shuffle
 from typing import List
 from scipy.special import binom
 from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_inputs
@@ -180,10 +180,16 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         )]
         return hstack([not_approximated_part, approximated_part])
 
+    # Symmetrization fix
+    def _permuted_interferometer_matrix(self) -> ndarray:
+        permutation = arange(self._permanent_calculator.matrix.shape[0])  # We work with unitary matrices.
+        shuffle(permutation)
+        return self._permanent_calculator.matrix[:, permutation]
+
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         # TODO TR: THIS WILL BE REWRITTEN AFTER MERGING WITH BRUTE-FORCE BRANCH
         random_phases_matrix = self._get_random_phases_matrix()
-        return self._permanent_calculator.matrix @ random_phases_matrix @ self._qft_matrix
+        return self._permuted_interferometer_matrix() @ random_phases_matrix @ self._qft_matrix
 
     def _get_qft_matrix(self):
         modes_number = self._permanent_calculator.matrix.shape[0]
