@@ -7,7 +7,6 @@ from src.boson_sampling_utilities.permanent_calculators.classic_permanent_calcul
 from src.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import *
 from src.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import *
 from src.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import *
-from src.boson_sampling_utilities.permanent_calculators.cliffords_permanent_calculator import *
 from src.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator_v2 import *
 from src.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator_v2 import *
 
