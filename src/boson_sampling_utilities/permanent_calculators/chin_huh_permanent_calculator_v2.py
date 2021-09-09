@@ -1,5 +1,8 @@
 __author__ = "Tomasz Rybotycki"
 
+import numpy
+import numpy as np
+
 """
     This file holds the implementation of Chin and Huhs method of permanent calculation, as presented in [2].
 """
@@ -10,6 +13,8 @@ from numpy import complex128, ndarray, nonzero, ones, zeros, allclose, isinf, po
 from scipy.special import binom
 from functools import reduce
 import operator
+
+from collections import defaultdict
 
 from ..permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
 
@@ -54,13 +59,13 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
         for i in considered_columns_indices:
             sums[i] = 0
             for j in range(len(self._input_state)):
-                sums[i] += self._input_state[j] * self._matrix[j][i]
+                sums[i] += self._input_state[j] * self._matrix[i][j]
 
         permanent += multiplier * binomials_product * \
                          reduce(operator.mul, [pow(sums[i], self._output_state[i]) for i in considered_columns_indices], 1)
 
         # Rest of the steps.
-        while (v_vector[-1] <= position_limits[-1]):
+        while v_vector[-1] <= position_limits[-1]:
 
             # UPDATE R VECTOR
             index_to_update = 0  # i
@@ -91,7 +96,7 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
             # Sums update
             for i in sums:
                 sums[i] -= 2 * (v_vector[index_to_update] - last_value_at_index) * \
-                           self.matrix[index_to_update][i]
+                           self.matrix[i][index_to_update]
 
             # Binoms update
             if v_vector[index_to_update] > last_value_at_index:
@@ -102,8 +107,10 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
                         self._input_state[index_to_update] - v_vector[
                     index_to_update])
 
-            permanent += multiplier * binomials_product * \
+            addend = multiplier * binomials_product * \
                          reduce(operator.mul, [pow(sums[j], self._output_state[j]) for j in considered_columns_indices], 1)
+
+            permanent += addend
 
         for _ in range(sum(self._input_state)):
             permanent /= 2
@@ -118,17 +125,3 @@ class ChinHuhPermanentCalculator_v2(BSPermanentCalculatorBase):
         """
         return self._matrix.shape[0] == self._matrix.shape[1] and len(self._output_state) == len(self._input_state) \
                and len(self._output_state) == self._matrix.shape[0]
-
-    def sums_check(self, v):
-        sums = dict()
-
-        for i in range(len(self._output_state)):
-
-            if self._output_state[i] == 0:
-                continue
-
-            sums[i] = 0
-            for j in range(len(self._input_state)):
-                sums[i] += (self._input_state[j] - 2 * v[j]) * self._matrix[j][i]
-
-        return sums
