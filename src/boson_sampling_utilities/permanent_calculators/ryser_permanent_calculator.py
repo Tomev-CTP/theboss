@@ -1,8 +1,9 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This file holds the implementation of Ryser method of permanent calculation, as presented in [Cliffords2020]. I've
-    modified it slightly, so that the permanent can be used for computing permanents for bunched and not-continuous
+    This file holds the implementation of Ryser method of permanent calculation, as
+    presented in [Cliffords2020]. I've modified it slightly, so that the permanent can
+    be used for computing permanents for bunched and not-continuous 
     (like [1, 1, 0, 1, 0]) inputs.
 """
 
@@ -17,9 +18,10 @@ from ..permanent_calculators.bs_permanent_calculator_base import \
 
 class RyserPermanentCalculator(BSPermanentCalculatorBase):
     """
-        This class is designed to calculate permanent of effective scattering matrix of a boson sampling instance.
-        Note, that it can be used to calculate permanent of given matrix. All that is required that input and output
-        states are correct representations of Fock states with proper dimensions.
+        This class is designed to calculate permanent of effective scattering matrix of
+        a boson sampling instance. Note, that it can be used to calculate permanent of
+        a given matrix. All that is required that input and output states are correct
+        representations of Fock states with proper dimensions.
     """
 
     def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
@@ -28,10 +30,12 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
 
     def compute_permanent(self) -> complex128:
         """
-            This is the main method of the calculator. Assuming that input state, output state and the matrix are
-            defined correctly (that is we've got m x m matrix, and vectors of with length m) this calculates the
-            permanent of an effective scattering matrix related to probability of obtaining output state from given
-            input state.
+            This is the main method of the calculator. Assuming that input state,
+            output state and the matrix are defined correctly (that is we've got m x m
+            matrix, and vectors of with length m) this calculates the permanent of an
+            effective scattering matrix related to probability of obtaining output state
+            from given input state.
+
             :return: Permanent of effective scattering matrix.
         """
         if not self._can_calculation_be_performed():
@@ -45,22 +49,14 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         permanent *= pow(-1, sum(self._input_state))
         return permanent
 
-    def _can_calculation_be_performed(self) -> bool:
+    def _calculate_r_vectors(self,
+                             input_vector: Optional[ndarray] = None) -> List[ndarray]:
         """
-            Checks if calculation can be performed. For this to happen sizes of given matrix and states have
-            to match.
-            :return: Information if the calculation can be performed.
-        """
-        return self._matrix.shape[0] == self._matrix.shape[1] and len(
-            self._output_state) == len(self._input_state) \
-               and len(self._output_state) == self._matrix.shape[0]
+            This method is used to calculate all the r vectors that appear in the
+            Ryser's formula during permanent calculation. By r vectors I denote vectors
+            in form [r_1, r_2, ..., r_m]. This method basically takes care of the sum of
+            sum ... of sum at the beginning of the formula.
 
-    def _calculate_r_vectors(self, input_vector: Optional[ndarray] = None) -> List[
-        ndarray]:
-        """
-            This method is used to calculate all the r vectors that appear in the Ryser's formula during permanent
-            calculation. By r vectors I denote vectors in form [r_1, r_2, ..., r_m]. This method basically takes care
-            of the sum of sum ... of sum at the beginning of the formula.
             :return: List of r vectors.
         """
         if input_vector is None:
