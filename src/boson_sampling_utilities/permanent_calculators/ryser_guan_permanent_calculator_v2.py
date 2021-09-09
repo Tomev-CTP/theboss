@@ -50,10 +50,16 @@ class RyserGuanPermanentCalculator_v2(BSPermanentCalculatorBase):
         multiplier = 1
         binomials_product = 1
 
-        for j in considered_columns_indices:
-            sums[j] = 0
+        # Initialization (0-th step).
+        for i in considered_columns_indices:
+            sums[i] = 0
+            for j in range(len(self._input_state)):
+                sums[i] += self._input_state[j] * self._matrix[i][j]
 
-        while (r_vector[-1] <= position_limits[-1]):
+        permanent += multiplier * binomials_product * \
+                     reduce(operator.mul, [pow(sums[i], self._input_state[i]) for i in considered_columns_indices], 1)
+
+        while r_vector[-1] <= position_limits[-1]:
 
             # UPDATE R VECTOR
             index_to_update = 0  # i

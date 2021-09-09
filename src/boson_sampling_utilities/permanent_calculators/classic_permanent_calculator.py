@@ -20,6 +20,13 @@ class ClassicPermanentCalculator(BSPermanentCalculatorBase):
         super().__init__(matrix, input_state, output_state)
 
     def compute_permanent(self) -> complex128:
+
+        if sum(self.input_state) == 0:
+            if sum(self.output_state) == 0:
+                return complex128(1 + 0j)
+            else:
+                return complex128(0)
+
         scattering_matrix_calculator = \
             EffectiveScatteringMatrixCalculator(self._matrix, self._input_state, self._output_state)
         scattering_matrix = scattering_matrix_calculator.calculate()
