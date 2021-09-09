@@ -14,7 +14,8 @@ from typing import List
 
 from numpy import allclose, array
 
-from src_tests import (ChinHuhPermanentCalculator_v2, ClassicPermanentCalculator,
+from src_tests import (ClassicPermanentCalculator,
+                       ChinHuhPermanentCalculator_v2,
                        ParallelChinHuhPermanentCalculator,
                        RyserPermanentCalculator,
                        RyserGuanPermanentCalculator_v2)
@@ -25,21 +26,26 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
     def setUp(self) -> None:
         self._matrix = generate_haar_random_unitary_matrix(4)
-        self._cl_permanent_calculator = ClassicPermanentCalculator(matrix=self._matrix,
-                                                                   input_state=array(
-                                                                       []),
-                                                                   output_state=array(
-                                                                       []))
-        self._ch_v2_permanent_calculator = ChinHuhPermanentCalculator_v2(self._matrix,
-                                                                         array([]),
-                                                                         array([]))
+
+        self._cl_permanent_calculator = ClassicPermanentCalculator(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
+        self._ch_v2_permanent_calculator = ChinHuhPermanentCalculator_v2(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
         self._pch_permanent_calculator = ParallelChinHuhPermanentCalculator(
-            self._matrix, array([]), array([]))
-        self._r_permanent_calculator = RyserPermanentCalculator(self._matrix, array([]),
-                                                                array([]))
-        self._rg_v2_permanent_calculator = RyserGuanPermanentCalculator_v2(self._matrix,
-                                                                           array([]),
-                                                                           array([]))
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
+        self._r_permanent_calculator = RyserPermanentCalculator(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
+        self._rg_v2_permanent_calculator = RyserGuanPermanentCalculator_v2(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
 
     def _set_input_and_output_states(self, input_state: List[int],
                                      output_state: List[int]) -> None:
@@ -106,9 +112,12 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self._set_input_and_output_states([0, 0, 0, 0], [0, 0, 0, 0])
         self._do_all_assertions()
 
-    # Given that the only difference between Chin-Huh and Parallel Chin-Huh is the parallelization in the main
-    # method, the only thing I believe I need to check is if it works. Results are expected to be the same in
-    # every case.
+    """
+        TR: Given that the only difference between Chin-Huh and Parallel Chin-Huh is the parallelization in the main
+            method, the only thing I believe I need to check is if it works. Results are expected to be the same in
+            every case. 
+    """
+
     def test_parallel_binned_input_binned_output_case(self) -> None:
         self._set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
