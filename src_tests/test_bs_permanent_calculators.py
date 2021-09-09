@@ -15,10 +15,10 @@ from typing import List
 from numpy import allclose, array
 
 from src_tests import (ClassicPermanentCalculator,
-                       ChinHuhPermanentCalculator_v2,
+                       ChinHuhPermanentCalculator,
                        ParallelChinHuhPermanentCalculator,
                        RyserPermanentCalculator,
-                       RyserGuanPermanentCalculator_v2)
+                       RyserGuanPermanentCalculator)
 from src_tests import generate_haar_random_unitary_matrix
 
 
@@ -31,7 +31,7 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
-        self._ch_v2_permanent_calculator = ChinHuhPermanentCalculator_v2(
+        self._ch_v2_permanent_calculator = ChinHuhPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
@@ -43,7 +43,7 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
-        self._rg_v2_permanent_calculator = RyserGuanPermanentCalculator_v2(
+        self._rg_v2_permanent_calculator = RyserGuanPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
