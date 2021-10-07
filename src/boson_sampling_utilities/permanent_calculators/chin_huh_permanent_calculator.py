@@ -13,7 +13,7 @@ from typing import Optional
 
 from numpy import complex128, ndarray, nonzero, ones, zeros
 
-from ..permanent_calculators.bs_permanent_calculator_base import BSPermanentCalculatorBase
+from .bs_permanent_calculator_base import BSPermanentCalculatorBase
 
 
 class ChinHuhPermanentCalculator(BSPermanentCalculatorBase):
