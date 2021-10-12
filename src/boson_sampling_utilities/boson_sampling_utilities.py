@@ -357,6 +357,10 @@ class EffectiveScatteringMatrixCalculator:
         self.__output_state = asarray(output_state, dtype=int64)
 
     def calculate(self) -> ndarray:
+
+        if sum(self.input_state) == 0 or sum(self.output_state) == 0:
+            return []
+
         transposed_input_matrix = transpose(self.__matrix)
         helper_mtx = []
 
