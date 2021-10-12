@@ -36,9 +36,12 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
         self.matrix = EffectiveScatteringMatrixCalculator(self.matrix, self.input_state,
                                                           self.output_state).calculate()
 
+        if len(self.matrix) == 0:
+            return complex128(1)
+
         # Initialize the variables.
         delta = ones(len(self.matrix), dtype=int)
-        multiplier = -1 if (len(self.matrix) - 1) % 2 == 1 else 1
+        multiplier = 1
         sums = []
 
         for j in range(len(self.matrix)):
