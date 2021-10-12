@@ -58,4 +58,4 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface):
         """
         return self._matrix.shape[0] == self._matrix.shape[1] \
             and len(self._output_state) == len(self._input_state) \
-            and len(self._output_state) == self._matrix.shape[0]
+            and len(self._output_state) <= self._matrix.shape[0]

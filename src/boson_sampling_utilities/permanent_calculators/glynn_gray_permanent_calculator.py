@@ -3,15 +3,18 @@ __author__ = "Tomasz Rybotycki"
 """
     This files contains the implementation of Glynn's formula for permanent calculation,
     that uses Gray codes to during the iterations. This method has the same complexity
-    as the Ryser formula, but has been proven to be numerically more stable (due to
-    physical limitations).
+    as the Ryser formula (O(n2^n), but has been proven to be numerically more stable
+    (due to physical limitations of the machines).
 """
 
+from math import prod
 from typing import Optional
 
-from numpy import ndarray, complex128
+from numpy import ndarray, complex128, ones
 
 from .bs_permanent_calculator_base import BSPermanentCalculatorBase
+from ..boson_sampling_utilities import EffectiveScatteringMatrixCalculator
+from ...GuanCodes.src.GrayCode import get_gray_code_update_indices
 
 
 class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
@@ -25,11 +28,40 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
             This is the method for computing the permanent. It will work as described
             in [0], meaning implement formula (1) and iterate over deltas in Gray code.
         """
-        permanent = complex128(0)
 
+        if not self._can_calculation_be_performed():
+            raise AttributeError
 
+        # Prepare the matrix.
+        self.matrix = EffectiveScatteringMatrixCalculator(self.matrix, self.input_state,
+                                                          self.output_state).calculate()
 
-        return permanent
+        if len(self.matrix) == 0:
+            return complex128(1)
 
-    def _generate_list_of_indices_to_update(self):
-        pass
+        # Initialize the variables.
+        delta = ones(len(self.matrix), dtype=int)
+        multiplier = 1
+        sums = []
+
+        for j in range(len(self.matrix)):
+            sums.append(complex128(0))
+            for i in range(len(delta)):
+                sums[-1] += delta[i] * self.matrix[i][j]
+
+        permanent = multiplier * prod(sums)
+
+        update_indices = get_gray_code_update_indices(len(self.matrix) - 1)
+
+        # Begin the iteration.
+        for i in update_indices:
+            multiplier = -multiplier
+            delta[i] = -delta[i]
+
+            # Sums update
+            for j in range(len(sums)):
+                sums[j] += 2 * delta[i] * self.matrix[i][j]
+
+            permanent += multiplier * prod(sums)
+
+        return permanent / 2 ** (len(self.matrix) - 1)
