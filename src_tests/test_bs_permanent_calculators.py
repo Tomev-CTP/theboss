@@ -18,7 +18,8 @@ from src_tests import (ClassicPermanentCalculator,
                        ChinHuhPermanentCalculator,
                        ParallelChinHuhPermanentCalculator,
                        RyserPermanentCalculator,
-                       RyserGuanPermanentCalculator)
+                       RyserGuanPermanentCalculator,
+                       GlynnGrayPermanentCalculator)
 from src_tests import generate_haar_random_unitary_matrix
 
 
@@ -31,10 +32,6 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
-        self._ch_v2_permanent_calculator = ChinHuhPermanentCalculator(
-            matrix=self._matrix, input_state=array([]), output_state=array([])
-        )
-
         self._pch_permanent_calculator = ParallelChinHuhPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
@@ -43,7 +40,15 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
-        self._rg_v2_permanent_calculator = RyserGuanPermanentCalculator(
+        self._rg_permanent_calculator = RyserGuanPermanentCalculator(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
+        self._ch_permanent_calculator = ChinHuhPermanentCalculator(
+            matrix=self._matrix, input_state=array([]), output_state=array([])
+        )
+
+        self._gg_permanent_calculator = GlynnGrayPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
@@ -52,29 +57,38 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self._cl_permanent_calculator.input_state = input_state
         self._cl_permanent_calculator.output_state = output_state
 
-        self._ch_v2_permanent_calculator.input_state = input_state
-        self._ch_v2_permanent_calculator.output_state = output_state
-
         self._pch_permanent_calculator.input_state = input_state
         self._pch_permanent_calculator.output_state = output_state
 
         self._r_permanent_calculator.input_state = input_state
         self._r_permanent_calculator.output_state = output_state
 
-        self._rg_v2_permanent_calculator.input_state = input_state
-        self._rg_v2_permanent_calculator.output_state = output_state
+        self._rg_permanent_calculator.input_state = input_state
+        self._rg_permanent_calculator.output_state = output_state
+
+        self._ch_permanent_calculator.input_state = input_state
+        self._ch_permanent_calculator.output_state = output_state
+
+        self._r_permanent_calculator.input_state = input_state
+        self._r_permanent_calculator.output_state = output_state
+
+        self._gg_permanent_calculator.input_state = input_state
+        self._gg_permanent_calculator.output_state = output_state
 
     def _do_all_assertions(self) -> None:
         cl_permanent = self._cl_permanent_calculator.compute_permanent()
 
-        self.assertTrue(allclose(cl_permanent,
-                                 self._ch_v2_permanent_calculator.compute_permanent()))
+        self.assertTrue(
+            allclose(cl_permanent, self._gg_permanent_calculator.compute_permanent()))
 
         self.assertTrue(
             allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
 
-        self.assertTrue(allclose(cl_permanent,
-                                 self._rg_v2_permanent_calculator.compute_permanent()))
+        self.assertTrue(
+            allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
+
+        self.assertTrue(
+            allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
 
     def test_full_input_output_case(self) -> None:
         self._set_input_and_output_states([1, 1, 1, 1], [1, 1, 1, 1])
@@ -112,13 +126,13 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self._set_input_and_output_states([0, 0, 0, 0], [0, 0, 0, 0])
         self._do_all_assertions()
 
-    """
-        TR: Given that the only difference between Chin-Huh and Parallel Chin-Huh is the parallelization in the main
-            method, the only thing I believe I need to check is if it works. Results are expected to be the same in
-            every case. 
-    """
-
     def test_parallel_binned_input_binned_output_case(self) -> None:
+        """
+            TR: Given that the only difference between Chin-Huh and Parallel Chin-Huh is
+                the parallelization in the main method, the only thing I believe I need
+                to check is if it works. Results are expected to be the same in every
+                case.
+        """
         self._set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
                                  self._pch_permanent_calculator.compute_permanent()))
