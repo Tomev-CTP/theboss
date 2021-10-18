@@ -12,8 +12,9 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List
 
-from numpy import array, ndarray, int64, zeros_like
+from numpy import array, ndarray, int64, zeros_like, ones
 from numpy.random import choice, randint
+from math import prod
 
 from .generalized_cliffords_simulation_strategy import \
     GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
@@ -75,6 +76,10 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
     def _get_permanents_of_submatrices(self):
         permanents = []
 
+        # In k-th step:
+        # sum(self.r_sample) = k - 1
+        # sum(self._working_input_state) = k
+
         forward_products = []
         backward_products = []
 
@@ -83,26 +88,80 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             input_state=self._working_input_state,
             output_state=self.r_sample).calculate()
 
-        update_indices = get_gray_code_update_indices(sum(self._working_input_state))
+        update_indices = get_gray_code_update_indices(sum(self.r_sample))
 
+        multiplier = 1
+        delta = ones(sum(self._working_input_state), dtype=int)
+        sums = []
 
+        # Initialize sums
+        for j in range(len(matrix)):
+            sums.append(0)
+            for i in range(len(delta)):
+                sums[-1] += matrix[i][j]  # Deltas are all ones
+
+        # Initialize backward and forward products and the permanents
+        # NOTE: Make it a separate method?
+        for l in range(len(sums)):
+            if l == 0:  # Initialization
+                forward_products.append(1)
+                backward_products.append(prod(sums) / sums[l])
+            else:
+                forward_products.append(forward_products[-1] * sums[l])
+                backward_products.append(backward_products[-1] / sums[l])
+
+            permanents.append(backward_products[-1] * forward_products[-1])
+
+        # Start Gray Code iterations
+        for i in update_indices:
+            delta[i] = - delta[i]
+            multiplier = -multiplier
+
+            # Update sums
+            for j in range(len(sums)):
+                sums[j] += 2 * delta[i] * matrix[i][j]
+
+            # Update products and the permanents
+            backward_products.clear()
+            forward_products.clear()
+
+            for l in range(len(sums)):
+                if l == 0:  # Initialization
+                    forward_products.append(1)
+                    backward_products.append(prod(sums) / sums[l])
+                else:
+                    forward_products.append(forward_products[-1] * sums[l])
+                    backward_products.append(backward_products[-1] / sums[l])
+
+                permanents[l] += multiplier * delta[i] * (backward_products[-1] * forward_products[-1])
+
+        for i in range(len(permanents)):
+            permanents[i] /= 2**sum(self.r_sample)
+
+        # return permanents
+
+        permanents_2 = []
 
         self._bs_permanent_calculator.output_state = self.r_sample
 
         for i in range(len(self._current_input)):
 
             if self._current_input[i] == 0:
-                permanents.append(0)
+                permanents_2.append(0)
                 continue
 
             self._current_input[i] -= 1
 
             self._bs_permanent_calculator.input_state = self._current_input
-            permanents.append(self._bs_permanent_calculator.compute_permanent())
+            permanents_2.append(self._bs_permanent_calculator.compute_permanent())
 
             self._current_input[i] += 1
 
+        for p in range(len(permanents)):
+            print(f"fast: {permanents[p]} vs standard: {permanents_2[p]}")
+
         return permanents
+        return permanents_2
 
     def _fill_r_sample(self) -> None:
         self.r_sample = [0 for _ in self.input_state]
