@@ -10,11 +10,17 @@ __author__ = "Tomasz Rybotycki"
             from an easier distribution and obtain the same results.
 """
 
-from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
-from numpy import array, ndarray, int64, zeros_like
 from typing import List
+
+from numpy import array, ndarray, int64, zeros_like, ones
 from numpy.random import choice, randint
-from ..boson_sampling_utilities.boson_sampling_utilities import modes_state_to_particle_state
+from math import prod
+
+from .generalized_cliffords_simulation_strategy import \
+    GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
+from ..boson_sampling_utilities.boson_sampling_utilities import \
+    modes_state_to_particle_state, EffectiveScatteringMatrixCalculator
+from ..GuanCodes.src.GrayCode import get_gray_code_update_indices
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
@@ -23,7 +29,6 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         super().__init__(bs_permanent_calculator)
         self._current_input = []
         self._working_input_state = None
-
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
@@ -63,11 +68,10 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
                 permanent_added *= self._bs_permanent_calculator.matrix[m][i]
                 permanent += permanent_added
 
-            self.pmf.append(abs(permanent)**2)
+            self.pmf.append(abs(permanent) ** 2)
 
         total = sum(self.pmf)
         self.pmf = [val / total for val in self.pmf]
-
 
     def _get_permanents_of_submatrices(self):
         permanents = []
@@ -98,7 +102,8 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._sample_from_pmf()
 
     def _update_current_input(self):
-        self._current_input[self._working_input_state.pop(randint(0, len(self._working_input_state)))] += 1
+        self._current_input[self._working_input_state.pop(
+            randint(0, len(self._working_input_state)))] += 1
 
     def _sample_from_pmf(self) -> None:
         m = choice(range(len(self.input_state)), p=self.pmf)
