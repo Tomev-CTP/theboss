@@ -29,9 +29,6 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
             in [0], meaning implement formula (1) and iterate over deltas in Gray code.
         """
 
-        if not self._can_calculation_be_performed():
-            raise AttributeError
-
         # Prepare the matrix.
         self.matrix = EffectiveScatteringMatrixCalculator(self.matrix, self.input_state,
                                                           self.output_state).calculate()
