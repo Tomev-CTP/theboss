@@ -47,7 +47,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
 
         # Add -1 to R indexation of modes (they start from 1).
         python_result = array([mode_value - 1 for mode_value in result], dtype=int64)
-        samples_in_particle_states = array_split(python_result, number_of_bosons)
+        samples_in_particle_states = array_split(python_result, samples_number)
 
         samples = [particle_state_to_modes_state(sample, len(self.interferometer_matrix))
                    for sample in samples_in_particle_states]
