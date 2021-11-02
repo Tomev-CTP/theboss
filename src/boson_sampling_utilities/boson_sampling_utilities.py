@@ -161,7 +161,7 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int,
     """
     states_number = 0
     for N in range(n + 1):
-        states_number += binom(N + m - 1, N)
+        states_number += round(binom(N + m - 1, N))
     return states_number
 
 
