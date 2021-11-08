@@ -22,10 +22,8 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
 
         required_packages = ('BosonSampling', 'Rcpp', 'RcppArmadillo')
 
-        # Check if required R packages are installed. And note if not.
-        if all(packages.isinstalled(package) for package in required_packages):
-            print('All R packages are installed!')
-        else:
+        # Check if required R packages are installed. Inform if not.
+        if not all(packages.isinstalled(package) for package in required_packages):
             print('Some packages are missing! Missing packages:')
             for package in required_packages:
                 if not packages.isinstalled(package):
@@ -38,18 +36,38 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         self.interferometer_matrix = interferometer_matrix
 
     def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+        """
+            Simulate BS experiment for given input.
+
+            Note:   The results of Clifford & Clifford method are given in the first
+                    quantization description (mode assignment)!
+
+            :param initial_state:   Input state in the modes occupation description.
+            :param samples_number:  Number of samples to sample.
+
+            :return:    List of samples in the first quantization description (mode
+                        assignment)
+        """
         number_of_bosons = int(sum(initial_state))
 
         boson_sampler_input_matrix = numpy_array_to_r_matrix(self.interferometer_matrix[:, arange(number_of_bosons)])
 
         result, permanent, probability_mass_function = \
-            self.cliffords_r_sampler(boson_sampler_input_matrix, sampleSize=samples_number, perm=False)
+            self.cliffords_r_sampler(boson_sampler_input_matrix,
+                                     sampleSize=samples_number,
+                                     perm=False)
 
         # Add -1 to R indexation of modes (they start from 1).
         python_result = array([mode_value - 1 for mode_value in result], dtype=int64)
         samples_in_particle_states = array_split(python_result, samples_number)
 
+        # There are some problems with the actual and theoretical runtimes. The reason
+        # for that could be parsing the result to a second quantization description.
+        return samples_in_particle_states
+
+        """
         samples = [particle_state_to_modes_state(sample, len(self.interferometer_matrix))
                    for sample in samples_in_particle_states]
 
         return samples
+        """
