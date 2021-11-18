@@ -1,12 +1,18 @@
 __author__ = "Tomasz Rybotycki"
 
-# TR TODO: Consider making this file a package along with exact distribution calculator.
+"""
+    This script contains various auxiliary methods useful for boson sampling
+    experiments.
+    
+    TODO TR:  Consider making this file a package along with exact distribution
+              calculator. 
+"""
 
 import itertools
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple, Set
 
-from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, power, \
-    sqrt, transpose, zeros, zeros_like, square, flip, pi, ones, exp
+from numpy import array, asarray, block, complex128, diag, eye, int64, ndarray, \
+    power, sqrt, transpose, zeros, zeros_like, square, flip, pi, ones, exp
 from numpy.linalg import svd
 from scipy.special import binom, factorial
 from numpy.random import rand
@@ -30,7 +36,6 @@ def modes_state_to_particle_state(mode_state: ndarray) -> ndarray:
         Return given mode-basis state in particle basis.
 
         :param mode_state: Input state in mode-basis.
-        :param particles_number: Number of particles.
         :return: Given mode-basis state in particle basis.
     """
 
@@ -98,8 +103,9 @@ def generate_possible_n_particle_outputs(number_of_particles: int,
     return [array(output) for output in sorted_outputs]
 
 
-def generate_lossy_inputs(initial_state: ndarray, number_of_particles_left: int) -> \
-List[ndarray]:
+def generate_lossy_inputs(initial_state: ndarray,
+                          number_of_particles_left: int) -> \
+        List[ndarray]:
     """
         From initial state generate all possible input states after losses application.
         :param initial_state: The state we start with.
@@ -119,13 +125,15 @@ List[ndarray]:
         return [initial_state]
 
     # Symmetrization.
-    for combination in itertools.combinations(list(range(initial_number_of_particles)),
-                                              number_of_particles_left):
+    for combination in itertools.combinations(
+            list(range(initial_number_of_particles)),
+            number_of_particles_left):
         lossy_input_in_particle_basis = array([x0[el] for el in combination],
                                               dtype=int64)
 
-        lossy_input = particle_state_to_modes_state(lossy_input_in_particle_basis,
-                                                    number_of_modes)
+        lossy_input = particle_state_to_modes_state(
+            lossy_input_in_particle_basis,
+            number_of_modes)
 
         # Check if calculated lossy input is already in the list. If not, add it.
         lossy_input_hash = hash(tuple(lossy_input))
@@ -136,7 +144,8 @@ List[ndarray]:
     return lossy_inputs_list
 
 
-def calculate_number_of_possible_n_particle_m_mode_output_states(n: int, m: int) -> int:
+def calculate_number_of_possible_n_particle_m_mode_output_states(n: int,
+                                                                 m: int) -> int:
     """
         Calculates the number of possible output states with n particles placed around m modes.
 
@@ -161,12 +170,13 @@ def calculate_number_of_possible_lossy_n_particle_m_mode_output_states(n: int,
     """
     states_number = 0
     for N in range(n + 1):
-        states_number += binom(N + m - 1, N)
+        states_number += round(binom(N + m - 1, N))
     return states_number
 
 
-def get_modes_transmissivity_values_from_matrix(lossy_interferometer_matrix: ndarray) -> \
-List[float]:
+def get_modes_transmissivity_values_from_matrix(
+        lossy_interferometer_matrix: ndarray) -> \
+        List[float]:
     v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
     return square(flip(singular_values))
 
@@ -235,12 +245,13 @@ def compute_state_types(modes_number: int, particles_number: int,
 
 def compute_number_of_state_types(modes_number: int,
                                   particles_number: int,
-                                  losses = False) -> int:
+                                  losses=False) -> int:
     state_types_number = 0
 
     for k in range(1, modes_number + 1):
         state_types_number += \
-            compute_number_of_k_element_integer_n_partitions(k, particles_number)
+            compute_number_of_k_element_integer_n_partitions(k,
+                                                             particles_number)
 
     if not losses:
         return state_types_number
@@ -248,12 +259,13 @@ def compute_number_of_state_types(modes_number: int,
     for particles_num in range(particles_number):
         for k in range(1, modes_number + 1):
             state_types_number += \
-                compute_number_of_k_element_integer_n_partitions(k, particles_num)
+                compute_number_of_k_element_integer_n_partitions(k,
+                                                                 particles_num)
 
     return state_types_number
 
-def compute_number_of_k_element_integer_n_partitions(k: int, n: int) -> int:
 
+def compute_number_of_k_element_integer_n_partitions(k: int, n: int) -> int:
     if k == 1:
         return 1
 
@@ -268,18 +280,21 @@ def compute_number_of_k_element_integer_n_partitions(k: int, n: int) -> int:
     return integer_partitions_number
 
 
-def compute_maximally_unbalanced_types(modes_number: int, particles_number: int) -> \
-List[List[int]]:
+def compute_maximally_unbalanced_types(modes_number: int,
+                                       particles_number: int) -> \
+        List[List[int]]:
     maximally_unbalanced_types = []
     all_types = compute_state_types(particles_number=particles_number,
                                     modes_number=modes_number)
 
     for state_type in all_types:
-        if state_type.count(1) == len(state_type) - 1 or state_type.count(1) == len(
-                state_type):
+        if state_type.count(1) == len(state_type) - 1 or state_type.count(
+                1) == len(
+            state_type):
             maximally_unbalanced_types.append(state_type)
 
     return maximally_unbalanced_types
+
 
 def compute_number_of_states_of_given_type(state_type: Sequence[int]) -> int:
     modes_number = len(state_type)
@@ -303,18 +318,45 @@ def compute_number_of_states_of_given_type(state_type: Sequence[int]) -> int:
     return number_of_states_of_given_type
 
 
-def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndarray:
+def compute_state_of_given_type(state_type: Sequence[int]) \
+        -> List[Tuple[int]]:
+
+    if len(state_type) == 0:
+        return [tuple()]
+
+    states_of_type: Set[Tuple[int, ...]] = set()
+
+    working_state: List[int] = list(state_type)
+    modes_number: int = len(state_type)
+
+    for _ in range(modes_number):
+        val: int = working_state.pop(0)
+        substates: List[Tuple[int]] = compute_state_of_given_type(working_state)
+
+        for substate in substates:
+            states_of_type.add((val, ) + substate)
+
+        working_state.append(val)
+
+    return list(states_of_type)
+
+
+def generate_qft_matrix_for_first_m_modes(m: int,
+                                          all_modes_number: int) -> ndarray:
     small_qft_matrix = compute_qft_matrix(m)
     qft_matrix = eye(all_modes_number, dtype=complex128)
     qft_matrix[0:m, 0:m] = small_qft_matrix
     return qft_matrix
 
 
-def generate_random_phases_matrix_for_first_m_modes(m: int, all_modes_number: int) \
+def generate_random_phases_matrix_for_first_m_modes(m: int,
+                                                    all_modes_number: int) \
         -> ndarray:
-    random_phases = ones(all_modes_number, dtype=complex128)  # [1, 1, 1, 1, 1, 1]
+    random_phases = ones(all_modes_number,
+                         dtype=complex128)  # [1, 1, 1, 1, 1, 1]
     random_phases[0:m] = exp(1j * 2 * pi * rand(m))
     return diag(random_phases)
+
 
 class EffectiveScatteringMatrixCalculator:
     """
@@ -373,7 +415,8 @@ class EffectiveScatteringMatrixCalculator:
         effective_scattering_matrix = []
 
         for index_of_row_to_insert in range(len(self.__output_state)):
-            effective_scattering_matrix += [helper_mtx[index_of_row_to_insert]] * \
+            effective_scattering_matrix += [helper_mtx[
+                                                index_of_row_to_insert]] * \
                                            int(self.__output_state[
                                                    index_of_row_to_insert])
 
