@@ -14,13 +14,13 @@ from typing import List
 
 from numpy import allclose, array
 
-from src_tests import (ClassicPermanentCalculator,
-                       ChinHuhPermanentCalculator,
-                       ParallelChinHuhPermanentCalculator,
-                       RyserPermanentCalculator,
-                       RyserGuanPermanentCalculator,
-                       GlynnGrayPermanentCalculator)
-from src_tests import generate_haar_random_unitary_matrix
+from tests import (ClassicPermanentCalculator,
+                   ChinHuhPermanentCalculator,
+                   ParallelChinHuhPermanentCalculator,
+                   RyserPermanentCalculator,
+                   RyserGuanPermanentCalculator,
+                   GlynnGrayPermanentCalculator)
+from tests import generate_haar_random_unitary_matrix
 
 
 class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):

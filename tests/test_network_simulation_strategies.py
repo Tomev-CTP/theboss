@@ -7,7 +7,7 @@ from typing import List, Union
 
 from numpy import asarray, block, eye, ndarray, zeros_like
 
-from src_tests import (
+from tests import (
     BSPermanentCalculatorFactory,
     BosonSamplingSimulator, BosonSamplingExperimentConfiguration,
     BSDistributionCalculatorWithUniformLosses, BSSampleBasedDistributionCalculator,

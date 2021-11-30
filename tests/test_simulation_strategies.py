@@ -16,7 +16,7 @@ from numpy import array, average, ndarray
 from numpy.random import randint
 from scipy.special import binom
 
-from src_tests import (
+from tests import (
     BSDistributionCalculatorInterface,  BSSampleBasedDistributionCalculator, BSDistributionCalculatorWithFixedLosses,
     BSDistributionCalculatorWithUniformLosses,
     BosonSamplingExperimentConfiguration,

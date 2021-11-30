@@ -4,8 +4,8 @@ import unittest
 
 from numpy import array, complex128, int64, allclose
 
-from src_tests import (BSPermanentCalculatorFactory, PermanentCalculatorType, BosonSamplingExperimentConfiguration,
-                       BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses)
+from tests import (BSPermanentCalculatorFactory, PermanentCalculatorType, BosonSamplingExperimentConfiguration,
+                   BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses)
 
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
