@@ -2,3 +2,6 @@
 	path = src/GuanCodes
 	url = git@github.com:Tomev-CTP/GuanCodes.git
 
+[submodule "BoSS/GuanCodes"]
+	path = BoSS/GuanCodes
+	url = git@github.com:Tomev-CTP/GuanCodes.git
