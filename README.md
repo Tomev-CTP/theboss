@@ -51,10 +51,11 @@ See the [LICENSE.md](LICENSE.md) file for details.
 ## Acknowledgments
 
   - [CTP PAS](http://www.cft.edu.pl/new/public/pl),
-  - Daniel Brod and Michał Oszmaniec,
+  - [Michał Oszmaniec](https://www.cft.edu.pl/pracownik/moszmaniec),
   - [Poór Boldizsár](https://github.com/boldar99) - major code review,
   - [Kolarovszki Zoltán](https://github.com/Kolarovszki) - output states _lexicographicalization_, 
   - [sisco0](https://github.com/sisco0) - some minor bugs pointed out.
+  - This research was supported in part by [PL-Grid](https://www.plgrid.pl/) Infrastructure.
   
   
   
