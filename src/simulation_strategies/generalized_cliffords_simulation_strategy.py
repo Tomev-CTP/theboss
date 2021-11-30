@@ -2,8 +2,9 @@ __author__ = "Tomasz Rybotycki"
 
 from collections import defaultdict
 from copy import copy
-from math import factorial, sqrt
+from math import factorial
 from typing import List
+from scipy.special import binom
 
 from numpy import array, delete, float64, insert, int64, ndarray
 from numpy.random import random
@@ -128,10 +129,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
         return array([self._calculate_weights(vector)
                       for vector in corresponding_k_vectors], dtype=float64)
 
-    @staticmethod
-    def binom(n:int , k:int) -> int:
-        return int(factorial(n) / (factorial(k) * factorial((n - k))))
-
     def _calculate_weights(self, k_vector):
         l = sum(k_vector)
         n = sum(self.input_state)
@@ -142,21 +139,6 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
             weight *= self.binom(self.input_state[m], k_vector[m])
 
         return weight
-
-    @staticmethod
-    def _calculate_multinomial_coefficient(vector: ndarray) -> int:
-        """
-            Calculates multinomial coefficient of the vector, as proposed in Oszmaniec, Brod 2018
-            (above formula 39).
-            :param vector: Vector of which multinomial coefficient will be calculated.
-            :return: Multinomial coefficient of given vector.
-        """
-        particles_number = sum(vector)
-        multinomial_coefficient = factorial(particles_number)
-        for value in vector:
-            multinomial_coefficient /= factorial(value)
-
-        return multinomial_coefficient
 
     def _generate_possible_output_states(self) -> List[ndarray]:
         possible_output_states = []
