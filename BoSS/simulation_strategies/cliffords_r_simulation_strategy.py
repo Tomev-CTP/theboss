@@ -1,18 +1,21 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    One should note, that R is required to use this module, as original Clifford's program is written in R. On my
-    Windows 10, I am using anaconda and I had to add R_HOME env variable and R_path\bin, R_path\bin\x64 to the path. 
+    One should note, that R is required to use this module, as original Clifford's
+    program is written in R. On my Windows 10, I am using anaconda and I had to add
+    R_HOME env variable and R_path\bin, R_path\bin\x64 to the path. 
     https://cran.r-project.org/web/packages/BosonSampling/index.html
 """
 
 from typing import List
 
 from numpy import arange, array, array_split, int64, ndarray
+from rpy2 import robjects
 from rpy2.robjects import packages
 
 from .simulation_strategy_interface import SimulationStrategyInterface
-from ..boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
+from ..boson_sampling_utilities.boson_sampling_utilities import \
+    particle_state_to_modes_state
 from ..rpy2_utilities import numpy_array_to_r_matrix
 
 
@@ -35,7 +38,16 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
     def set_matrix(self, interferometer_matrix: ndarray) -> None:
         self.interferometer_matrix = interferometer_matrix
 
-    def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    @staticmethod
+    def _numpy_array_to_r_matrix(numpy_array: ndarray) -> robjects.r.matrix:
+        rows_number, columns_number = numpy_array.shape
+        # Transposition is required as R inserts columns, not rows.
+        r_values = robjects.ComplexVector(
+            [val for val in numpy_array.transpose().reshape(numpy_array.size)])
+        return robjects.r.matrix(r_values, nrow=rows_number, ncol=columns_number)
+
+    def simulate(self, initial_state: ndarray, samples_number: int = 1) -> List[
+        ndarray]:
         """
             Simulate BS experiment for given input.
 
@@ -50,7 +62,8 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         """
         number_of_bosons = int(sum(initial_state))
 
-        boson_sampler_input_matrix = numpy_array_to_r_matrix(self.interferometer_matrix[:, arange(number_of_bosons)])
+        boson_sampler_input_matrix = _numpy_array_to_r_matrix(
+            self.interferometer_matrix[:, arange(number_of_bosons)])
 
         result, permanent, probability_mass_function = \
             self.cliffords_r_sampler(boson_sampler_input_matrix,
@@ -64,10 +77,3 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         # There are some problems with the actual and theoretical runtimes. The reason
         # for that could be parsing the result to a second quantization description.
         return samples_in_particle_states
-
-        """
-        samples = [particle_state_to_modes_state(sample, len(self.interferometer_matrix))
-                   for sample in samples_in_particle_states]
-
-        return samples
-        """
