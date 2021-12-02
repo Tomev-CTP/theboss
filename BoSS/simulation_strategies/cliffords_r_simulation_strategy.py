@@ -14,9 +14,6 @@ from rpy2 import robjects
 from rpy2.robjects import packages
 
 from .simulation_strategy_interface import SimulationStrategyInterface
-from ..boson_sampling_utilities.boson_sampling_utilities import \
-    particle_state_to_modes_state
-from ..rpy2_utilities import numpy_array_to_r_matrix
 
 
 class CliffordsRSimulationStrategy(SimulationStrategyInterface):
@@ -62,7 +59,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         """
         number_of_bosons = int(sum(initial_state))
 
-        boson_sampler_input_matrix = _numpy_array_to_r_matrix(
+        boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
             self.interferometer_matrix[:, arange(number_of_bosons)])
 
         result, permanent, probability_mass_function = \
