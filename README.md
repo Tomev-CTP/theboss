@@ -1,7 +1,7 @@
 # (Bo)son (S)ampling (S)imulator
 
-The project is meant to implement the ideas proposed in references [1] and [2] for classically simulating 
-lossy boson sampling.  
+The project is meant to implement the ideas proposed in references [1] and [2] for
+classically simulating lossy boson sampling.  
 
 ## Summary
 
@@ -14,12 +14,23 @@ lossy boson sampling.
 
 ## Getting Started
 
-So far, to get the project one only needs to download it from this repository (or any other source).
+So far, to get the project one only needs to download it from the
+[repository](https://github.com/Tomev-CTP/BoSS) (or any other source).
+
+It's also possible to download it as a package with
+
+`pip install BoSS`
+
+which will download the package from [pypi](https://pypi.org/project/BoSS/).
 
 ### Prerequisites
 
-To run the scripts there will be needed some version of Python. During development I'm using 3.7, but I believe that
-it will also work just fine with some earlier / newer version (at least for now and I cannot guarantee it).
+To run the scripts there will be needed some version of Python. During the development
+I'm using 3.8, but I believe that it will also work just fine with some earlier or newer
+version (at least for now).
+
+In some places I use `math.prod` and `typing` package, that's why 3.8 version is
+desirable.
 
 ### Code style
 
@@ -31,7 +42,7 @@ U. Alternatively explicit use of matrix is also acceptable.
 
 ## Running the tests
 
-Just run all test in src_tests folder.
+Just run all test in `tests` folder with `pytest`.
 
 ## Versioning
 

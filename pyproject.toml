@@ -5,12 +5,14 @@ build-backend = "flit_core.buildapi"
 [project]
 name            = "BoSS"
 authors         = [ {name = "Tomasz Rybotycki", email = "rybotycki.tomasz@gmail.com"},
-                    {name = "Michal Oszmaniec", email= " "}]
+                    {name = "Michal Oszmaniec", email = "oszmaniec@cft.edu.pl"}]
+mainteiners     = [{name = "Tomasz Rybotycki", email = "rybotycki.tomasz@gmail.com"}]
 readme          = "README.md"
 license         = {file = "LICENSE.md"}
 classifiers     = ["License :: OSI Approved :: Apache Software License"]
 dynamic         = ["version", "description"]
 dependencies    = ["numpy", "scipy"]
+requires-python = ">=3.8"
 
 
 [project.optional-dependencies]
