@@ -136,7 +136,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
         weight = factorial(l) * factorial(n - l) / factorial(n)
 
         for m in range(len(self.input_state)):
-            weight *= self.binom(self.input_state[m], k_vector[m])
+            weight *= binom(self.input_state[m], k_vector[m])
 
         return weight
 

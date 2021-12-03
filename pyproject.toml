@@ -15,7 +15,7 @@ dependencies    = ["numpy", "scipy"]
 
 [project.optional-dependencies]
 r = [
-    "r-bosonsampling",
+    "rpy2",
 ]
 
 [project.urls]

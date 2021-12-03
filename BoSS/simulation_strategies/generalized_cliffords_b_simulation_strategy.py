@@ -12,15 +12,13 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List
 
-from numpy import array, ndarray, int64, zeros_like, ones
+from numpy import array, ndarray, int64, zeros_like
 from numpy.random import choice, randint
-from math import prod
 
 from .generalized_cliffords_simulation_strategy import \
     GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
 from ..boson_sampling_utilities.boson_sampling_utilities import \
-    modes_state_to_particle_state, EffectiveScatteringMatrixCalculator
-from ..GuanCodes.src.GrayCode import get_gray_code_update_indices
+    modes_state_to_particle_state
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
