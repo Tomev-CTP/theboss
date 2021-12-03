@@ -4,7 +4,7 @@ import unittest
 
 from numpy import conjugate, identity, ndarray, transpose, allclose
 
-from ..BoSS.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from ..BoSS_Tomev.quantum_computations_utilities import generate_haar_random_unitary_matrix
 
 
 class TestQuantumComputationsUtilities(unittest.TestCase):

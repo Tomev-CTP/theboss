@@ -4,9 +4,9 @@ import unittest
 
 from numpy import array, complex128, int64, allclose
 
-from ..BoSS.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
     BSPermanentCalculatorFactory, PermanentCalculatorType
-from ..BoSS.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
+from ..BoSS_Tomev.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
     BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses, \
     BosonSamplingExperimentConfiguration
 

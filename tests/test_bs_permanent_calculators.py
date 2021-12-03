@@ -14,19 +14,19 @@ from typing import List
 
 from numpy import allclose, array
 
-from ..BoSS.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import \
     ChinHuhPermanentCalculator
-from ..BoSS.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import \
     ClassicPermanentCalculator
-from ..BoSS.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent_calculator import \
     GlynnGrayPermanentCalculator
-from ..BoSS.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import \
     ParallelChinHuhPermanentCalculator
-from ..BoSS.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import \
     RyserGuanPermanentCalculator
-from ..BoSS.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import \
+from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import \
     RyserPermanentCalculator
-from ..BoSS.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from ..BoSS_Tomev.quantum_computations_utilities import generate_haar_random_unitary_matrix
 
 
 class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
