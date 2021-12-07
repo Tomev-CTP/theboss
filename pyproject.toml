@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name            = "BoSS_Tomev"
+name            = "theboss"
 authors         = [ {name = "Tomasz Rybotycki", email = "rybotycki.tomasz@gmail.com"},
                     {name = "Michal Oszmaniec", email = "oszmaniec@cft.edu.pl"}]
 mainteiners     = [{name = "Tomasz Rybotycki", email = "rybotycki.tomasz@gmail.com"}]

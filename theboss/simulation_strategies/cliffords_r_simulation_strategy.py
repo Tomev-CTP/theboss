@@ -17,7 +17,7 @@ try:
 
     from typing import List
 
-    from BoSS_Tomev.boson_sampling_utilities.boson_sampling_utilities import \
+    from theboss.boson_sampling_utilities.boson_sampling_utilities import \
         particle_state_to_modes_state
 
 

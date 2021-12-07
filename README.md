@@ -19,7 +19,7 @@ So far, to get the project one only needs to download it from the
 
 It's also possible to download it as a package with
 
-`pip install BoSS_Tomev`
+`pip install theboss`
 
 which will download the package from [pypi](https://pypi.org/project/BoSS/).
 

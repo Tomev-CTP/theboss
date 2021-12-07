@@ -7,18 +7,18 @@ from typing import List, Union
 
 from numpy import asarray, block, eye, ndarray, zeros_like
 
-from ..BoSS_Tomev.boson_sampling_simulator import BosonSamplingSimulator
-from ..BoSS_Tomev.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
+from ..theboss.boson_sampling_simulator import BosonSamplingSimulator
+from ..theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
     BSPermanentCalculatorFactory
-from ..BoSS_Tomev.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
+from ..theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
     BSDistributionCalculatorWithUniformLosses, BosonSamplingExperimentConfiguration
-from ..BoSS_Tomev.distribution_calculators.bs_sample_based_distribution_calculator import \
+from ..theboss.distribution_calculators.bs_sample_based_distribution_calculator import \
     BSSampleBasedDistributionCalculator
-from ..BoSS_Tomev.network_simulation_strategy.lossy_network_simulation_strategy import \
+from ..theboss.network_simulation_strategy.lossy_network_simulation_strategy import \
     LossyNetworkSimulationStrategy
-from ..BoSS_Tomev.quantum_computations_utilities import generate_haar_random_unitary_matrix, \
+from ..theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix, \
     count_total_variation_distance, count_tv_distance_error_bound_of_experiment_results
-from ..BoSS_Tomev.simulation_strategies.simulation_strategy_factory import StrategyType, \
+from ..theboss.simulation_strategies.simulation_strategy_factory import StrategyType, \
     SimulationStrategyFactory
 
 
