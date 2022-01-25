@@ -11,9 +11,10 @@ from typing import Optional
 from numpy import ndarray, int64, array, asarray
 
 from ..permanent_calculators.bs_permanent_calculator_interface import BSPermanentCalculatorInterface
+import abc
 
 
-class BSPermanentCalculatorBase(BSPermanentCalculatorInterface):
+class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 
     def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
                  output_state: Optional[ndarray] = None) -> None:
