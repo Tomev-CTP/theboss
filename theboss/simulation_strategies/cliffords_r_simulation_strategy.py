@@ -89,15 +89,11 @@ try:
 
             return samples_in_occupation_description
 
-
-
-
 except ImportError as e:
-    print("You have to install rpy2 package in order to use this strategy.")
-
 
     class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         def __init__(self, interferometer_matrix: ndarray) -> None:
+            print("You have to install rpy2 package in order to use CliffordsRSimulationStrategy.")
             raise NotImplementedError
 
         def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
