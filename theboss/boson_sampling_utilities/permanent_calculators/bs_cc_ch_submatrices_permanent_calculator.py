@@ -166,7 +166,7 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
 
                 if index_to_update == len(v_vector):
 
-                    for _ in range(sum(self.input_state) - 1):
+                    for _ in range(int(sum(self.input_state)) - 1):
                         for i in range(len(permanents)):
                             permanents[i] /= 2
 
@@ -204,7 +204,7 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
                 if v_vector[i] != self.input_state[i]:
                     permanents[i] += addend
 
-        for _ in range(sum(self._input_state) - 1):
+        for _ in range(int(sum(self._input_state)) - 1):
             for i in range(len(permanents)):
                 permanents[i] /= 2
 
