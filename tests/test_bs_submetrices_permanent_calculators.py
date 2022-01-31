@@ -5,9 +5,9 @@ __author__ = "Tomasz Rybotycki"
 """
 
 import unittest
-from ..theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import BSCCCHSubmatricesPermanentCalculator
-from ..theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
-from ..theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import BSCCCHSubmatricesPermanentCalculator
+from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
+from theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix
 from numpy import ones, zeros
 
 
@@ -30,9 +30,9 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
 
         self._permanent_calculator = ChinHuhPermanentCalculator(self._matrix)
 
-    #def test_submatrices_permanent_calculator_for_std_input(self) -> None:
-    #    self._input_state = ones(self._dim, dtype=int)
-    #    self._compute_permanents_and_assert()
+    def test_submatrices_permanent_calculator_for_std_input(self) -> None:
+        self._input_state = ones(self._dim, dtype=int)
+        self._compute_permanents_and_assert()
 
     def test_submatrices_permanent_calculator_for_collision_input(self) -> None:
         self._input_state = zeros(self._dim)
@@ -60,10 +60,6 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
                     self._permanent_calculator.compute_permanent())
 
             self._input_state[i] += 1
-
-        print("\n")
-        print(submatrices_permanents_all)
-        print(submatrices_permanents_single)
 
         for i in range(len(submatrices_permanents_all)):
             self.assertAlmostEqual(abs(submatrices_permanents_all[i]),
