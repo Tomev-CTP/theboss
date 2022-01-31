@@ -121,35 +121,45 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
         iterated in Guan Codes induced order.
     """
 
+    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
+                 output_state: Optional[ndarray] = None) -> None:
+        
+        self.sums: dict = dict()
+        self.permanents: List[complex128] = []
+        self.multiplier: int = 1
+        self.binomials_product: int = 1
+        self.v_vector: ndarray = array(0)
+        
+        super(BSSubmatricesPermanentCalculatorBase, self).__init__(matrix, input_state, output_state)
+
     def compute_permanents(self) -> List[complex128]:
 
         # TODO TR:  This method is huge and complicated. It would be smart to break
         #           it down into smaller ones.
 
-        permanents = [complex128(0) for _ in range(len(self.input_state))]
+        self.permanents = [complex128(0) for _ in range(len(self.input_state))]
 
         # Required for Guan Code iteration
         v_vector = zeros(len(self._input_state), dtype=int)  # g
         code_update_information = ones(len(self._input_state), dtype=int)  # u
         position_limits = list(self._input_state)  # n
 
-        sums = dict()
-
+        self.sums = dict()
         binomials_product = 1
         considered_columns_indices = nonzero(self._output_state)[0]
 
-        multiplier = 1
+        self.multiplier = 1
 
         # Initialization (0-th step).
         for i in considered_columns_indices:
-            sums[i] = 0
+            self.sums[i] = 0
             for j in range(len(self._input_state)):
-                sums[i] += self._input_state[j] * self._matrix[i][j]
+                self.sums[i] += self._input_state[j] * self._matrix[i][j]
 
-        for i in range(len(permanents)):
+        for i in range(len(self.permanents)):
             if v_vector[i] != self.input_state[i]:
-                permanents[i] += multiplier * binomials_product * \
-                             reduce(operator.mul, [pow(sums[i], self._output_state[i])
+                self.permanents[i] += self.multiplier * binomials_product * \
+                             reduce(operator.mul, [pow(self.sums[i], self._output_state[i])
                                                    for i in considered_columns_indices], 1)
 
         # Rest of the steps.
@@ -167,10 +177,10 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
                 if index_to_update == len(v_vector):
 
                     for _ in range(int(sum(self.input_state)) - 1):
-                        for i in range(len(permanents)):
-                            permanents[i] /= 2
+                        for i in range(len(self.permanents)):
+                            self.permanents[i] /= 2
 
-                    return permanents
+                    return self.permanents
 
                 updated_value_at_index = \
                     v_vector[index_to_update] + \
@@ -181,11 +191,11 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
             # END UPDATE
 
             # START PERMANENT UPDATE
-            multiplier = -multiplier
+            self.multiplier = -self.multiplier
 
             # Sums update
-            for i in sums:
-                sums[i] -= 2 * (v_vector[index_to_update] - last_value_at_index) * \
+            for i in self.sums:
+                self.sums[i] -= 2 * (v_vector[index_to_update] - last_value_at_index) * \
                            self.matrix[i][index_to_update]
 
             # Binoms update
@@ -196,16 +206,27 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
                 binomials_product *= last_value_at_index / (
                         self._input_state[index_to_update] - v_vector[index_to_update])
 
-            addend = multiplier * binomials_product * \
-                     reduce(operator.mul, [pow(sums[j], self._output_state[j])
+            addend = self.multiplier * binomials_product * \
+                     reduce(operator.mul, [pow(self.sums[j], self._output_state[j])
                                            for j in considered_columns_indices], 1)
 
-            for i in range(len(permanents)):
+            for i in range(len(self.permanents)):
                 if v_vector[i] != self.input_state[i]:
-                    permanents[i] += addend
+                    self.permanents[i] += addend
 
         for _ in range(int(sum(self._input_state)) - 1):
-            for i in range(len(permanents)):
-                permanents[i] /= 2
+            for i in range(len(self.permanents)):
+                self.permanents[i] /= 2
 
-        return permanents
+        return self.permanents
+
+    def _add_permanent_addends(self) -> None:
+        # For each occupied mode
+        for i in range(len(self.input_state)):
+            # Update the sums
+            for j in range(len(s))
+
+            # Return the sums to their proper state
+
+
+        pass
