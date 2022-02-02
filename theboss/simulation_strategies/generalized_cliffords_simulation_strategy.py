@@ -4,6 +4,7 @@ from collections import defaultdict
 from copy import copy
 from math import factorial
 from typing import List
+from scipy.special import binom
 
 from numpy import array, delete, float64, insert, int64, ndarray
 from numpy.random import random
@@ -100,11 +101,16 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
             self._sample_from_latest_pmf()
 
     def _calculate_new_layer_of_pmfs(self) -> None:
+
         number_of_particle_to_sample = sum(self.r_sample) + 1
+
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
+
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
+
         weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+
         weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
@@ -120,23 +126,19 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
         self.pmfs[self.current_key] = pmf
 
     def _calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
-        return array([self._calculate_multinomial_coefficient(vector)
+        return array([self._calculate_weights(vector)
                       for vector in corresponding_k_vectors], dtype=float64)
 
-    @staticmethod
-    def _calculate_multinomial_coefficient(vector: ndarray) -> int:
-        """
-            Calculates multinomial coefficient of the vector, as proposed in Oszmaniec, Brod 2018
-            (above formula 39).
-            :param vector: Vector of which multinomial coefficient will be calculated.
-            :return: Multinomial coefficient of given vector.
-        """
-        particles_number = sum(vector)
-        multinomial_coefficient = factorial(particles_number)
-        for value in vector:
-            multinomial_coefficient /= factorial(value)
+    def _calculate_weights(self, k_vector):
+        l = sum(k_vector)
+        n = sum(self.input_state)
 
-        return multinomial_coefficient
+        weight = factorial(l) * factorial(n - l) / factorial(n)
+
+        for m in range(len(self.input_state)):
+            weight *= binom(self.input_state[m], k_vector[m])
+
+        return weight
 
     def _generate_possible_output_states(self) -> List[ndarray]:
         possible_output_states = []

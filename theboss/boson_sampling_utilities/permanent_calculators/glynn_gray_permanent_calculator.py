@@ -7,7 +7,21 @@ __author__ = "Tomasz Rybotycki"
     (due to physical limitations of the machines).
 """
 
-from math import prod
+try:
+    from math import prod
+except:
+    def prod(values):
+
+        if len(values) == 0:
+            return 0
+
+        prod = 1
+
+        for v in values:
+            prod *= v
+
+        return prod
+
 from typing import Optional
 
 from numpy import ndarray, complex128, ones

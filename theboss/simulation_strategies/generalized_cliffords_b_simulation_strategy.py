@@ -12,15 +12,14 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List
 
-from numpy import array, ndarray, int64, zeros_like, ones
+from numpy import array, ndarray, int64, zeros_like, complex128
 from numpy.random import choice, randint
-from math import prod
 
 from .generalized_cliffords_simulation_strategy import \
     GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
 from ..boson_sampling_utilities.boson_sampling_utilities import \
-    modes_state_to_particle_state, EffectiveScatteringMatrixCalculator
-from ..GuanCodes.src.GrayCode import get_gray_code_update_indices
+    modes_state_to_particle_state
+from ..boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import BSCCCHSubmatricesPermanentCalculator
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
@@ -56,7 +55,11 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
         self.pmf = []
 
-        submatrices_permanents = self._get_permanents_of_submatrices()
+        submatrices_permanents_calculator = BSCCCHSubmatricesPermanentCalculator(
+            self._bs_permanent_calculator.matrix, self._current_input, self.r_sample
+        )
+
+        submatrices_permanents = submatrices_permanents_calculator.compute_permanents()
 
         self._bs_permanent_calculator.input_state = self._current_input
 
@@ -72,26 +75,6 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
         total = sum(self.pmf)
         self.pmf = [val / total for val in self.pmf]
-
-    def _get_permanents_of_submatrices(self):
-        permanents = []
-
-        self._bs_permanent_calculator.output_state = self.r_sample
-
-        for i in range(len(self._current_input)):
-
-            if self._current_input[i] == 0:
-                permanents.append(0)
-                continue
-
-            self._current_input[i] -= 1
-
-            self._bs_permanent_calculator.input_state = self._current_input
-            permanents.append(self._bs_permanent_calculator.compute_permanent())
-
-            self._current_input[i] += 1
-
-        return permanents
 
     def _fill_r_sample(self) -> None:
         self.r_sample = [0 for _ in self.input_state]

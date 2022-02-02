@@ -7,14 +7,19 @@ from typing import List, Union
 
 from numpy import asarray, block, eye, ndarray, zeros_like
 
-from src_tests import (
-    BSPermanentCalculatorFactory,
-    BosonSamplingSimulator, BosonSamplingExperimentConfiguration,
-    BSDistributionCalculatorWithUniformLosses, BSSampleBasedDistributionCalculator,
-    SimulationStrategyFactory, StrategyType,
-    LossyNetworkSimulationStrategy,
-    generate_haar_random_unitary_matrix, count_total_variation_distance,
-    count_tv_distance_error_bound_of_experiment_results)
+from ..theboss.boson_sampling_simulator import BosonSamplingSimulator
+from ..theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
+    BSPermanentCalculatorFactory
+from ..theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
+    BSDistributionCalculatorWithUniformLosses, BosonSamplingExperimentConfiguration
+from ..theboss.distribution_calculators.bs_sample_based_distribution_calculator import \
+    BSSampleBasedDistributionCalculator
+from ..theboss.network_simulation_strategy.lossy_network_simulation_strategy import \
+    LossyNetworkSimulationStrategy
+from ..theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix, \
+    count_total_variation_distance, count_tv_distance_error_bound_of_experiment_results
+from ..theboss.simulation_strategies.simulation_strategy_factory import StrategyType, \
+    SimulationStrategyFactory
 
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
@@ -34,15 +39,19 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             number_of_particles_lost=0,  # Losses should only come from network.
             number_of_particles_left=sum(self._initial_state),
             uniform_transmissivity=self._probability_of_uniform_loss,
-            network_simulation_strategy=LossyNetworkSimulationStrategy(self._lossy_interferometer_matrix)
+            network_simulation_strategy=LossyNetworkSimulationStrategy(
+                self._lossy_interferometer_matrix)
         )
 
-        permanent_calculator_factory = BSPermanentCalculatorFactory(self._lossy_interferometer_matrix, None, None)
+        permanent_calculator_factory = BSPermanentCalculatorFactory(
+            self._lossy_interferometer_matrix, None, None)
         self._permanent_calculator = permanent_calculator_factory.generate_calculator()
-        self._strategy_factory = SimulationStrategyFactory(self._experiment_configuration, self._permanent_calculator)
+        self._strategy_factory = SimulationStrategyFactory(
+            self._experiment_configuration, self._permanent_calculator)
 
-        calculator = BSDistributionCalculatorWithUniformLosses(self._experiment_configuration,
-                                                               self._permanent_calculator)
+        calculator = BSDistributionCalculatorWithUniformLosses(
+            self._experiment_configuration,
+            self._permanent_calculator)
         self._possible_outcomes = calculator.get_outcomes_in_proper_order()
         self._possible_outcomes_number = len(self._possible_outcomes)
 
@@ -58,8 +67,9 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         lossy_average_number_of_particles = 0
-        samples = simulator.get_classical_simulation_results(asarray(self._initial_state, dtype=int),
-                                                             self._number_of_samples_for_experiments)
+        samples = simulator.get_classical_simulation_results(
+            asarray(self._initial_state, dtype=int),
+            self._number_of_samples_for_experiments)
         for sample in samples:
             lossy_average_number_of_particles += sum(sample)
 
@@ -83,7 +93,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         uniform_losses_distribution = estimated_distribution_calculator.calculate_approximate_distribution()
 
-        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(uniform_losses_distribution)
+        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
+            uniform_losses_distribution)
 
     def __check_if_given_distribution_is_close_to_lossy_network_distribution(
             self, distribution: Union[ndarray, List[float]]) -> None:
@@ -110,26 +121,31 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             lossy_network_distribution, distribution
         )
 
-        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
+        self.assertLessEqual(distance_between_distributions,
+                             distance_bound_between_estimated_distributions)
 
-    def __calculate_statistical_distance_bound_between_two_approximate_distributions(self,
-                                                                                     outcomes_number: int) -> float:
+    def __calculate_statistical_distance_bound_between_two_approximate_distributions(
+            self,
+            outcomes_number: int) -> float:
         return 2 * count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=outcomes_number,
             samples_number=self._number_of_samples_for_experiments,
             error_probability=self._probability_of_error_in_distribution_calculation
         )
 
-    def test_lossy_network_with_uniform_losses_distribution_accuracy_against_generalized_cliffords(self) -> None:
+    def test_lossy_network_with_uniform_losses_distribution_accuracy_against_generalized_cliffords(
+            self) -> None:
         """
         This test checks if lossy networks distribution provides same approximate (up to statistical bounds)
         distribution as generalized cliffords distribution with lossy inputs.
         """
         generalized_cliffords_distribution = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs()
 
-        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(generalized_cliffords_distribution)
+        self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
+            generalized_cliffords_distribution)
 
-    def __calculate_generalized_cliffords_distribution_with_lossy_inputs(self) -> List[float]:
+    def __calculate_generalized_cliffords_distribution_with_lossy_inputs(self) -> List[
+        float]:
         """
         This method calculates approximate distribution for lossy states using generalized cliffords
         method.
@@ -140,19 +156,22 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
 
-        samples = simulator.get_classical_simulation_results(self.__get_uniformly_lossy_input_state(),
-                                                             self._number_of_samples_for_experiments)
+        samples = simulator.get_classical_simulation_results(
+            self.__get_uniformly_lossy_input_state(),
+            self._number_of_samples_for_experiments)
 
         return self.__calculate_distribution(samples, self._possible_outcomes)
 
     @staticmethod
-    def __calculate_distribution(samples: List[ndarray], possible_outcomes: List[ndarray]) -> List[float]:
+    def __calculate_distribution(samples: List[ndarray],
+                                 possible_outcomes: List[ndarray]) -> List[float]:
         probabilities = [0] * len(possible_outcomes)
 
         for sample in samples:
             for i in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
-                if all(sample == possible_outcomes[i]):  # Expect all elements of resultant list to be True.
+                if all(sample == possible_outcomes[
+                    i]):  # Expect all elements of resultant list to be True.
                     probabilities[i] += 1
                     break
 
@@ -170,11 +189,13 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         lossy_input = asarray(self._initial_state, dtype=int)
         for i in range(len(self._initial_state)):
             for _ in range(self._initial_state[i]):
-                if uniform(0, 1) < self._experiment_configuration.uniform_transmissivity:
+                if uniform(0,
+                           1) < self._experiment_configuration.uniform_transmissivity:
                     lossy_input[i] -= 1
         return lossy_input
 
-    def test_lossy_network_with_uniform_losses_on_bosonful_modes_and_higher_losses_on_bosonless(self) -> None:
+    def test_lossy_network_with_uniform_losses_on_bosonful_modes_and_higher_losses_on_bosonless(
+            self) -> None:
         """
         This test checks the situation, for which losses are uniform only for these modes that have any bosons in it.
         It assumes that initial state is [1, 1, 1, 1, 0, 0, 0, 0] as in initial version of the tests case. It goes to
@@ -208,7 +229,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
             distribution_with_huge_losses_on_bosonless_modes)
 
-    def test_distance_of_generalized_cliffords_with_lossy_network_and_lossy_input(self) -> None:
+    def test_distance_of_generalized_cliffords_with_lossy_network_and_lossy_input(
+            self) -> None:
         distribution_with_lossy_net = self.__calculate_generalized_cliffords_distribution_with_lossy_network()
         distribution_with_lossy_input = self.__calculate_generalized_cliffords_distribution_with_lossy_inputs()
 
@@ -220,9 +242,11 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             distribution_with_lossy_input, distribution_with_lossy_net
         )
 
-        self.assertLessEqual(distance_between_distributions, distance_bound_between_estimated_distributions)
+        self.assertLessEqual(distance_between_distributions,
+                             distance_bound_between_estimated_distributions)
 
-    def __calculate_generalized_cliffords_distribution_with_lossy_network(self) -> List[float]:
+    def __calculate_generalized_cliffords_distribution_with_lossy_network(self) -> List[
+        float]:
         """
         This method calculates approximate distribution for lossy states using generalized cliffords
         method.
@@ -231,7 +255,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
-        samples = simulator.get_classical_simulation_results(asarray(self._initial_state, dtype=int),
-                                                             self._number_of_samples_for_experiments)
+        samples = simulator.get_classical_simulation_results(
+            asarray(self._initial_state, dtype=int),
+            self._number_of_samples_for_experiments)
 
         return self.__calculate_distribution(samples, self._possible_outcomes)

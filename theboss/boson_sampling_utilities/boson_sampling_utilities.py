@@ -81,7 +81,7 @@ def generate_possible_n_particle_outputs(number_of_particles: int,
                                          number_of_modes: int) -> List[ndarray]:
     outputs = []
 
-    output = zeros(number_of_modes)
+    output = zeros(number_of_modes, dtype=int)
     output[0] = number_of_particles
     outputs.append(output)
 

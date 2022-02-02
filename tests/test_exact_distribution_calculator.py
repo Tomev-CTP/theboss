@@ -4,8 +4,11 @@ import unittest
 
 from numpy import array, complex128, int64, allclose
 
-from src_tests import (BSPermanentCalculatorFactory, PermanentCalculatorType, BosonSamplingExperimentConfiguration,
-                       BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses)
+from ..theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
+    BSPermanentCalculatorFactory, PermanentCalculatorType
+from ..theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
+    BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses, \
+    BosonSamplingExperimentConfiguration
 
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
@@ -32,12 +35,14 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             number_of_modes=len(self.initial_state),
             initial_number_of_particles=sum(self.initial_state),
             number_of_particles_lost=self.number_of_particles_lost,
-            number_of_particles_left=sum(self.initial_state) - self.number_of_particles_lost,
+            number_of_particles_left=sum(
+                self.initial_state) - self.number_of_particles_lost,
             uniform_transmissivity=0.8
         )
 
         self._calculator_type = PermanentCalculatorType.PARALLEL_CHIN_HUH
-        self._permanent_calculator_factory = BSPermanentCalculatorFactory(matrix=None, input_state=None,
+        self._permanent_calculator_factory = BSPermanentCalculatorFactory(matrix=None,
+                                                                          input_state=None,
                                                                           output_state=None,
                                                                           calculator_type=self._calculator_type)
         self._permanent_calculator = self._permanent_calculator_factory.generate_calculator()
