@@ -218,23 +218,16 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
             if self.input_state[i] == 0 or self.input_state[i] == self.v_vector[i]:
                 continue
 
-            # Update the sums
+            # Compute update the sums
+            updated_sums = {}
             for j in self.considered_columns_indices:
-                self.sums[j] -= self.matrix[j][i]
+                updated_sums[j] = self.sums[j] - self.matrix[j][i]
 
-            # Update binomial product
-            self.binomials_product /= self.input_state[i] / (self.input_state[i] - self.v_vector[i])
+            # Compute update binomial product
+            updated_binom = self.binomials_product / (self.input_state[i] / (self.input_state[i] - self.v_vector[i]))
 
-            addend = self.multiplier * self.binomials_product * \
-                     reduce(operator.mul, [pow(self.sums[j], self._output_state[j])
+            addend = self.multiplier * updated_binom * \
+                     reduce(operator.mul, [pow(updated_sums[j], self._output_state[j])
                                            for j in self.considered_columns_indices], 1)
 
             self.permanents[i] += addend
-
-            # Return the sums to their initial state
-            for j in self.considered_columns_indices:
-                self.sums[j] += self.matrix[j][i]
-
-            # Return binomial product to its initial state
-            self.binomials_product *= self.input_state[i] / (
-                        self.input_state[i] - self.v_vector[i])
