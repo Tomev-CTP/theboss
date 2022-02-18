@@ -4,7 +4,7 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Union
 
-from numpy import abs, linalg, log2, ndarray, sqrt, pi, exp, asarray, tile, power, diag, dot
+from numpy import abs, linalg, log, ndarray, sqrt, pi, exp, asarray, tile, power, diag, dot
 from numpy.random import randn
 
 
@@ -68,17 +68,13 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         In the method formally I should compute
 
             for prime_factor in prime_factors_of_the_large_number:
-                error_bound += log2(prime_factor)
+                error_bound += log(prime_factor)
 
         where the large_number =  2 ** outcomes_number - 2.
 
         However, by simply approximating large_number =  2 ** outcomes_number I can do the same with just
 
-            error_bound += log2(2) * outcomes_number
-
-        or even
-
-            error_bound += outcomes_number
+            error_bound += log(2) * outcomes_number
 
         without wasting a lot of time for calculating the prime factors or the number.
 
@@ -87,10 +83,10 @@ def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, sa
         :param error_probability: Desired probability of error.
         :return: Bound on the tv distance between the estimate and the experimental results.
     """
-    error_bound = -log2(error_probability)
-    error_bound += outcomes_number  # APPROXIMATION!
-
+    error_bound = -log(error_probability)
+    error_bound += outcomes_number * log(2)  # APPROXIMATION!
     error_bound /= 2 * samples_number
+
     return sqrt(error_bound)
 
 
@@ -113,9 +109,9 @@ def get_prime_factors(number: int) -> List[int]:
 
 def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
                                                            expected_distance: float) -> int:
-    samples_number = -log2(error_probability)
+    samples_number = -log(error_probability)
 
-    samples_number += outcomes_number
+    samples_number += log(2) * outcomes_number
 
     samples_number /= 2 * pow(expected_distance, 2)
 
