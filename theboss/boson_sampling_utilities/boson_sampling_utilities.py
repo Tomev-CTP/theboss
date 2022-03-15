@@ -288,9 +288,8 @@ def compute_maximally_unbalanced_types(modes_number: int,
                                     modes_number=modes_number)
 
     for state_type in all_types:
-        if state_type.count(1) == len(state_type) - 1 or state_type.count(
-                1) == len(
-            state_type):
+        if state_type.count(1) == len(state_type) - 1 or \
+           state_type.count(1) == len(state_type):
             maximally_unbalanced_types.append(state_type)
 
     return maximally_unbalanced_types
