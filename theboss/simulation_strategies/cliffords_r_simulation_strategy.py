@@ -113,12 +113,17 @@ try:
                 python_result = array([mode_value - 1 for mode_value in result],
                                       dtype=int64)
                 samples_in_particle_states = array_split(python_result, 1)
+                print(samples_in_particle_states)
 
                 sample = tuple(particle_state_to_modes_state(samples_in_particle_states,
                                                              len(initial_state)))
 
                 if sample in outcomes_of_interest:
                     outcomes_probabilities[sample] = pmf[0]
+                else:
+                    print(f"\t{sample} not in {outcomes_of_interest}")
+
+                print(f"{len(outcomes_probabilities)} / {len(outcomes_of_interest)}")
 
             return outcomes_probabilities
 
