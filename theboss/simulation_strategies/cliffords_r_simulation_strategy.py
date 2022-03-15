@@ -15,9 +15,9 @@ try:
     from rpy2 import robjects
     from rpy2.robjects import packages
 
-    from typing import List
+    from typing import List, Dict, Tuple
 
-    from theboss.boson_sampling_utilities.boson_sampling_utilities import \
+    from ..boson_sampling_utilities.boson_sampling_utilities import \
         particle_state_to_modes_state
 
 
@@ -85,11 +85,46 @@ try:
 
             for sample in samples_in_particle_states:
                 samples_in_occupation_description.append(
-                    particle_state_to_modes_state(sample))
+                    particle_state_to_modes_state(sample, len(initial_state)))
 
             return samples_in_occupation_description
 
+        def find_probabilities(self, initial_state: ndarray,
+                               outcomes_of_interest: List[ndarray]) \
+                -> Dict[Tuple[int, ...], float]:
+
+            number_of_bosons = int(sum(initial_state))
+
+            outcomes_of_interest = [tuple(o) for o in outcomes_of_interest]
+
+            outcomes_probabilities: dict = {}
+
+            boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
+                self.interferometer_matrix[:, arange(number_of_bosons)])
+
+            while len(outcomes_probabilities) != len(outcomes_of_interest):
+
+                result, permanent, pmf = \
+                    self.cliffords_r_sampler(boson_sampler_input_matrix,
+                                             sampleSize=1,
+                                             perm=True)
+
+                # Add -1 to R indexation of modes (they start from 1).
+                python_result = array([mode_value - 1 for mode_value in result],
+                                      dtype=int64)
+                samples_in_particle_states = array_split(python_result, 1)
+
+                sample = tuple(particle_state_to_modes_state(samples_in_particle_states,
+                                                             len(initial_state)))
+
+                if sample in outcomes_of_interest:
+                    outcomes_probabilities[sample] = pmf[0]
+
+            return outcomes_probabilities
+
 except ImportError as e:
+
+    print(f"An import error occurred during Cliffords R Strategy initialization:\n\t{e}")
 
     class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         def __init__(self, interferometer_matrix: ndarray) -> None:
