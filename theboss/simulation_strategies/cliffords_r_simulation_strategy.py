@@ -7,7 +7,9 @@ __author__ = "Tomasz Rybotycki"
     https://cran.r-project.org/web/packages/BosonSampling/index.html
 """
 
-from numpy import arange, array, array_split, int64, ndarray
+from numpy import arange, array, array_split, int64, ndarray, isclose
+from scipy.special import binom
+from collections import defaultdict
 
 from .simulation_strategy_interface import SimulationStrategyInterface
 
@@ -15,7 +17,7 @@ try:
     from rpy2 import robjects
     from rpy2.robjects import packages
 
-    from typing import List, Dict, Tuple
+    from typing import List, Dict, Tuple, DefaultDict
 
     from ..boson_sampling_utilities.boson_sampling_utilities import \
         particle_state_to_modes_state
@@ -102,6 +104,8 @@ try:
             boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
                 self.interferometer_matrix[:, arange(number_of_bosons)])
 
+            number_of_samplings = 0
+
             while len(outcomes_probabilities) != len(outcomes_of_interest):
 
                 result, permanent, pmf = \
@@ -109,23 +113,71 @@ try:
                                              sampleSize=1,
                                              perm=True)
 
+                number_of_samplings += 1
+
                 # Add -1 to R indexation of modes (they start from 1).
                 python_result = array([mode_value - 1 for mode_value in result],
                                       dtype=int64)
-                samples_in_particle_states = array_split(python_result, 1)
-                print(samples_in_particle_states)
+                sample_in_particle_states = array_split(python_result, 1)[0]
 
-                sample = tuple(particle_state_to_modes_state(samples_in_particle_states,
+                sample = tuple(particle_state_to_modes_state(sample_in_particle_states,
                                                              len(initial_state)))
 
                 if sample in outcomes_of_interest:
                     outcomes_probabilities[sample] = pmf[0]
-                else:
-                    print(f"\t{sample} not in {outcomes_of_interest}")
 
-                print(f"{len(outcomes_probabilities)} / {len(outcomes_of_interest)}")
+                if number_of_samplings % int(1e4) == 0:
+                    print(f"\tNumber of samplings: {number_of_samplings}")
 
             return outcomes_probabilities
+
+        def find_probabilities_of_n_random_states(self, initial_state: ndarray,
+                                                  number_of_random_states: int) \
+                -> DefaultDict[Tuple[int, ...], float]:
+
+            n = int(sum(initial_state))
+            m = len(initial_state)
+
+            boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
+                self.interferometer_matrix[:, arange(n)])
+
+            if int(binom(n + m - 1, m - 1)) < number_of_random_states:
+                number_of_random_states = int(binom(n + m - 1, m - 1))
+
+            probabilities_of_random_states = defaultdict(lambda: 0)
+            probabilities_sum = 0.0
+            number_of_samplings = 0
+
+            while len(probabilities_of_random_states) < number_of_random_states or \
+                 not isclose(probabilities_sum, 1):
+
+                result, permanent, pmf = \
+                    self.cliffords_r_sampler(boson_sampler_input_matrix,
+                                             sampleSize=1,
+                                             perm=True)
+
+                number_of_samplings += 1
+
+                # Add -1 to R indexation of modes (they start from 1).
+                python_result = array([mode_value - 1 for mode_value in result],
+                                      dtype=int64)
+                sample_in_particle_states = array_split(python_result, 1)[0]
+
+                sample = tuple(particle_state_to_modes_state(sample_in_particle_states,
+                                                             len(initial_state)))
+
+                probabilities_of_random_states[sample] = pmf[0]
+
+                if number_of_samplings % int(1e4) == 0:
+                    print(f"\tNumber of samplings: {number_of_samplings}")
+
+                probabilities_sum = 0.0
+
+                for state in probabilities_of_random_states:
+                    probabilities_sum += probabilities_of_random_states[state]
+
+            return probabilities_of_random_states
+
 
 except ImportError as e:
 
