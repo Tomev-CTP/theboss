@@ -20,6 +20,7 @@ from concurrent.futures import ProcessPoolExecutor as Pool
 from copy import deepcopy
 from ..quantum_computations_utilities import compute_qft_matrix
 
+
 class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, uniform_transmissivity: float,
                  hierarchy_level: int, threads_number: int = -1):
@@ -36,7 +37,8 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         self._permanent_calculator = bs_permanent_calculator  # Should contain an UNITARY (no losses here!)
         self._qft_matrix = self._get_qft_matrix()
 
-    def _get_proper_threads_number(self, threads_number: int) -> int:
+    @staticmethod
+    def _get_proper_threads_number(threads_number: int) -> int:
         if threads_number < 1 or threads_number > cpu_count():
             return cpu_count()
         else:
@@ -141,14 +143,21 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
                 self._approximated_input_state_part_possibilities[-1]
             )
 
-    def _compute_number_of_samples_for_each_thread(self, samples_number: int) -> List[int]:
-        # This method is basically the same as in Nonuniform losses approximation strategy
-        samples_per_thread = (samples_number + self._threads_number - (
-                    samples_number % self._threads_number))
-        samples_per_thread = int(samples_per_thread / self._threads_number)
-        number_of_samples_for_each_thread = [samples_per_thread] * self._threads_number
+    @staticmethod
+    def _distribute_uniformly(val: int, bins: int) -> List[int]:
+        # TODO TR: Might be but in a more general file.
+        distributed_values = []
 
-        return number_of_samples_for_each_thread
+        for v in range(bins):
+            distributed_values.append(val // bins)
+
+        for i in range(val % bins):
+            distributed_values[i] += 1
+
+        return distributed_values
+
+    def _compute_number_of_samples_for_each_thread(self, samples_number: int) -> List[int]:
+        return self._distribute_uniformly(samples_number, self._threads_number)
 
     def _simulate_in_parallel(self, samples_number: int = 1) -> List[ndarray]:
         """ This method produces given number of samples from lossy approximated
