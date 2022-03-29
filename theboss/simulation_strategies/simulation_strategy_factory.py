@@ -52,6 +52,15 @@ class SimulationStrategyFactory:
             StrategyType.NONUNIFORM_APPROXIMATED: self._generate_nonuniform_approximating_strategy,
             StrategyType.UNIFORM_LOSSY_STATE_APPROXIMATED: self._generate_uniform_lossy_state_approximating_strategy
         }
+        self._available_threads_number = -1
+
+    @property
+    def available_threads_number(self) -> int:
+        return self._available_threads_number
+
+    @available_threads_number.setter
+    def available_threads_number(self, available_threads_number: int) -> None:
+        self._available_threads_number = available_threads_number
 
     @property
     def strategy_type(self) -> StrategyType:
@@ -143,5 +152,6 @@ class SimulationStrategyFactory:
         return LossyStateApproximationSimulationStrategy(
             bs_permanent_calculator=self._bs_permanent_calculator,
             uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,
-            hierarchy_level=self._experiment_configuration.hierarchy_level
+            hierarchy_level=self._experiment_configuration.hierarchy_level,
+            threads_number=self._available_threads_number
         )
