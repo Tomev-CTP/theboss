@@ -20,9 +20,12 @@ from numpy.random import rand
 from ..quantum_computations_utilities import compute_qft_matrix
 
 
+# TODO TR:  Change the names of these two methods to reflect that it will denote the
+#           state description in the 1st and 2nd quantization (with the remark that the
+#           first quantization one will not be symmetrized, but just "a representative")
 def particle_state_to_modes_state(particle_state: ndarray,
                                   observed_modes_number: int) -> ndarray:
-    modes_state = zeros(observed_modes_number)
+    modes_state = zeros(observed_modes_number, dtype=int)
 
     # Adding the particle to it's mode.
     for particles_mode in asarray(particle_state, dtype=int64):
