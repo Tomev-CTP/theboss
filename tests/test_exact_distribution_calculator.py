@@ -4,9 +4,9 @@ import unittest
 
 from numpy import array, complex128, int64, allclose
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
+from ..theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
     BSPermanentCalculatorFactory, PermanentCalculatorType
-from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
+from ..theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
     BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses, \
     BosonSamplingExperimentConfiguration
 

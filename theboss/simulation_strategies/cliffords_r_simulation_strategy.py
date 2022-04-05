@@ -10,13 +10,14 @@ __author__ = "Tomasz Rybotycki"
 from numpy import arange, array, array_split, int64, ndarray, isclose
 from scipy.special import binom
 from collections import defaultdict
-from typing import List, Dict, Tuple, DefaultDict
 
 from .simulation_strategy_interface import SimulationStrategyInterface
 
 try:
     from rpy2 import robjects
     from rpy2.robjects import packages
+
+    from typing import List, Dict, Tuple, DefaultDict
 
     from ..boson_sampling_utilities.boson_sampling_utilities import \
         particle_state_to_modes_state
