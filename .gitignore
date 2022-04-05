@@ -218,5 +218,3 @@ quick_tests/*
 
 *quick_tests.py
 *.pkl
-
-.github
