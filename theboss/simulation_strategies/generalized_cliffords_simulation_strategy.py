@@ -109,7 +109,7 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
         corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
                                    for state in possible_input_states]
 
-        weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+        weights = self._calculate_weights_from_k_vectors(corresponding_k_vectors)
 
         weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
@@ -125,11 +125,11 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
 
         self.pmfs[self.current_key] = pmf
 
-    def _calculate_weights_from_k_vectors(self, corresponding_k_vectors: ndarray) -> ndarray:
+    def _calculate_weights_from_k_vectors(self, corresponding_k_vectors: List[List[int]]) -> ndarray:
         return array([self._calculate_weights(vector)
                       for vector in corresponding_k_vectors], dtype=float64)
 
-    def _calculate_weights(self, k_vector):
+    def _calculate_weights(self, k_vector: List[int]):
         l = sum(k_vector)
         n = sum(self.input_state)
 
