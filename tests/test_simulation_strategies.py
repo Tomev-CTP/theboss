@@ -61,13 +61,17 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             [0, 1, 0, 0, 0],
         ], dtype=complex)
 
+        # TEST
+        from numpy import eye
+        self._permutation_matrix = eye(5)
+
         self._number_of_samples_for_estimated_distribution_calculation = int(1e3)
         self._probability_of_error_in_distribution_calculation = 1e-3
 
         self._distance_calculation_initial_state = [1, 1, 1, 1, 0]
         self._distance_calculation_binned_initial_state = [2, 1, 1, 0, 0]
         self._distance_calculation_number_of_particles_lost = 2
-        self._uniform_transmissivity = 0.8
+        self._uniform_transmissivity = 0.5
 
         self._nonuniform_strategy_initial_state = [0, 2, 1, 1, 0]
         self._approximated_modes_number = 2
@@ -160,6 +164,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def __perform_distance_of_approximate_distribution_from_ideal(
             self,
             distance_accuracy_experiment_configuration: DistributionAccuracyExperimentConfiguration) -> None:
+
         distance_from_exact_to_estimated = self.__calculate_distance_from_exact_distribution_to_estimated_distribution(
             exact_distribution_calculator=distance_accuracy_experiment_configuration.exact_calculator,
             estimated_distribution_calculator=distance_accuracy_experiment_configuration.estimation_calculator
@@ -202,10 +207,23 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             distribution.
             :return: TV distance between exact and approximated distribution.
         """
+
         exact_distribution = exact_distribution_calculator.calculate_distribution()
+
+        estimated_distribution_calculator.outcomes = exact_distribution_calculator.get_outcomes_in_proper_order()
+
+        if self._strategies_factory.strategy_type == StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD or \
+                self._strategies_factory.strategy_type == StrategyType.NONUNIFORM_APPROXIMATED:
+            self._strategies_factory.bs_permanent_calculator.matrix *= pow(self._uniform_transmissivity, 0.5)
+
         approximated_distribution = estimated_distribution_calculator.calculate_approximate_distribution(
             samples_number=self._number_of_samples_for_estimated_distribution_calculation
         )
+
+        # TEST
+        print(f"Exact:\n\t{exact_distribution}\n\tsum: {sum(exact_distribution)}, len: {len(exact_distribution)}")
+        print(f"Approx:\n\t{approximated_distribution}\n\tsum: {sum(approximated_distribution)}, len: {len(approximated_distribution)}")
+
         return count_total_variation_distance(exact_distribution,
                                               approximated_distribution)
 
@@ -444,23 +462,30 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def test_distribution_accuracy_for_nonuniform_losses_approximated_strategy_with_approximated_modes(
             self):
         self.__prepare_lossy_distance_experiment_settings()
+
         self._distributions_distance_experiment_configuration.approximated_modes_number = \
             self._approximated_modes_number
+
+        self._strategies_factory.experiment_configuration.hierarchy_level = \
+            self._strategies_factory.experiment_configuration.number_of_modes - self._approximated_modes_number
+
         self.__continue_with_common_part_of_uniformly_lossy_nonuniform_losses_approximated_strategy_tests()
 
     def __continue_with_common_part_of_uniformly_lossy_nonuniform_losses_approximated_strategy_tests(
             self) -> None:
 
-        self._strategies_factory.experiment_configuration = self._distributions_distance_experiment_configuration
+        self._strategies_factory.experiment_configuration = \
+            self._distributions_distance_experiment_configuration
         self._strategies_factory.strategy_type = StrategyType.NONUNIFORM_APPROXIMATED
+
         exact_calculator = BSDistributionCalculatorWithUniformLosses(
             self._distributions_distance_experiment_configuration,
             self._bs_permanent_calculator)
 
         self._distributions_distance_experiment_configuration.initial_state = \
             self._nonuniform_strategy_initial_state
-        self._strategies_factory.bs_permanent_calculator.matrix *= pow(
-            self._uniform_transmissivity, 0.5)
+
+        self._strategies_factory.bs_permanent_calculator.matrix *= pow(self._uniform_transmissivity, 0.5)
 
         distance_experiment_configuration = DistributionAccuracyExperimentConfiguration(
             # This exact calculator, when there are no losses, will do the work just fine.
@@ -499,7 +524,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self.__test_haar_random_interferometers_approximation_distance_from_ideal(
             strategy_factory)
 
-    @pytest.mark.ccr
+    @pytest.mark.ignore
     def test_haar_random_interferometers_distance_for_cliffords_r_strategy(
             self) -> None:
         self.__set_experiment_configuration_for_lossless_haar_random()
