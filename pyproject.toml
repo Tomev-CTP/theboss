@@ -12,7 +12,7 @@ license         = {file = "LICENSE.md"}
 classifiers     = ["License :: OSI Approved :: Apache Software License"]
 dynamic         = ["version", "description"]
 dependencies    = ["numpy", "scipy"]
-requires-python = ">=3.6"  # Typing package (3.5 is no longer supported)
+requires-python = ">=3.7"  # Dataclasses package
 
 
 [project.optional-dependencies]
