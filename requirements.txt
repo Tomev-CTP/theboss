@@ -1,7 +1,8 @@
-# Testing
-pytest==7.1.1
-
+# Base
 numpy~=1.21.2
 scipy~=1.7.1
+# Optional (and ignored during tests)
 rpy2~=3.4.5
+# Testing
+pytest==7.1.1
 tqdm~=4.62.2
