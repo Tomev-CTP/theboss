@@ -1,31 +1,15 @@
 __author__ = "Tomasz Rybotycki"
+"""
+    A script containing some utilities that could be used in general QC simulaitons.
+"""
 
 # TODO TR: Consider releasing this file as a separate package.
 
 from typing import List, Union
 
-from numpy import abs, linalg, log, ndarray, sqrt, pi, exp, asarray, tile, power, diag, dot
+from numpy import ( abs, linalg, log, ndarray, sqrt, pi, exp, asarray, tile, power,
+ diag, dot)
 from numpy.random import randn
-
-
-def generate_haar_random_unitary_matrix(d: int) -> ndarray:
-    """
-        This method generates and returns a random, complex unitary matrix, according
-        to the haar measure.
-
-        Note: FBM also gave me a version of that method that generates real matrices,
-        not the complex ones.
-
-        :param n: Dimension of the matrix to generate.
-        :return: A Haar random unitary matrix.
-    """
-    random_complex_number = randn(d, d) + 1j * randn(d, d) / sqrt(2)
-    q, r = linalg.qr(random_complex_number)
-    r = diag(r)
-    lamb = diag(r / abs(r))
-    q_prime = dot(q, lamb)
-
-    return q_prime.T @ q_prime
 
 
 def count_total_variation_distance(distribution1: Union[List[float], ndarray],
@@ -37,7 +21,8 @@ def count_total_variation_distance(distribution1: Union[List[float], ndarray],
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), f"Distributions must have equal lengths! Got: {len(distribution1)}" \
+    assert len(distribution1) == len(distribution2), " \
+    f"f"Distributions must have equal lengths! Got: {len(distribution1)}" \
                                                      f"and {len(distribution2)}!"
     total_variation_distance = 0
 
@@ -49,18 +34,22 @@ def count_total_variation_distance(distribution1: Union[List[float], ndarray],
 
 def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float:
     """
-        Calculates distance between two given matrices. This method assumes, that the matrices have proper sizes.
-        :param matrix1: First matrix.
-        :param matrix2: Second matrix.
-        :return: Distance between two given matrices.
+    Calculates distance between two given matrices. This method assumes, that the
+    matrices have proper sizes.
+
+    :param matrix1: First matrix.
+    :param matrix2: Second matrix.
+
+    :return: Distance between two given matrices.
     """
     return linalg.norm(matrix1 - matrix2)
 
 
-def count_tv_distance_error_bound_of_experiment_results(outcomes_number: int, samples_number: int,
-                                                        error_probability: float) -> float:
+def count_tv_distance_error_bound_of_experiment_results(
+outcomes_number: int, samples_number: int, error_probability: float) -> float:
     """
-        Calculates the distance bound between the experimental results and the n-sample estimation of these results.
+        Calculates the distance bound between the experimental results and the n-sample
+        estimation of these results.
 
         In case of large outcomes numbers one should consider solutions given here:
         https://math.stackexchange.com/questions/2696344/is-there-a-way-to-find-the-log-of-very-large-numbers
@@ -107,8 +96,8 @@ def get_prime_factors(number: int) -> List[int]:
     return prime_factors
 
 
-def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int, error_probability: float,
-                                                           expected_distance: float) -> int:
+def compute_minimal_number_of_samples_for_desired_accuracy(
+outcomes_number: int, error_probability: float, expected_distance: float) -> int:
     samples_number = -log(error_probability)
 
     samples_number += log(2) * outcomes_number
@@ -120,7 +109,8 @@ def compute_minimal_number_of_samples_for_desired_accuracy(outcomes_number: int,
 
 def compute_qft_matrix(n: int) -> ndarray:
     """
-        Computes n x n matrix of quantum fourier transform. The formula can be found e.g. on wiki
+        Computes n x n matrix of quantum fourier transform. The formula can be found
+        e.g. on wiki
 
         https://en.wikipedia.org/wiki/Quantum_Fourier_transform
 

@@ -3,8 +3,7 @@ __author__ = "Tomasz Rybotycki"
 import unittest
 
 from numpy import conjugate, identity, ndarray, transpose, allclose
-
-from theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from scipy.stats import unitary_group
 
 
 class TestQuantumComputationsUtilities(unittest.TestCase):
@@ -15,7 +14,7 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         pass
 
     def test_unitarity_of_matrices_generated_by_haar_random_unitary_method(self) -> None:
-        random_matrix = generate_haar_random_unitary_matrix(self.matrix_size)
+        random_matrix = unitary_group.rvs(self.matrix_size)
         random_matrix_hermitian_adjoint = transpose(conjugate(random_matrix))
         product_of_matrix_and_hermitian_adjoint = random_matrix_hermitian_adjoint.dot(random_matrix)
 
@@ -35,7 +34,7 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
 
     def test_haar_random_unitary_matrices_generation_differences(self) -> None:
         generated_unitaries_matrices = \
-            [generate_haar_random_unitary_matrix(self.matrix_size) for _ in
+            [unitary_group.rvs(self.matrix_size) for _ in
              range(self.number_of_matrices_for_distinct_elements_check)]
 
         are_all_matrices_different = []

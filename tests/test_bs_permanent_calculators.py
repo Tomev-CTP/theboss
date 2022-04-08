@@ -26,13 +26,13 @@ from theboss.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent
     RyserGuanPermanentCalculator
 from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import \
     RyserPermanentCalculator
-from theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from scipy.stats import unitary_group
 
 
 class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
     def setUp(self) -> None:
-        self._matrix = generate_haar_random_unitary_matrix(4)
+        self._matrix = unitary_group.rvs(4)
 
         self._cl_permanent_calculator = ClassicPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])

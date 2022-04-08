@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
 import unittest
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import BSCCCHSubmatricesPermanentCalculator
 from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
-from theboss.quantum_computations_utilities import generate_haar_random_unitary_matrix
+from scipy.stats import unitary_group
 from numpy import ones, zeros
 
 
@@ -17,7 +17,7 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
 
         self._dim = 4
 
-        self._matrix = generate_haar_random_unitary_matrix(self._dim)
+        self._matrix = unitary_group.rvs(self._dim)
 
         self._input_state = ones(self._dim, dtype=int)
 
