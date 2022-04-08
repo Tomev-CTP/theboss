@@ -28,7 +28,7 @@ from numpy import ndarray, complex128, ones
 
 from .bs_permanent_calculator_base import BSPermanentCalculatorBase
 from ..boson_sampling_utilities import EffectiveScatteringMatrixCalculator
-from ...GuanCodes.src.GrayCode import get_gray_code_update_indices
+from guancodes.GrayCode import get_gray_code_update_indices
 
 
 class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):

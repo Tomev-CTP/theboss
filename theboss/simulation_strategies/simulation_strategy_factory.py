@@ -27,31 +27,43 @@ class StrategyType(enum.IntEnum):
     FIXED_LOSS = enum.auto()
     UNIFORM_LOSS = enum.auto()
     CLIFFORD_R = enum.auto()
-    GENERALIZED_CLIFFORD = enum.auto()
-    LOSSY_NET_GENERALIZED_CLIFFORD = enum.auto()
+    GCC = enum.auto()
+    LOSSY_NET_GCC = enum.auto()
     LOSSLESS_MODES_STRATEGY = enum.auto()
-    GENERALIZED_U_LOSSY_CLIFFORD = enum.auto()
-    NONUNIFORM_APPROXIMATED = enum.auto()
-    UNIFORM_LOSSY_STATE_APPROXIMATED = enum.auto()
+    UNIFORM_LOSSES_GCC = enum.auto()
+    BOBS = enum.auto()  # Brod-Oszmaniec BosonSampling
+    UNIFORM_LOSSES_BOBS = enum.auto()
 
 
 class SimulationStrategyFactory:
+
     def __init__(self, experiment_configuration: BosonSamplingExperimentConfiguration,
                  bs_permanent_calculator: BSPermanentCalculatorInterface,
                  strategy_type: StrategyType = StrategyType.FIXED_LOSS) -> None:
+
         self._experiment_configuration = experiment_configuration
         self._strategy_type = strategy_type
         self._bs_permanent_calculator = deepcopy(bs_permanent_calculator)
+
         self._strategy_mapping = {
-            StrategyType.FIXED_LOSS: self._generate_fixed_losses_strategy,
-            StrategyType.UNIFORM_LOSS: self._generate_uniform_losses_strategy,
-            StrategyType.CLIFFORD_R: self._generate_r_cliffords_strategy,
-            StrategyType.GENERALIZED_CLIFFORD: self._generate_generalized_cliffords_strategy,
-            StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD: self._generate_lossy_net_generalized_cliffords_strategy,
-            StrategyType.GENERALIZED_U_LOSSY_CLIFFORD: self._generate_u_lossy_generalized_cliffords_strategy,
-            StrategyType.NONUNIFORM_APPROXIMATED: self._generate_nonuniform_approximating_strategy,
-            StrategyType.UNIFORM_LOSSY_STATE_APPROXIMATED: self._generate_uniform_lossy_state_approximating_strategy
+            StrategyType.FIXED_LOSS:
+                self._generate_fixed_losses_strategy,
+            StrategyType.UNIFORM_LOSS:
+                self._generate_uniform_losses_strategy,
+            StrategyType.CLIFFORD_R:
+                self._generate_r_cliffords_strategy,
+            StrategyType.GCC:
+                self._generate_gcc_strategy,
+            StrategyType.LOSSY_NET_GCC:
+                self._generate_lossy_net_gcc_strategy,
+            StrategyType.UNIFORM_LOSSES_GCC:
+                self._generate_uniform_losses_gcc_strategy,
+            StrategyType.BOBS:
+                self._generate_bobs_strategy,
+            StrategyType.UNIFORM_LOSSES_BOBS:
+                self._generate_uniform_losses_bobs_strategy
         }
+
         self._available_threads_number = -1
 
     @property
@@ -75,7 +87,9 @@ class SimulationStrategyFactory:
         return self._experiment_configuration
 
     @experiment_configuration.setter
-    def experiment_configuration(self, experiment_configuration: BosonSamplingExperimentConfiguration) -> None:
+    def experiment_configuration(
+            self, experiment_configuration: BosonSamplingExperimentConfiguration
+    ) -> None:
         self._experiment_configuration = experiment_configuration
 
     @property
@@ -83,20 +97,26 @@ class SimulationStrategyFactory:
         return self._bs_permanent_calculator
 
     @bs_permanent_calculator.setter
-    def bs_permanent_calculator(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
+    def bs_permanent_calculator(
+            self, bs_permanent_calculator: BSPermanentCalculatorInterface
+    ) -> None:
         self._bs_permanent_calculator = deepcopy(bs_permanent_calculator)
 
     def generate_strategy(self) -> SimulationStrategyInterface:
         """
-            Generates simulation strategy of desired type. The type is selected in the constructor.
-        :return: Simulation strategy of desired type.
+        Generates simulation strategy of desired type. The type is selected in the
+        constructor.
+
+        :return:    Simulation strategy of desired type.
         """
-        handler = self._strategy_mapping.get(self._strategy_type, self._generate_fixed_losses_strategy)
+        handler = self._strategy_mapping.get(self._strategy_type,
+                                             self._generate_fixed_losses_strategy)
         return handler()
 
     def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategy:
         """
-            Generates fixed loss strategy.
+        Generates fixed losses' strategy from [1].
+
         :return: Fixed loss strategy.
         """
         return FixedLossSimulationStrategy(
@@ -108,7 +128,8 @@ class SimulationStrategyFactory:
 
     def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
         """
-            Generates uniform losses strategy.
+        Generates uniform losses' strategy from [1].
+
         :return: Uniform losses strategy.
         """
         return UniformLossSimulationStrategy(
@@ -119,36 +140,55 @@ class SimulationStrategyFactory:
 
     def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
         """
-            Generates Cliffords algorithm strategy using their code implemented in R.
+        Generates Cliffords algorithm strategy using their code implemented in R.
+
         :return: Cliffords strategy in R.
         """
-        return CliffordsRSimulationStrategy(self._experiment_configuration.interferometer_matrix)
+        return CliffordsRSimulationStrategy(
+            self._experiment_configuration.interferometer_matrix
+        )
 
-    def _generate_generalized_cliffords_strategy(self) -> GeneralizedCliffordsSimulationStrategy:
+    def _generate_gcc_strategy(self) \
+            -> GeneralizedCliffordsSimulationStrategy:
         """
-            Generates generalized Cliffords strategy from Oszmaniec / Brod.
+        Generates generalized Cliffords strategy from Oszmaniec & Brod.
+
         :return: Generalized Cliffords strategy.
         """
-        return GeneralizedCliffordsSimulationStrategy(deepcopy(self.bs_permanent_calculator))
+        return GeneralizedCliffordsSimulationStrategy(
+            deepcopy(self.bs_permanent_calculator)
+        )
 
-    def _generate_lossy_net_generalized_cliffords_strategy(self) \
+    def _generate_lossy_net_gcc_strategy(self) \
             -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
         """
-            Generates generalized Cliffords strategy for lossy networks from Oszmaniec / Brod 2020.
+        Generates generalized Cliffords strategy for lossy networks from [2].
+
         :return: Generalized Cliffords strategy for lossy networks.
         """
-        return LossyNetworksGeneralizedCliffordsSimulationStrategy(deepcopy(self.bs_permanent_calculator))
+        return LossyNetworksGeneralizedCliffordsSimulationStrategy(
+            deepcopy(self.bs_permanent_calculator))
 
-    def _generate_u_lossy_generalized_cliffords_strategy(self) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
-        return GeneralizedCliffordsUniformLossesSimulationStrategy(deepcopy(self.bs_permanent_calculator),
-                                                                   self._experiment_configuration.uniform_transmissivity)
+    def _generate_uniform_losses_gcc_strategy(self) \
+            -> GeneralizedCliffordsUniformLossesSimulationStrategy:
+        return GeneralizedCliffordsUniformLossesSimulationStrategy(
+            deepcopy(self.bs_permanent_calculator),
+            self._experiment_configuration.uniform_transmissivity
+        )
 
-    def _generate_nonuniform_approximating_strategy(self) -> NonuniformLossesApproximationStrategy:
-        return NonuniformLossesApproximationStrategy(deepcopy(self.bs_permanent_calculator),
-                                                     self._experiment_configuration.number_of_modes - self._experiment_configuration.hierarchy_level,
-                                                     self._experiment_configuration.uniform_transmissivity)
+    def _generate_bobs_strategy(self) \
+            -> NonuniformLossesApproximationStrategy:
+        approximated_modes_number = self._experiment_configuration.number_of_modes
+        approximated_modes_number -= self._experiment_configuration.hierarchy_level
 
-    def _generate_uniform_lossy_state_approximating_strategy(self) -> LossyStateApproximationSimulationStrategy:
+        return NonuniformLossesApproximationStrategy(
+            bs_permanent_calculator=deepcopy(self.bs_permanent_calculator),
+            approximated_modes_number=approximated_modes_number,
+            modes_transsmisivity=self._experiment_configuration.uniform_transmissivity
+        )
+
+    def _generate_uniform_losses_bobs_strategy(self) \
+            -> LossyStateApproximationSimulationStrategy:
         return LossyStateApproximationSimulationStrategy(
             bs_permanent_calculator=self._bs_permanent_calculator,
             uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,

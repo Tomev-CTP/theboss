@@ -124,7 +124,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
 
         pmf = []
 
-        weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+        weights = self._calculate_weights_from_k_vectors(corresponding_k_vectors)
         weights /= sum(weights)
         self.possible_outputs[self.current_key] = self._generate_possible_output_states()
 
