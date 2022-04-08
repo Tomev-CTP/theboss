@@ -162,7 +162,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         generalized_cliffords_distribution = \
             self.__calculate_gcc_distribution_with_lossy_inputs()
 
-        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD
+        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GCC
 
         self.__check_if_given_distribution_is_close_to_lossy_network_distribution(
             generalized_cliffords_distribution)
@@ -174,7 +174,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         GC&C method.
         :return: Approximate distribution.
         """
-        self._strategy_factory.strategy_type = StrategyType.GENERALIZED_CLIFFORD
+        self._strategy_factory.strategy_type = StrategyType.GCC
         self._permanent_calculator.matrix = self._interferometer_matrix
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
@@ -279,7 +279,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         :return: Approximate distribution.
         """
         self._strategy_factory.strategy_type = \
-            StrategyType.LOSSY_NET_GENERALIZED_CLIFFORD
+            StrategyType.LOSSY_NET_GCC
         self._strategy_factory.experiment_configuration.interferometer_matrix = self._lossy_interferometer_matrix
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
