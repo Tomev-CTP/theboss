@@ -1,9 +1,9 @@
 # Base
-numpy~=1.21.2
-scipy~=1.7.1
+numpy>=1.19
+scipy>=1.6
 guancodes~=0.0.3
 # Optional (and ignored during tests)
-rpy2~=3.4.5
+rpy2>=3.0
 # Testing
 pytest==7.1.1
-tqdm~=4.62.2
+tqdm>=4.0

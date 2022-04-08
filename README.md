@@ -27,7 +27,9 @@ which will download the package from [pypi](https://pypi.org/project/BoSS/).
 
 To run the scripts there will be needed some version of Python. During the development
 I'm using 3.8, but I believe that it will also work just fine with some earlier or newer
-version (at least for now).
+version (at least for now). 
+
+The package has been tested for python 3.6 to 3.10.
 
 In some places I use `math.prod` and `typing` package, that's why 3.8 version is
 desirable.
