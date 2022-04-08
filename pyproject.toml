@@ -22,3 +22,8 @@ r = [
 
 [project.urls]
 Home = "https://github.com/Tomev-CTP/BoSS"
+
+[tool.pytest.ini_options]
+markers = [
+    "ignore: marks ignored tests (deselect with '-m \"not ignore\"')",
+]

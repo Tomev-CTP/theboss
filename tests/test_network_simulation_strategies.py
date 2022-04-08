@@ -6,6 +6,7 @@ from random import uniform
 from typing import List, Union
 
 from numpy import asarray, eye, ndarray
+from scipy.stats import unitary_group
 
 from theboss.boson_sampling_simulator import BosonSamplingSimulator
 from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import \
@@ -16,9 +17,9 @@ from theboss.distribution_calculators.bs_sample_based_distribution_calculator im
     BSSampleBasedDistributionCalculator
 from theboss.network_simulation_strategy.lossy_network_simulation_strategy import \
     LossyNetworkSimulationStrategy
-from theboss.quantum_computations_utilities import \
-    generate_haar_random_unitary_matrix, \
+from theboss.quantum_computations_utilities import (
     count_total_variation_distance, count_tv_distance_error_bound_of_experiment_results
+)
 from theboss.simulation_strategies.simulation_strategy_factory import StrategyType, \
     SimulationStrategyFactory
 
@@ -32,7 +33,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._number_of_samples_for_experiments = 1000
         self._probability_of_error_in_distribution_calculation = 0.001
 
-        random_unitary = generate_haar_random_unitary_matrix(len(self._initial_state))
+        random_unitary = unitary_group.rvs(len(self._initial_state))
 
         self._interferometer_matrix = random_unitary
         self._lossy_interferometer_matrix = uniform_transmissivity * random_unitary

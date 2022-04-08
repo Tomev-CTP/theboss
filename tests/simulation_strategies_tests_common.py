@@ -78,7 +78,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         ], dtype=complex)
 
         self._number_of_samples_for_estimated_distribution_calculation = int(1e3)
-        self._probability_of_error_in_distribution_calculation = 1e-3
+        self._probability_of_error_in_distribution_calculation = 1e-4
 
         self._distance_calculation_initial_state = [1, 1, 1, 1, 0]
         self._distance_calculation_binned_initial_state = [2, 1, 1, 0, 0]
