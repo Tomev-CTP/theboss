@@ -1,0 +1,2 @@
+# Optional requirements (optionally ignored during tests)
+rpy2>=3.0

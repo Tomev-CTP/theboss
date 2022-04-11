@@ -2,8 +2,6 @@
 numpy>=1.19
 scipy>=1.5
 guancodes~=0.0.3
-# Optional (and ignored during tests)
-rpy2>=3.0
 # Testing
 pytest>=7.0.1
 tqdm>=4.0

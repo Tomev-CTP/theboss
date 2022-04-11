@@ -7,7 +7,6 @@ __author__ = "Tomasz Rybotycki"
 import enum
 from copy import deepcopy
 
-from .cliffords_r_simulation_strategy import CliffordsRSimulationStrategy
 from .fixed_loss_simulation_strategy import FixedLossSimulationStrategy
 from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
 from .generalized_cliffords_uniform_losses_simulation_strategy import \
@@ -138,12 +137,35 @@ class SimulationStrategyFactory:
             self._experiment_configuration.uniform_transmissivity
         )
 
-    def _generate_r_cliffords_strategy(self) -> CliffordsRSimulationStrategy:
+    def _generate_r_cliffords_strategy(self):
         """
         Generates Cliffords algorithm strategy using their code implemented in R.
 
         :return: Cliffords strategy in R.
         """
+        try:
+            from rpy2.robjects import packages
+        except ImportError as error:
+            raise ImportError(
+                f"{str(error)}. You have to install 'rpy2' in order to use the"
+                "'CLIFFORD_R' strategy."
+            )
+
+        required_packages = ('BosonSampling', 'Rcpp', 'RcppArmadillo')
+
+        missing_packages = [
+            package
+            for package in required_packages
+            if not packages.isinstalled(package)
+        ]
+
+        if missing_packages:
+            raise ImportError(
+                f"Some R packages are missing: missing_packages='{required_packages}'"
+            )
+
+        from .cliffords_r_simulation_strategy import CliffordsRSimulationStrategy
+
         return CliffordsRSimulationStrategy(
             self._experiment_configuration.interferometer_matrix
         )
