@@ -75,12 +75,12 @@ def generate_possible_outputs(number_of_particles: int, number_of_modes: int,
         starting_number_of_particles = 0
 
     for n in range(starting_number_of_particles, number_of_particles + 1):
-        outputs.extend(generate_possible_n_particle_outputs(n, number_of_modes))
+        outputs.extend(_generate_possible_n_particle_outputs(n, number_of_modes))
 
     return outputs
 
 
-def generate_possible_n_particle_outputs(number_of_particles: int,
+def _generate_possible_n_particle_outputs(number_of_particles: int,
                                          number_of_modes: int) -> List[ndarray]:
     outputs = []
 
@@ -101,7 +101,7 @@ def generate_possible_n_particle_outputs(number_of_particles: int,
 
         outputs.append(output)
 
-    sorted_outputs = sorted([tuple(output) for output in outputs])
+    sorted_outputs = sorted([tuple(output) for output in outputs], reverse=True)
 
     return [array(output) for output in sorted_outputs]
 
