@@ -74,6 +74,8 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
         k -= self._approximated_modes_number
         self._strategies_factory.experiment_configuration.hierarchy_level = k
 
+        self._strategy_initial_state = self._nonuniform_strategy_initial_state
+
         self._sampling_tvd_experiment_config.initial_state = \
             self._nonuniform_strategy_initial_state
 

@@ -58,9 +58,15 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
 
         self._strategies_factory.strategy_type = strategy
 
+        self._sampling_tvd_experiment_config.initial_state = \
+            self._calculator_initial_state
+
         exact_calculator = BSDistributionCalculatorWithUniformLosses(
             self._sampling_tvd_experiment_config,
             self._bs_permanent_calculator)
+
+        self._sampling_tvd_experiment_config.initial_state = \
+            self._strategy_initial_state
 
         if strategy == StrategyType.LOSSY_NET_GCC or strategy == StrategyType.BOBS:
             self._strategies_factory.bs_permanent_calculator.matrix *= \
@@ -80,5 +86,4 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
             approximation_tvd_bound=approximation_bound
         )
 
-        self._check_if_approximation_is_within_bounds(
-            distance_experiment_configuration)
+        self._check_if_approximation_is_within_bounds(distance_experiment_configuration)
