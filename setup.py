@@ -17,7 +17,7 @@ setup(
         'importlib-metadata; python_version == "3.7"',
         'numpy>=1.19.5; python_version >= "3.7"',
         'scipy>=1.5.4; python_version >= "3.7"',
-        'guancodes>=0.03; python_version >= "3.7"',
+        'guancodes>=0.0.3; python_version >= "3.7"',
     ],
     classifiers=[
         "Intended Audience :: Developers",
