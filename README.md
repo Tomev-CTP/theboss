@@ -15,13 +15,13 @@ classically simulating lossy boson sampling.
 ## Getting Started
 
 So far, to get the project one only needs to download it from the
-[repository](https://github.com/Tomev-CTP/BoSS) (or any other source).
+[repository](https://github.com/Tomev-CTP/theboss) (or any other source).
 
 It's also possible to download it as a package with
 
 `pip install theboss`
 
-which will download the package from [pypi](https://pypi.org/project/BoSS/).
+which will download the package from [pypi](https://pypi.org/project/theboss/).
 
 ### Prerequisites
 
@@ -44,7 +44,7 @@ U. Alternatively explicit use of matrix is also acceptable.
 
 ## Running the tests
 
-Just run all test in `tests` folder with `pytest`.
+Just run all test in `tests` folder with `pytest` or via `tox` command.
 
 ## Versioning
 
