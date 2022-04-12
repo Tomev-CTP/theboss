@@ -67,6 +67,9 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._haar_random_experiment_configuration = None
         self._haar_random_binned_experiment_input_state = None
 
+        self._strategy_initial_state = None
+        self._calculator_initial_state = None
+
     def setUp(self) -> None:
         print(f"\nIn method {self._testMethodName}. Test start!\n")
         self._permutation_matrix = array([
@@ -85,8 +88,9 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_number_of_particles_lost = 2
         self._uniform_transmissivity = 0.5
 
-        self._nonuniform_strategy_initial_state = [0, 2, 1, 1, 0]
-        self._approximated_modes_number = 2
+        # self._nonuniform_strategy_initial_state = [0, 2, 1, 1, 0]
+        self._nonuniform_strategy_initial_state = [0, 0, 3, 1, 0]
+        self._approximated_modes_number = 3
 
         distance_calculation_initial_number_of_particles = sum(
             self._distance_calculation_initial_state)
@@ -127,6 +131,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         )
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]
 
+        self._calculator_initial_state = self._distance_calculation_initial_state
+
     def tearDown(self) -> None:
         print("\nTest finished!\n")
 
@@ -134,6 +140,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             self) -> None:
         self._sampling_tvd_experiment_config.initial_state = \
             self._distance_calculation_binned_initial_state
+        self._strategy_initial_state = self._distance_calculation_binned_initial_state
         initial_number_of_particles = sum(
             self._distance_calculation_binned_initial_state)
         self._sampling_tvd_experiment_config.initial_number_of_particles = initial_number_of_particles
@@ -142,26 +149,34 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._sampling_tvd_experiment_config.uniform_transmissivity = 1
 
     def _prepare_lossy_distance_experiment_settings_with_binned_input(self):
-        # At least for now lossy experiments are only for standatd states.
-        self._sampling_tvd_experiment_config.initial_state = self._distance_calculation_binned_initial_state
+        self._sampling_tvd_experiment_config.initial_state = \
+            self._distance_calculation_binned_initial_state
+        self._strategy_initial_state = self._distance_calculation_binned_initial_state
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = initial_number_of_particles
+        self._sampling_tvd_experiment_config.initial_number_of_particles = \
+            initial_number_of_particles
         self._sampling_tvd_experiment_config.number_of_particles_lost = \
             self._distance_calculation_number_of_particles_lost
         self._sampling_tvd_experiment_config.number_of_particles_left = \
             initial_number_of_particles - self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.uniform_transmissivity = self._uniform_transmissivity
+        self._sampling_tvd_experiment_config.uniform_transmissivity = \
+            self._uniform_transmissivity
+        self._calculator_initial_state = self._distance_calculation_binned_initial_state
 
     def _prepare_lossy_distance_experiment_settings(self) -> None:
         # At least for now lossy experiments are only for standard input states.
-        self._sampling_tvd_experiment_config.initial_state = self._distance_calculation_initial_state
+        self._sampling_tvd_experiment_config.initial_state = \
+            self._distance_calculation_initial_state
+        self._strategy_initial_state = self._distance_calculation_initial_state
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = initial_number_of_particles
+        self._sampling_tvd_experiment_config.initial_number_of_particles = \
+            initial_number_of_particles
         self._sampling_tvd_experiment_config.number_of_particles_lost = \
             self._distance_calculation_number_of_particles_lost
         self._sampling_tvd_experiment_config.number_of_particles_left = \
             initial_number_of_particles - self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.uniform_transmissivity = self._uniform_transmissivity
+        self._sampling_tvd_experiment_config.uniform_transmissivity = \
+            self._uniform_transmissivity
 
     def _check_if_approximation_is_within_bounds(
             self,
