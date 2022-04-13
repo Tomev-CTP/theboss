@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='theboss',
-    version='2.0.2',
+    version='2.0.3',
     author="Tomasz Rybotycki",
     author_email="rybotycki.tomasz+theboss@gmail.com",
     long_description=long_description,
