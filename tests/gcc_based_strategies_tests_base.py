@@ -8,82 +8,82 @@ __author__ = "Tomasz Rybotycki"
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
     calculate_number_of_possible_n_particle_m_mode_output_states,
-    calculate_number_of_possible_lossy_n_particle_m_mode_output_states
+    calculate_number_of_possible_lossy_n_particle_m_mode_output_states,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
     BSDistributionCalculatorWithFixedLosses,
-    BSDistributionCalculatorWithUniformLosses
+    BSDistributionCalculatorWithUniformLosses,
 )
 from tests.simulation_strategies_tests_common import (
     TestBSClassicalSimulationStrategies,
-    SamplingAccuracyExperimentConfiguration
+    SamplingAccuracyExperimentConfiguration,
 )
-from theboss.simulation_strategies.simulation_strategy_factory import (
-    StrategyType
-)
+from theboss.simulation_strategies.simulation_strategy_factory import StrategyType
 
 
 class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
-
-    def _perform_lossless_test(
-            self,
-            strategy: StrategyType = StrategyType.GCC) -> None:
-        self._strategies_factory.experiment_configuration = \
+    def _perform_lossless_test(self, strategy: StrategyType = StrategyType.GCC) -> None:
+        self._strategies_factory.experiment_configuration = (
             self._sampling_tvd_experiment_config
+        )
         self._strategies_factory.strategy_type = strategy
         distance_experiment_configuration = SamplingAccuracyExperimentConfiguration(
             # This exact calculator, when there are no losses, will do the work just fine.
             exact_calculator=BSDistributionCalculatorWithFixedLosses(
-                self._sampling_tvd_experiment_config,
-                self._bs_permanent_calculator),
+                self._sampling_tvd_experiment_config, self._bs_permanent_calculator
+            ),
             estimation_calculator=self._generate_frequencies_calculator(
                 self._strategies_factory.generate_strategy()
             ),
             outcomes_number=calculate_number_of_possible_n_particle_m_mode_output_states(
                 n=self._sampling_tvd_experiment_config.number_of_particles_left,
-                m=self._sampling_tvd_experiment_config.number_of_modes
+                m=self._sampling_tvd_experiment_config.number_of_modes,
             ),
-            approximation_tvd_bound=0  # This strategy returns exact solution.
+            approximation_tvd_bound=0,  # This strategy returns exact solution.
         )
-        self._check_if_approximation_is_within_bounds(
-            distance_experiment_configuration)
+        self._check_if_approximation_is_within_bounds(distance_experiment_configuration)
 
     def _perform_test_for_uniform_losses(
-            self,
-            strategy: StrategyType = StrategyType.UNIFORM_LOSSES_GCC,
-            approximation_bound: int = 0) -> None:
+        self,
+        strategy: StrategyType = StrategyType.UNIFORM_LOSSES_GCC,
+        approximation_bound: int = 0,
+    ) -> None:
 
-        self._strategies_factory.experiment_configuration = \
+        self._strategies_factory.experiment_configuration = (
             self._sampling_tvd_experiment_config
+        )
 
         self._strategies_factory.strategy_type = strategy
 
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._calculator_initial_state
+        )
 
         exact_calculator = BSDistributionCalculatorWithUniformLosses(
-            self._sampling_tvd_experiment_config,
-            self._bs_permanent_calculator)
+            self._sampling_tvd_experiment_config, self._bs_permanent_calculator
+        )
 
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._strategy_initial_state
+        )
 
         if strategy == StrategyType.LOSSY_NET_GCC or strategy == StrategyType.BOBS:
-            self._strategies_factory.bs_permanent_calculator.matrix *= \
-                pow(self._uniform_transmissivity, 0.5)
+            self._strategies_factory.bs_permanent_calculator.matrix *= pow(
+                self._uniform_transmissivity, 0.5
+            )
 
         distance_experiment_configuration = SamplingAccuracyExperimentConfiguration(
             # This exact calculator, when there are no losses, will do the work just fine.
             exact_calculator=exact_calculator,
             estimation_calculator=self._generate_frequencies_calculator(
                 self._strategies_factory.generate_strategy(),
-                outcomes=exact_calculator.get_outcomes_in_proper_order()
+                outcomes=exact_calculator.get_outcomes_in_proper_order(),
             ),
             outcomes_number=calculate_number_of_possible_lossy_n_particle_m_mode_output_states(
                 n=self._sampling_tvd_experiment_config.initial_number_of_particles,
-                m=self._sampling_tvd_experiment_config.number_of_modes
+                m=self._sampling_tvd_experiment_config.number_of_modes,
             ),
-            approximation_tvd_bound=approximation_bound
+            approximation_tvd_bound=approximation_bound,
         )
 
         self._check_if_approximation_is_within_bounds(distance_experiment_configuration)

@@ -9,13 +9,18 @@ from typing import Optional
 
 from numpy import complex128, ndarray
 
-from ..permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
+from ..permanent_calculators.chin_huh_permanent_calculator import (
+    ChinHuhPermanentCalculator,
+)
 
 
 class ParallelChinHuhPermanentCalculator(ChinHuhPermanentCalculator):
-
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
         super().__init__(matrix, input_state, output_state)
 
     def calculate(self) -> complex128:

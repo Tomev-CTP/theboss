@@ -12,8 +12,9 @@ from typing import List, Optional
 from numpy import complex128, ndarray
 from scipy.special import binom
 
-from ..permanent_calculators.bs_permanent_calculator_base import \
-    BSPermanentCalculatorBase
+from ..permanent_calculators.bs_permanent_calculator_base import (
+    BSPermanentCalculatorBase,
+)
 
 
 class RyserPermanentCalculator(BSPermanentCalculatorBase):
@@ -24,8 +25,12 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         representations of Fock states with proper dimensions.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
         super().__init__(matrix, input_state, output_state)
 
     def compute_permanent(self) -> complex128:
@@ -49,8 +54,9 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         permanent *= pow(-1, sum(self._input_state))
         return permanent
 
-    def _calculate_r_vectors(self,
-                             input_vector: Optional[ndarray] = None) -> List[ndarray]:
+    def _calculate_r_vectors(
+        self, input_vector: Optional[ndarray] = None
+    ) -> List[ndarray]:
         """
             This method is used to calculate all the r vectors that appear in the
             Ryser's formula during permanent calculation. By r vectors I denote vectors
@@ -88,7 +94,8 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         for mode_index in range(len(self._input_state)):
             if self._input_state[mode_index] != 0:
                 considered_columns_indices.append(
-                    mode_index)  # Consider non-standard inputs
+                    mode_index
+                )  # Consider non-standard inputs
 
         for j in considered_columns_indices:
             product_part = 0
@@ -96,7 +103,8 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
             for nu in range(len(self._input_state)):
                 product_part += r_vector[nu] * self._matrix[nu][j]
 
-            product *= pow(product_part, self._input_state[
-                j])  # Take into account bunching in the input
+            product *= pow(
+                product_part, self._input_state[j]
+            )  # Take into account bunching in the input
         addend *= product
         return addend

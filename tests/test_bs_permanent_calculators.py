@@ -14,23 +14,28 @@ from typing import List
 
 from numpy import allclose, array
 
-from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import \
-    ChinHuhPermanentCalculator
-from theboss.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import \
-    ClassicPermanentCalculator
-from theboss.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent_calculator import \
-    GlynnGrayPermanentCalculator
-from theboss.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import \
-    ParallelChinHuhPermanentCalculator
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import \
-    RyserGuanPermanentCalculator
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import \
-    RyserPermanentCalculator
+from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
+    ChinHuhPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import (
+    ClassicPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent_calculator import (
+    GlynnGrayPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import (
+    ParallelChinHuhPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import (
+    RyserGuanPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+    RyserPermanentCalculator,
+)
 from scipy.stats import unitary_group
 
 
 class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
-
     def setUp(self) -> None:
         self._matrix = unitary_group.rvs(4)
 
@@ -58,8 +63,9 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
-    def _set_input_and_output_states(self, input_state: List[int],
-                                     output_state: List[int]) -> None:
+    def _set_input_and_output_states(
+        self, input_state: List[int], output_state: List[int]
+    ) -> None:
         self._cl_permanent_calculator.input_state = input_state
         self._cl_permanent_calculator.output_state = output_state
 
@@ -85,16 +91,20 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         cl_permanent = self._cl_permanent_calculator.compute_permanent()
 
         self.assertTrue(
-            allclose(cl_permanent, self._gg_permanent_calculator.compute_permanent()))
+            allclose(cl_permanent, self._gg_permanent_calculator.compute_permanent())
+        )
 
         self.assertTrue(
-            allclose(cl_permanent, self._r_permanent_calculator.compute_permanent()))
+            allclose(cl_permanent, self._r_permanent_calculator.compute_permanent())
+        )
 
         self.assertTrue(
-            allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent()))
+            allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent())
+        )
 
         self.assertTrue(
-            allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent()))
+            allclose(cl_permanent, self._ch_permanent_calculator.compute_permanent())
+        )
 
     def test_full_input_output_case(self) -> None:
         self._set_input_and_output_states([1, 1, 1, 1], [1, 1, 1, 1])
@@ -140,5 +150,9 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
                 case.
         """
         self._set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
-        self.assertTrue(allclose(self._cl_permanent_calculator.compute_permanent(),
-                                 self._pch_permanent_calculator.compute_permanent()))
+        self.assertTrue(
+            allclose(
+                self._cl_permanent_calculator.compute_permanent(),
+                self._pch_permanent_calculator.compute_permanent(),
+            )
+        )

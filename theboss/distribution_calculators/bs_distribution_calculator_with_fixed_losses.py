@@ -8,12 +8,15 @@ from numpy import ndarray
 from scipy.special import binom
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    generate_lossy_inputs, generate_possible_outputs
+    generate_lossy_inputs,
+    generate_possible_outputs,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
+from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
 from theboss.distribution_calculators.bs_distribution_calculator_interface import (
-    BosonSamplingExperimentConfiguration, BSDistributionCalculatorInterface
+    BosonSamplingExperimentConfiguration,
+    BSDistributionCalculatorInterface,
 )
 
 
@@ -23,8 +26,12 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
     regime where only a fixed number of particles is lost. It's a vital component of
     the BS distribution calculator with uniform losses.
     """
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration,
-                 permanent_calculator: BSPermanentCalculatorInterface) -> None:
+
+    def __init__(
+        self,
+        configuration: BosonSamplingExperimentConfiguration,
+        permanent_calculator: BSPermanentCalculatorInterface,
+    ) -> None:
         self.configuration = deepcopy(configuration)
         self._permanent_calculator = permanent_calculator
 
@@ -37,8 +44,10 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         :return:    All the possible outcomes of BS experiment specified by the
                     configuration.
         """
-        return generate_possible_outputs(self.configuration.number_of_particles_left,
-                                         self.configuration.number_of_modes)
+        return generate_possible_outputs(
+            self.configuration.number_of_particles_left,
+            self.configuration.number_of_modes,
+        )
 
     def calculate_distribution(self) -> List[float]:
         """
@@ -53,8 +62,9 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
         return self.calculate_probabilities_of_outcomes(possible_outcomes)
 
-    def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]]) -> \
-            List[float]:
+    def calculate_probabilities_of_outcomes(
+        self, outcomes: Iterable[Iterable[int]]
+    ) -> List[float]:
         """
         Computes and returns the probabilities of obtaining specified outcomes in the
         BS experiment described by the configuration. The order of the probabilities
@@ -65,8 +75,9 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
         :return:            A list of probabilities of obtaining specified outcomes.
         """
-        outcomes_probabilities = [self.__calculate_probability_of_outcome(outcome) for
-                                  outcome in outcomes]
+        outcomes_probabilities = [
+            self.__calculate_probability_of_outcome(outcome) for outcome in outcomes
+        ]
 
         return outcomes_probabilities
 
@@ -81,20 +92,22 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         :return:        Probability of obtaining given state in current experiment
                         configuration.
         """
-        outcome_probability = \
-            self.__compute_probability_of_outcome_state_for_indistinguishable_photons(
-                outcome)
+        outcome_probability = self.__compute_probability_of_outcome_state_for_indistinguishable_photons(
+            outcome
+        )
 
         # Different states in particles-basis may give the same outcome state.
         outcome_probability *= math.factorial(
-            self.configuration.number_of_particles_left)
+            self.configuration.number_of_particles_left
+        )
         for i in range(self.configuration.number_of_modes):
             outcome_probability /= math.factorial(outcome[i])
 
         return outcome_probability
 
-    def __compute_probability_of_outcome_state_for_indistinguishable_photons(self,
-                                                                             outcome_state: ndarray) -> float:
+    def __compute_probability_of_outcome_state_for_indistinguishable_photons(
+        self, outcome_state: ndarray
+    ) -> float:
         """
         Computes the probability of obtaining specified outcome state.
 
@@ -106,14 +119,16 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         probability_of_outcome = 0
 
         # Symmetrize the input.
-        lossy_inputs_list = \
-            generate_lossy_inputs(self.configuration.initial_state,
-                                  self.configuration.number_of_particles_left)
+        lossy_inputs_list = generate_lossy_inputs(
+            self.configuration.initial_state,
+            self.configuration.number_of_particles_left,
+        )
 
         for lossy_input in lossy_inputs_list:
 
-            lossy_input_multiplicity = \
-                self.__compute_lossy_input_multiplicity(lossy_input)
+            lossy_input_multiplicity = self.__compute_lossy_input_multiplicity(
+                lossy_input
+            )
 
             self._permanent_calculator.matrix = self.configuration.interferometer_matrix
             self._permanent_calculator.input_state = lossy_input
@@ -128,8 +143,10 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
 
         # Normalization (read Brod & Oszmaniec 2019).
         probability_of_outcome /= math.factorial(sum(lossy_input))
-        probability_of_outcome /= binom(self.configuration.initial_number_of_particles,
-                                        self.configuration.number_of_particles_left)
+        probability_of_outcome /= binom(
+            self.configuration.initial_number_of_particles,
+            self.configuration.number_of_particles_left,
+        )
 
         return probability_of_outcome
 
@@ -145,7 +162,8 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         lossy_input_multiplicity = 1
 
         for i in range(len(lossy_input)):
-            lossy_input_multiplicity *= binom(self.configuration.initial_state[i],
-                                              self.configuration.initial_state[i] -
-                                              lossy_input[i])
+            lossy_input_multiplicity *= binom(
+                self.configuration.initial_state[i],
+                self.configuration.initial_state[i] - lossy_input[i],
+            )
         return int(lossy_input_multiplicity)

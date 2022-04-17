@@ -8,12 +8,12 @@ __author__ = "Tomasz Rybotycki"
 
 from tests.gcc_based_strategies_tests_base import GCCBasedStrategiesTestsBase
 from theboss.simulation_strategies.simulation_strategy_factory import (
-    StrategyType, SimulationStrategyFactory
+    StrategyType,
+    SimulationStrategyFactory,
 )
 
 
 class TestGCCStrategies(GCCBasedStrategiesTestsBase):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -29,8 +29,7 @@ class TestGCCStrategies(GCCBasedStrategiesTestsBase):
         self._prepare_lossless_distance_experiment_settings()
         self._perform_lossless_test()
 
-    def test_exact_sampling_accuracy_with_binned_input(
-            self) -> None:
+    def test_exact_sampling_accuracy_with_binned_input(self) -> None:
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
         self._perform_lossless_test()
 
@@ -56,8 +55,9 @@ class TestGCCStrategies(GCCBasedStrategiesTestsBase):
         self._prepare_lossless_distance_experiment_settings()
         self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_GCC)
 
-    def test_exact_sampling_accuracy_for_u_losses_strategy_with_binned_input(self)\
-            -> None:
+    def test_exact_sampling_accuracy_for_u_losses_strategy_with_binned_input(
+        self,
+    ) -> None:
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
         self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_GCC)
 
@@ -72,30 +72,35 @@ class TestGCCStrategies(GCCBasedStrategiesTestsBase):
     # Haar random matrices tests
     def _set_experiment_configuration_for_binned_haar_random(self) -> None:
         # Note that binned configuration is also for lossless case (for now)
-        self._haar_random_experiment_configuration.initial_state = \
+        self._haar_random_experiment_configuration.initial_state = (
             self._haar_random_binned_experiment_input_state
+        )
         number_of_particles_in_the_experiment = len(
-            self._haar_random_binned_experiment_input_state)
-        self._haar_random_experiment_configuration.initial_number_of_particles = \
+            self._haar_random_binned_experiment_input_state
+        )
+        self._haar_random_experiment_configuration.initial_number_of_particles = (
             number_of_particles_in_the_experiment
-        self._haar_random_experiment_configuration.number_of_particles_left = \
+        )
+        self._haar_random_experiment_configuration.number_of_particles_left = (
             number_of_particles_in_the_experiment
+        )
 
     def test_gcc_state_average_probability_for_haar_random_matrices(self) -> None:
         self._set_experiment_configuration_for_lossless_haar_random()
         strategy_factory = SimulationStrategyFactory(
             self._haar_random_experiment_configuration,
             self._bs_permanent_calculator,
-            StrategyType.GCC)
-        self._test_state_average_probability_for_haar_random_matrices(
-            strategy_factory)
+            StrategyType.GCC,
+        )
+        self._test_state_average_probability_for_haar_random_matrices(strategy_factory)
 
-    def test_binned_input_gcc_state_average_probability_for_haar_random_matrices(self)\
-            -> None:
+    def test_binned_input_gcc_state_average_probability_for_haar_random_matrices(
+        self,
+    ) -> None:
         self._set_experiment_configuration_for_binned_haar_random()
         strategy_factory = SimulationStrategyFactory(
             self._haar_random_experiment_configuration,
             self._bs_permanent_calculator,
-            StrategyType.GCC)
-        self._test_state_average_probability_for_haar_random_matrices(
-            strategy_factory)
+            StrategyType.GCC,
+        )
+        self._test_state_average_probability_for_haar_random_matrices(strategy_factory)

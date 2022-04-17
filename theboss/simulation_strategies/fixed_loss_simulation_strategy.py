@@ -7,18 +7,26 @@ from numpy import conjugate, exp, ndarray, ones, sqrt, zeros, pi
 from numpy.random import rand
 
 from .simulation_strategy_interface import SimulationStrategyInterface
-from ..network_simulation_strategy.lossy_network_simulation_strategy import LossyNetworkSimulationStrategy
-from ..network_simulation_strategy.network_simulation_strategy import NetworkSimulationStrategy
+from ..network_simulation_strategy.lossy_network_simulation_strategy import (
+    LossyNetworkSimulationStrategy,
+)
+from ..network_simulation_strategy.network_simulation_strategy import (
+    NetworkSimulationStrategy,
+)
 
 
 class FixedLossSimulationStrategy(SimulationStrategyInterface):
-
-    def __init__(self, interferometer_matrix: ndarray,
-                 number_of_photons_left: int, number_of_observed_modes: int,
-                 network_simulation_strategy: Optional[NetworkSimulationStrategy] = None) \
-            -> None:
+    def __init__(
+        self,
+        interferometer_matrix: ndarray,
+        number_of_photons_left: int,
+        number_of_observed_modes: int,
+        network_simulation_strategy: Optional[NetworkSimulationStrategy] = None,
+    ) -> None:
         if network_simulation_strategy is None:
-            network_simulation_strategy = LossyNetworkSimulationStrategy(interferometer_matrix)
+            network_simulation_strategy = LossyNetworkSimulationStrategy(
+                interferometer_matrix
+            )
         self.number_of_photons_left = number_of_photons_left
         self.interferometer_matrix = interferometer_matrix
         self.number_of_observed_modes = number_of_observed_modes
@@ -35,9 +43,13 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
         samples = []
         while len(samples) < samples_number:
             phi_0 = self._prepare_initial_state(input_state)
-            evolved_state = self._network_simulation_strategy.simulate(input_state=phi_0)
+            evolved_state = self._network_simulation_strategy.simulate(
+                input_state=phi_0
+            )
             probabilities = self._calculate_probabilities(evolved_state)
-            samples.append(self._calculate_approximation_of_boson_sampling_outcome(probabilities))
+            samples.append(
+                self._calculate_approximation_of_boson_sampling_outcome(probabilities)
+            )
         return samples
 
     def _prepare_initial_state(self, input_state: ndarray) -> ndarray:
@@ -50,7 +62,9 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
         initial_number_of_photons = int(sum(input_state))
         prepared_state = ones(self.number_of_observed_modes, dtype=float)
         prepared_state[initial_number_of_photons:] = 0
-        prepared_state /= sqrt(initial_number_of_photons)  # Note, that numpy version of sqrt is used here!
+        prepared_state /= sqrt(
+            initial_number_of_photons
+        )  # Note, that numpy version of sqrt is used here!
 
         return self._randomize_modes_phases(prepared_state)
 
@@ -67,7 +81,9 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
     def _calculate_probabilities(state: ndarray) -> ndarray:
         return conjugate(state) * state
 
-    def _calculate_approximation_of_boson_sampling_outcome(self, probabilities: ndarray) -> ndarray:
+    def _calculate_approximation_of_boson_sampling_outcome(
+        self, probabilities: ndarray
+    ) -> ndarray:
         """
             This method applies evolution to every photon. Note, that evolution of each particle is independent of
             each other.

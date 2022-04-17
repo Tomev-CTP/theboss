@@ -7,13 +7,27 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Union
 
-from numpy import ( abs, linalg, log, ndarray, sqrt, pi, exp, asarray, tile, power,
- diag, dot)
+from numpy import (
+    abs,
+    linalg,
+    log,
+    ndarray,
+    sqrt,
+    pi,
+    exp,
+    asarray,
+    tile,
+    power,
+    diag,
+    dot,
+)
 from numpy.random import randn
 
 
-def count_total_variation_distance(distribution1: Union[List[float], ndarray],
-                                   distribution2: Union[List[float], ndarray]) -> float:
+def count_total_variation_distance(
+    distribution1: Union[List[float], ndarray],
+    distribution2: Union[List[float], ndarray],
+) -> float:
     """
         This method calculates total variation distance between two given distributions.
         :param distribution1: First distribution.
@@ -21,9 +35,12 @@ def count_total_variation_distance(distribution1: Union[List[float], ndarray],
         :return: Total variation distance between two given distributions.
     """
 
-    assert len(distribution1) == len(distribution2), " \
-    f"f"Distributions must have equal lengths! Got: {len(distribution1)}" \
-                                                     f"and {len(distribution2)}!"
+    assert len(distribution1) == len(distribution2), (
+        " \
+    f"
+        f"Distributions must have equal lengths! Got: {len(distribution1)}"
+        f"and {len(distribution2)}!"
+    )
     total_variation_distance = 0
 
     for i in range(len(distribution1)):
@@ -46,7 +63,8 @@ def count_distance_between_matrices(matrix1: ndarray, matrix2: ndarray) -> float
 
 
 def count_tv_distance_error_bound_of_experiment_results(
-outcomes_number: int, samples_number: int, error_probability: float) -> float:
+    outcomes_number: int, samples_number: int, error_probability: float
+) -> float:
     """
         Calculates the distance bound between the experimental results and the n-sample
         estimation of these results.
@@ -97,7 +115,8 @@ def get_prime_factors(number: int) -> List[int]:
 
 
 def compute_minimal_number_of_samples_for_desired_accuracy(
-outcomes_number: int, error_probability: float, expected_distance: float) -> int:
+    outcomes_number: int, error_probability: float, expected_distance: float
+) -> int:
     samples_number = -log(error_probability)
 
     samples_number += log(2) * outcomes_number

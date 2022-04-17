@@ -9,15 +9,17 @@ import unittest
 from numpy import isclose
 
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
-    BSDistributionCalculatorWithUniformLosses, BSDistributionCalculatorWithFixedLosses,
-    BosonSamplingExperimentConfiguration
+    BSDistributionCalculatorWithUniformLosses,
+    BSDistributionCalculatorWithFixedLosses,
+    BosonSamplingExperimentConfiguration,
 )
 
-from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import ChinHuhPermanentCalculator
+from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
+    ChinHuhPermanentCalculator,
+)
 
 
 class TestDistributionCalculators(unittest.TestCase):
-
     def setUp(self) -> None:
         self._m: int = 4  # Modes number
 
@@ -41,12 +43,13 @@ class TestDistributionCalculators(unittest.TestCase):
 
     def _prepare_test_setup(self, input_state) -> None:
         self._config = BosonSamplingExperimentConfiguration(
-            interferometer_matrix=self._matrix, initial_state=input_state,
+            interferometer_matrix=self._matrix,
+            initial_state=input_state,
             initial_number_of_particles=sum(input_state),
             number_of_modes=self._m,
             number_of_particles_lost=self._number_of_particles_lost,
             number_of_particles_left=sum(input_state) - self._number_of_particles_lost,
-            uniform_transmissivity=self._uniform_transmissivity
+            uniform_transmissivity=self._uniform_transmissivity,
         )
         self._permanent_calculator.input_state = input_state
 

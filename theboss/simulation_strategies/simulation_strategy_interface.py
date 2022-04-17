@@ -7,11 +7,9 @@ from numpy import ndarray
 
 
 class SimulationStrategyInterface(abc.ABC):
-
     @classmethod
     def __subclasshook__(cls, subclass):
-        return (hasattr(subclass, "simulate") and
-                callable(subclass.simulate))
+        return hasattr(subclass, "simulate") and callable(subclass.simulate)
 
     @abc.abstractmethod
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:

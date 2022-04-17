@@ -13,7 +13,6 @@ from numpy import complex128, ndarray
 
 
 class BSPermanentCalculatorInterface(abc.ABC):
-
     @abc.abstractmethod
     def compute_permanent(self) -> complex128:
         """Computes permanent of a matrix given before."""

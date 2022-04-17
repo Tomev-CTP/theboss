@@ -17,24 +17,29 @@ from numpy import ndarray, diag, ones_like
 from numpy.random import choice
 from scipy import special
 
-from .lossy_networks_generalized_cliffords_simulation_strategy import \
-    BSPermanentCalculatorInterface, \
-    LossyNetworksGeneralizedCliffordsSimulationStrategy
-from ..boson_sampling_utilities.boson_sampling_utilities import \
-    prepare_interferometer_matrix_in_expanded_space, \
-    generate_qft_matrix_for_first_m_modes, \
-    generate_random_phases_matrix_for_first_m_modes
+from .lossy_networks_generalized_cliffords_simulation_strategy import (
+    BSPermanentCalculatorInterface,
+    LossyNetworksGeneralizedCliffordsSimulationStrategy,
+)
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    prepare_interferometer_matrix_in_expanded_space,
+    generate_qft_matrix_for_first_m_modes,
+    generate_random_phases_matrix_for_first_m_modes,
+)
 
 
-class NonuniformLossesApproximationStrategy():
-
-    def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface,
-                 approximated_modes_number: int,
-                 modes_transsmisivity: float, threads_number: int = -1) -> None:
+class NonuniformLossesApproximationStrategy:
+    def __init__(
+        self,
+        bs_permanent_calculator: BSPermanentCalculatorInterface,
+        approximated_modes_number: int,
+        modes_transsmisivity: float,
+        threads_number: int = -1,
+    ) -> None:
 
         self._approximated_modes_number = self._get_proper_approximated_modes_number(
-            bs_permanent_calculator,
-            approximated_modes_number)
+            bs_permanent_calculator, approximated_modes_number
+        )
         self._modes_transmissivity = modes_transsmisivity
 
         self._initial_matrix = self._prepare_initial_matrix(bs_permanent_calculator)
@@ -47,20 +52,23 @@ class NonuniformLossesApproximationStrategy():
 
     @staticmethod
     def _get_proper_approximated_modes_number(
-            bs_permanent_calculator: BSPermanentCalculatorInterface,
-            approximated_modes_number: int):
+        bs_permanent_calculator: BSPermanentCalculatorInterface,
+        approximated_modes_number: int,
+    ):
         if approximated_modes_number > bs_permanent_calculator.matrix.shape[0]:
             approximated_modes_number = bs_permanent_calculator.matrix.shape[0]
         if approximated_modes_number < 0:
             approximated_modes_number = 0
         return approximated_modes_number
 
-    def _prepare_initial_matrix(self,
-                                bs_permanent_calculator: BSPermanentCalculatorInterface):
+    def _prepare_initial_matrix(
+        self, bs_permanent_calculator: BSPermanentCalculatorInterface
+    ):
 
         loss_removing_matrix = ones_like(bs_permanent_calculator.matrix[0])
-        loss_removing_matrix[:self._approximated_modes_number] = 1.0 / sqrt(
-            self._modes_transmissivity) # This here assumes uniform losses
+        loss_removing_matrix[: self._approximated_modes_number] = 1.0 / sqrt(
+            self._modes_transmissivity
+        )  # This here assumes uniform losses
         loss_removing_matrix = diag(loss_removing_matrix)
 
         initial_matrix = bs_permanent_calculator.matrix @ loss_removing_matrix
@@ -94,8 +102,11 @@ class NonuniformLossesApproximationStrategy():
             return []
 
         # Get samples number per thread
-        samples_per_thread = (samples_number + self._threads_number - (
-                    samples_number % self._threads_number))
+        samples_per_thread = (
+            samples_number
+            + self._threads_number
+            - (samples_number % self._threads_number)
+        )
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
@@ -104,8 +115,9 @@ class NonuniformLossesApproximationStrategy():
         multiprocessing_context = multiprocessing.get_context("spawn")
 
         with Pool(mp_context=multiprocessing_context) as p:
-            samples_lists = p.map(self._simulate_in_parallel, repeat(input_state),
-                                  samples_for_threads)
+            samples_lists = p.map(
+                self._simulate_in_parallel, repeat(input_state), samples_for_threads
+            )
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
 
@@ -115,7 +127,8 @@ class NonuniformLossesApproximationStrategy():
         samples = []
 
         helper_strategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(
-            deepcopy(self._permanent_calculator))
+            deepcopy(self._permanent_calculator)
+        )
 
         for _ in range(samples_number):
             lossy_input = self._compute_lossy_input(input_state)
@@ -142,17 +155,17 @@ class NonuniformLossesApproximationStrategy():
 
         binned_input_index = self._approximated_modes_number - 1
         lossy_input[binned_input_index] = choice(
-            range(self._approximated_modes_number + 1), p=self._binom_weights)
+            range(self._approximated_modes_number + 1), p=self._binom_weights
+        )
 
         return lossy_input
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         qft_matrix = generate_qft_matrix_for_first_m_modes(
-            self._approximated_modes_number,
-            self._initial_matrix.shape[0])
+            self._approximated_modes_number, self._initial_matrix.shape[0]
+        )
         random_phases_matrix = generate_random_phases_matrix_for_first_m_modes(
-            self._approximated_modes_number,
-            self._initial_matrix.shape[0]
+            self._approximated_modes_number, self._initial_matrix.shape[0]
         )
 
         return self._initial_matrix @ random_phases_matrix @ qft_matrix

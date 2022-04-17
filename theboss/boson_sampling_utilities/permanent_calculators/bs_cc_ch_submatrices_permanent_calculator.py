@@ -65,8 +65,9 @@ class BSSubmatricesPermanentCalculatorInterface(abc.ABC):
         raise NotImplementedError
 
 
-class BSSubmatricesPermanentCalculatorBase(BSSubmatricesPermanentCalculatorInterface,
-                                           abc.ABC):
+class BSSubmatricesPermanentCalculatorBase(
+    BSSubmatricesPermanentCalculatorInterface, abc.ABC
+):
     """
         Base class for BSSubmatricesPermanentCalculator classes. It takes care of some
         boilerplate code.
@@ -76,8 +77,12 @@ class BSSubmatricesPermanentCalculatorBase(BSSubmatricesPermanentCalculatorInter
         permanent calculator.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
         if output_state is None:
             output_state = array([], dtype=int64)
         if input_state is None:
@@ -121,16 +126,20 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
         iterated in Guan Codes induced order.
     """
 
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
-        
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
+
         self.sums: dict = dict()
         self.permanents: List[complex128] = []
         self.multiplier: int = 1
         self.binomials_product: int = 1
         self.v_vector: ndarray = array(0)
         self.considered_columns_indices = array(0)
-        
+
         super().__init__(matrix, input_state, output_state)
 
     def compute_permanents(self) -> List[complex128]:
@@ -165,10 +174,13 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
             # UPDATE R VECTOR
             index_to_update = 0  # i
             updated_value_at_index = self.v_vector[0] + code_update_information[0]  # k
-            while updated_value_at_index > position_limits[index_to_update] \
-                    or updated_value_at_index < 0:
+            while (
+                updated_value_at_index > position_limits[index_to_update]
+                or updated_value_at_index < 0
+            ):
                 code_update_information[index_to_update] = -code_update_information[
-                    index_to_update]
+                    index_to_update
+                ]
                 index_to_update += 1
 
                 if index_to_update == len(self.v_vector):
@@ -179,9 +191,10 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
 
                     return self.permanents
 
-                updated_value_at_index = \
-                    self.v_vector[index_to_update] + \
-                    code_update_information[index_to_update]
+                updated_value_at_index = (
+                    self.v_vector[index_to_update]
+                    + code_update_information[index_to_update]
+                )
 
             last_value_at_index = self.v_vector[index_to_update]
             self.v_vector[index_to_update] = updated_value_at_index
@@ -192,16 +205,21 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
 
             # Sums update
             for i in self.sums:
-                self.sums[i] -= 2 * (self.v_vector[index_to_update] - last_value_at_index) * \
-                           self.matrix[i][index_to_update]
+                self.sums[i] -= (
+                    2
+                    * (self.v_vector[index_to_update] - last_value_at_index)
+                    * self.matrix[i][index_to_update]
+                )
 
             # Binoms update
             if self.v_vector[index_to_update] > last_value_at_index:
-                self.binomials_product *= (self._input_state[index_to_update] -
-                                      last_value_at_index) / self.v_vector[index_to_update]
+                self.binomials_product *= (
+                    self._input_state[index_to_update] - last_value_at_index
+                ) / self.v_vector[index_to_update]
             else:
                 self.binomials_product *= last_value_at_index / (
-                        self._input_state[index_to_update] - self.v_vector[index_to_update])
+                    self._input_state[index_to_update] - self.v_vector[index_to_update]
+                )
 
             self._add_permanent_addends()
 
@@ -224,10 +242,21 @@ class BSCCCHSubmatricesPermanentCalculator(BSSubmatricesPermanentCalculatorBase)
                 updated_sums[j] = self.sums[j] - self.matrix[j][i]
 
             # Compute update binomial product
-            updated_binom = self.binomials_product / (self.input_state[i] / (self.input_state[i] - self.v_vector[i]))
+            updated_binom = self.binomials_product / (
+                self.input_state[i] / (self.input_state[i] - self.v_vector[i])
+            )
 
-            addend = self.multiplier * updated_binom * \
-                     reduce(operator.mul, [pow(updated_sums[j], self._output_state[j])
-                                           for j in self.considered_columns_indices], 1)
+            addend = (
+                self.multiplier
+                * updated_binom
+                * reduce(
+                    operator.mul,
+                    [
+                        pow(updated_sums[j], self._output_state[j])
+                        for j in self.considered_columns_indices
+                    ],
+                    1,
+                )
+            )
 
             self.permanents[i] += addend

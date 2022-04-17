@@ -10,15 +10,18 @@ from numpy import array, delete, float64, insert, int64, ndarray
 from numpy.random import random
 
 from .simulation_strategy_interface import SimulationStrategyInterface
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
 
 
 class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         self.r_sample = []
         self.number_of_input_photons = 0
-        self.pmfs = dict()  # Probability mass functions calculated along the way. Keys should be current r as tuples.
+        self.pmfs = (
+            dict()
+        )  # Probability mass functions calculated along the way. Keys should be current r as tuples.
         self._bs_permanent_calculator = bs_permanent_calculator
         self.input_state = array([], dtype=int64)
         self._labeled_states = defaultdict(list)
@@ -58,7 +61,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
             particles in this state.
         """
         # Calculating all possible substates of the input
-        possible_input_states = self._calculate_all_input_substates(self.input_state.copy())
+        possible_input_states = self._calculate_all_input_substates(
+            self.input_state.copy()
+        )
 
         # Labeling them into dict where keys are being number of particles in the state.
         self._labeled_states = defaultdict(list)
@@ -106,28 +111,38 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
 
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
 
-        corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
-                                   for state in possible_input_states]
+        corresponding_k_vectors = [
+            [self.input_state[i] - state[i] for i in range(len(state))]
+            for state in possible_input_states
+        ]
 
         weights = self._calculate_weights_from_k_vectors(corresponding_k_vectors)
 
         weights /= sum(weights)
-        self.possible_outputs[self.current_key] = self._generate_possible_output_states()
+        self.possible_outputs[
+            self.current_key
+        ] = self._generate_possible_output_states()
 
         pmf = []
 
         for output in self.possible_outputs[self.current_key]:
             pmf.append(0)
             for i in range(len(possible_input_states)):
-                probability = self._calculate_outputs_probability(possible_input_states[i], output)
+                probability = self._calculate_outputs_probability(
+                    possible_input_states[i], output
+                )
                 probability *= weights[i]
                 pmf[-1] += probability
 
         self.pmfs[self.current_key] = pmf
 
-    def _calculate_weights_from_k_vectors(self, corresponding_k_vectors: List[List[int]]) -> ndarray:
-        return array([self._calculate_weights(vector)
-                      for vector in corresponding_k_vectors], dtype=float64)
+    def _calculate_weights_from_k_vectors(
+        self, corresponding_k_vectors: List[List[int]]
+    ) -> ndarray:
+        return array(
+            [self._calculate_weights(vector) for vector in corresponding_k_vectors],
+            dtype=float64,
+        )
 
     def _calculate_weights(self, k_vector: List[int]):
         l = sum(k_vector)
@@ -150,7 +165,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
 
         return possible_output_states
 
-    def _calculate_outputs_probability(self, input_state: ndarray, output_state: ndarray) -> float:
+    def _calculate_outputs_probability(
+        self, input_state: ndarray, output_state: ndarray
+    ) -> float:
         self._bs_permanent_calculator.input_state = input_state
         self._bs_permanent_calculator.output_state = output_state
         probability = abs(self._bs_permanent_calculator.compute_permanent()) ** 2
@@ -165,7 +182,9 @@ class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
     def _sample_from_latest_pmf(self) -> None:
 
         sample_index = 0
-        random_value = random() * sum(self.pmfs[self.current_key])  # PMFs are not normalized.
+        random_value = random() * sum(
+            self.pmfs[self.current_key]
+        )  # PMFs are not normalized.
         current_probability = 0
         for probability in self.pmfs[self.current_key]:
             current_probability += probability

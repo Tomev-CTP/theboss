@@ -15,15 +15,19 @@ from typing import List
 from numpy import array, ndarray, int64, zeros_like, complex128
 from numpy.random import choice, randint
 
-from .generalized_cliffords_simulation_strategy import \
-    GeneralizedCliffordsSimulationStrategy, BSPermanentCalculatorInterface
-from ..boson_sampling_utilities.boson_sampling_utilities import \
-    modes_state_to_particle_state
-from ..boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import BSCCCHSubmatricesPermanentCalculator
+from .generalized_cliffords_simulation_strategy import (
+    GeneralizedCliffordsSimulationStrategy,
+    BSPermanentCalculatorInterface,
+)
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    modes_state_to_particle_state,
+)
+from ..boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import (
+    BSCCCHSubmatricesPermanentCalculator,
+)
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
-
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(bs_permanent_calculator)
         self._current_input = []
@@ -85,8 +89,9 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._sample_from_pmf()
 
     def _update_current_input(self):
-        self._current_input[self._working_input_state.pop(
-            randint(0, len(self._working_input_state)))] += 1
+        self._current_input[
+            self._working_input_state.pop(randint(0, len(self._working_input_state)))
+        ] += 1
 
     def _sample_from_pmf(self) -> None:
         m = choice(range(len(self.input_state)), p=self.pmf)

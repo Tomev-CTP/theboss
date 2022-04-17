@@ -5,13 +5,20 @@ from typing import List
 
 from numpy import append, array, int64, ndarray
 
-from ..boson_sampling_utilities.boson_sampling_utilities import particle_state_to_modes_state
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
-from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    particle_state_to_modes_state,
+)
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
+from .generalized_cliffords_simulation_strategy import (
+    GeneralizedCliffordsSimulationStrategy,
+)
 
 
-class GeneralizedCliffordsSimulationStrategyInterfaceV2(GeneralizedCliffordsSimulationStrategy):
+class GeneralizedCliffordsSimulationStrategyInterfaceV2(
+    GeneralizedCliffordsSimulationStrategy
+):
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(bs_permanent_calculator)
 
@@ -32,7 +39,11 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(GeneralizedCliffordsSimu
 
         while len(samples) < samples_number:
             self._fill_r_sample()
-            samples.append(particle_state_to_modes_state(array(self.r_sample, dtype=int64), len(self.input_state)))
+            samples.append(
+                particle_state_to_modes_state(
+                    array(self.r_sample, dtype=int64), len(self.input_state)
+                )
+            )
         return samples
 
     def _fill_r_sample(self) -> None:
@@ -48,20 +59,28 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(GeneralizedCliffordsSimu
     def _calculate_new_layer_of_pmfs(self) -> None:
         number_of_particle_to_sample = len(self.r_sample) + 1
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
-        corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
-                                   for state in possible_input_states]
+        corresponding_k_vectors = [
+            [self.input_state[i] - state[i] for i in range(len(state))]
+            for state in possible_input_states
+        ]
 
         pmf = []
 
-        weights = self._calculate_weights_from_k_vectors(array(corresponding_k_vectors, dtype=float))
+        weights = self._calculate_weights_from_k_vectors(
+            array(corresponding_k_vectors, dtype=float)
+        )
         weights /= sum(weights)
-        self.possible_outputs[self.current_key] = self._generate_possible_output_states()
+        self.possible_outputs[
+            self.current_key
+        ] = self._generate_possible_output_states()
 
         for output in self.possible_outputs[self.current_key]:
             output = particle_state_to_modes_state(output, len(self.input_state))
             pmf.append(0)
             for i in range(len(possible_input_states)):
-                probability = self._calculate_outputs_probability(possible_input_states[i], output)
+                probability = self._calculate_outputs_probability(
+                    possible_input_states[i], output
+                )
                 probability *= weights[i]
                 pmf[-1] += probability
 

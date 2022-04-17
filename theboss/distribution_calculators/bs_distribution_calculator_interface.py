@@ -35,7 +35,9 @@ class BSDistributionCalculatorInterface(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def calculate_probabilities_of_outcomes(self, outcomes: Iterable[Iterable[int]]) -> List[float]:
+    def calculate_probabilities_of_outcomes(
+        self, outcomes: Iterable[Iterable[int]]
+    ) -> List[float]:
         """ This method allows one to compute probabilities of only selected outcomes. """
         raise NotImplementedError
 

@@ -12,39 +12,42 @@ from theboss.simulation_strategies.simulation_strategy_factory import StrategyTy
 
 
 class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def test_exact_sampling_accuracy(self):
         self._prepare_lossless_distance_experiment_settings()
 
-        self._sampling_tvd_experiment_config.hierarchy_level = \
+        self._sampling_tvd_experiment_config.hierarchy_level = (
             self._sampling_tvd_experiment_config.number_of_modes
+        )
 
         self._perform_lossless_test(StrategyType.BOBS)
 
     def test_exact_sampling_accuracy_with_binned_input(self):
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
 
-        self._sampling_tvd_experiment_config.hierarchy_level = \
+        self._sampling_tvd_experiment_config.hierarchy_level = (
             self._sampling_tvd_experiment_config.number_of_modes
+        )
 
         self._perform_lossless_test(StrategyType.BOBS)
 
     def test_exact_lossy_sampling_accuracy(self):
         self._prepare_lossy_distance_experiment_settings()
 
-        self._sampling_tvd_experiment_config.hierarchy_level = \
+        self._sampling_tvd_experiment_config.hierarchy_level = (
             self._sampling_tvd_experiment_config.number_of_modes
+        )
 
         self._perform_test_for_uniform_losses(StrategyType.BOBS)
 
     def test_exact_lossy_sampling_accuracy_with_binned_input(self):
         self._prepare_lossy_distance_experiment_settings_with_binned_input()
 
-        self._sampling_tvd_experiment_config.hierarchy_level = \
+        self._sampling_tvd_experiment_config.hierarchy_level = (
             self._sampling_tvd_experiment_config.number_of_modes
+        )
 
         self._perform_test_for_uniform_losses(StrategyType.BOBS)
 
@@ -63,12 +66,12 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
 
         return bound
 
-    def test_lossy_approximate_sampling_accuracy(
-            self):
+    def test_lossy_approximate_sampling_accuracy(self):
         self._prepare_lossy_distance_experiment_settings()
 
-        self._sampling_tvd_experiment_config.approximated_modes_number = \
+        self._sampling_tvd_experiment_config.approximated_modes_number = (
             self._approximated_modes_number
+        )
 
         k = self._strategies_factory.experiment_configuration.number_of_modes
         k -= self._approximated_modes_number
@@ -76,8 +79,9 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
 
         self._strategy_initial_state = self._nonuniform_strategy_initial_state
 
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._nonuniform_strategy_initial_state
+        )
 
         self._perform_test_for_uniform_losses(
             StrategyType.BOBS, self._compute_bobs_approximation_tvd_bound()

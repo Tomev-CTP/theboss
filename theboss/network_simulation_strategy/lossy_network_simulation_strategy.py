@@ -3,7 +3,9 @@ __author__ = "Tomasz Rybotycki"
 from numpy import complex128, delete, ndarray, vstack, zeros_like
 
 from .network_simulation_strategy import NetworkSimulationStrategy
-from ..boson_sampling_utilities.boson_sampling_utilities import prepare_interferometer_matrix_in_expanded_space
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    prepare_interferometer_matrix_in_expanded_space,
+)
 
 
 class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):

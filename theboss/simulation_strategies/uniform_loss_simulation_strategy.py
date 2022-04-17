@@ -12,9 +12,12 @@ from .simulation_strategy_interface import SimulationStrategyInterface
 
 
 class UniformLossSimulationStrategy(SimulationStrategyInterface):
-    def __init__(self, interferometer_matrix: ndarray,
-                 number_of_modes: int, transmissivity: float) \
-            -> None:
+    def __init__(
+        self,
+        interferometer_matrix: ndarray,
+        number_of_modes: int,
+        transmissivity: float,
+    ) -> None:
         self.interferometer_matrix = interferometer_matrix
         self.number_of_modes = number_of_modes
         self.transmissivity = transmissivity
@@ -26,15 +29,22 @@ class UniformLossSimulationStrategy(SimulationStrategyInterface):
         n = initial_number_of_particles
         eta = self.transmissivity
 
-        separable_states_weights = [pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l) for l in range(n + 1)]
+        separable_states_weights = [
+            pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)
+            for l in range(n + 1)
+        ]
 
         samples = []
         while len(samples) < samples_number:
-            number_of_particles_left_in_selected_separable_state = choice(arange(0, n + 1), p=separable_states_weights)
+            number_of_particles_left_in_selected_separable_state = choice(
+                arange(0, n + 1), p=separable_states_weights
+            )
 
-            strategy = FixedLossSimulationStrategy(self.interferometer_matrix,
-                                                   number_of_particles_left_in_selected_separable_state,
-                                                   self.number_of_modes)
+            strategy = FixedLossSimulationStrategy(
+                self.interferometer_matrix,
+                number_of_particles_left_in_selected_separable_state,
+                self.number_of_modes,
+            )
 
             simulator = BosonSamplingSimulator(strategy)
 

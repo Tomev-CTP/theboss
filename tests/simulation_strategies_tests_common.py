@@ -13,21 +13,29 @@ from typing import List
 from numpy import array, ndarray, average
 from numpy.random import randint
 from scipy.stats import unitary_group
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import BSPermanentCalculatorFactory
-from theboss.simulation_strategies.simulation_strategy_factory import SimulationStrategyFactory
-from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import \
-    BosonSamplingExperimentConfiguration
-from theboss.distribution_calculators.bs_sample_based_distribution_calculator import (
-    BSSampleBasedDistributionCalculator, BSDistributionCalculatorInterface
-)
-from theboss.quantum_computations_utilities import (
-    count_tv_distance_error_bound_of_experiment_results, count_total_variation_distance
+from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import (
+    BSPermanentCalculatorFactory,
 )
 from theboss.simulation_strategies.simulation_strategy_factory import (
-    StrategyType, SimulationStrategyInterface
+    SimulationStrategyFactory,
+)
+from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
+    BosonSamplingExperimentConfiguration,
+)
+from theboss.distribution_calculators.bs_sample_based_distribution_calculator import (
+    BSSampleBasedDistributionCalculator,
+    BSDistributionCalculatorInterface,
+)
+from theboss.quantum_computations_utilities import (
+    count_tv_distance_error_bound_of_experiment_results,
+    count_total_variation_distance,
+)
+from theboss.simulation_strategies.simulation_strategy_factory import (
+    StrategyType,
+    SimulationStrategyInterface,
 )
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    calculate_number_of_possible_n_particle_m_mode_output_states
+    calculate_number_of_possible_n_particle_m_mode_output_states,
 )
 from tqdm import tqdm
 
@@ -41,7 +49,6 @@ class SamplingAccuracyExperimentConfiguration:
 
 
 class TestBSClassicalSimulationStrategies(unittest.TestCase):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -72,13 +79,16 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
 
     def setUp(self) -> None:
         print(f"\nIn method {self._testMethodName}. Test start!\n")
-        self._permutation_matrix = array([
-            [0, 0, 1, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 1],
-            [0, 1, 0, 0, 0],
-        ], dtype=complex)
+        self._permutation_matrix = array(
+            [
+                [0, 0, 1, 0, 0],
+                [1, 0, 0, 0, 0],
+                [0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 1],
+                [0, 1, 0, 0, 0],
+            ],
+            dtype=complex,
+        )
 
         self._number_of_samples_for_estimated_distribution_calculation = int(1e3)
         self._probability_of_error_in_distribution_calculation = 1e-4
@@ -93,41 +103,45 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._approximated_modes_number = 3
 
         distance_calculation_initial_number_of_particles = sum(
-            self._distance_calculation_initial_state)
+            self._distance_calculation_initial_state
+        )
 
         self._sampling_tvd_experiment_config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._permutation_matrix,
-            initial_state=array(self._distance_calculation_initial_state,
-                                dtype=int),
+            initial_state=array(self._distance_calculation_initial_state, dtype=int),
             initial_number_of_particles=distance_calculation_initial_number_of_particles,
             number_of_modes=len(self._distance_calculation_initial_state),
             number_of_particles_lost=self._distance_calculation_number_of_particles_lost,
-            number_of_particles_left=distance_calculation_initial_number_of_particles -
-                                     self._distance_calculation_number_of_particles_lost,
-            uniform_transmissivity=0.8
+            number_of_particles_left=distance_calculation_initial_number_of_particles
+            - self._distance_calculation_number_of_particles_lost,
+            uniform_transmissivity=0.8,
         )
 
         permanent_calculator_factory = BSPermanentCalculatorFactory(
-            self._permutation_matrix, None, None)
-        self._bs_permanent_calculator = permanent_calculator_factory.generate_calculator()
+            self._permutation_matrix, None, None
+        )
+        self._bs_permanent_calculator = (
+            permanent_calculator_factory.generate_calculator()
+        )
 
         self._strategies_factory = SimulationStrategyFactory(
-            self._sampling_tvd_experiment_config,
-            self._bs_permanent_calculator)
+            self._sampling_tvd_experiment_config, self._bs_permanent_calculator
+        )
 
         self._haar_random_matrices_number = 10
         self._haar_random_experiment_input_state = [1, 1, 1, 1, 0]
         haar_random_initial_number_of_particles = sum(
-            self._haar_random_experiment_input_state)
+            self._haar_random_experiment_input_state
+        )
         haar_random_number_of_particles_lost = 2
         self._haar_random_experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=array([], dtype=complex),
-            initial_state=array(self._haar_random_experiment_input_state,
-                                dtype=int),
+            initial_state=array(self._haar_random_experiment_input_state, dtype=int),
             initial_number_of_particles=haar_random_number_of_particles_lost,
             number_of_modes=len(self._haar_random_experiment_input_state),
             number_of_particles_lost=haar_random_number_of_particles_lost,
-            number_of_particles_left=haar_random_initial_number_of_particles - haar_random_number_of_particles_lost
+            number_of_particles_left=haar_random_initial_number_of_particles
+            - haar_random_number_of_particles_lost,
         )
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]
 
@@ -137,94 +151,109 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         print("\nTest finished!\n")
 
     def _prepare_lossless_distance_experiments_settings_with_binned_inputs(
-            self) -> None:
-        self._sampling_tvd_experiment_config.initial_state = \
+        self,
+    ) -> None:
+        self._sampling_tvd_experiment_config.initial_state = (
             self._distance_calculation_binned_initial_state
+        )
         self._strategy_initial_state = self._distance_calculation_binned_initial_state
         initial_number_of_particles = sum(
-            self._distance_calculation_binned_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = initial_number_of_particles
+            self._distance_calculation_binned_initial_state
+        )
+        self._sampling_tvd_experiment_config.initial_number_of_particles = (
+            initial_number_of_particles
+        )
         self._sampling_tvd_experiment_config.number_of_particles_lost = 0
-        self._sampling_tvd_experiment_config.number_of_particles_left = initial_number_of_particles
+        self._sampling_tvd_experiment_config.number_of_particles_left = (
+            initial_number_of_particles
+        )
         self._sampling_tvd_experiment_config.uniform_transmissivity = 1
 
     def _prepare_lossy_distance_experiment_settings_with_binned_input(self):
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._distance_calculation_binned_initial_state
+        )
         self._strategy_initial_state = self._distance_calculation_binned_initial_state
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = \
+        self._sampling_tvd_experiment_config.initial_number_of_particles = (
             initial_number_of_particles
-        self._sampling_tvd_experiment_config.number_of_particles_lost = \
+        )
+        self._sampling_tvd_experiment_config.number_of_particles_lost = (
             self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.number_of_particles_left = \
-            initial_number_of_particles - self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.uniform_transmissivity = \
+        )
+        self._sampling_tvd_experiment_config.number_of_particles_left = (
+            initial_number_of_particles
+            - self._distance_calculation_number_of_particles_lost
+        )
+        self._sampling_tvd_experiment_config.uniform_transmissivity = (
             self._uniform_transmissivity
+        )
         self._calculator_initial_state = self._distance_calculation_binned_initial_state
 
     def _prepare_lossy_distance_experiment_settings(self) -> None:
         # At least for now lossy experiments are only for standard input states.
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._distance_calculation_initial_state
+        )
         self._strategy_initial_state = self._distance_calculation_initial_state
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = \
+        self._sampling_tvd_experiment_config.initial_number_of_particles = (
             initial_number_of_particles
-        self._sampling_tvd_experiment_config.number_of_particles_lost = \
+        )
+        self._sampling_tvd_experiment_config.number_of_particles_lost = (
             self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.number_of_particles_left = \
-            initial_number_of_particles - self._distance_calculation_number_of_particles_lost
-        self._sampling_tvd_experiment_config.uniform_transmissivity = \
+        )
+        self._sampling_tvd_experiment_config.number_of_particles_left = (
+            initial_number_of_particles
+            - self._distance_calculation_number_of_particles_lost
+        )
+        self._sampling_tvd_experiment_config.uniform_transmissivity = (
             self._uniform_transmissivity
-
-    def _check_if_approximation_is_within_bounds(
-            self,
-            sampling_accuracy_experiment_config: SamplingAccuracyExperimentConfiguration
-    ) -> None:
-
-        distance_from_exact_to_estimated = \
-            self._compute_tvd_between_distribution_and_frequencies(
-                exact_distribution_calculator=
-                sampling_accuracy_experiment_config.exact_calculator,
-                estimated_distribution_calculator=
-                sampling_accuracy_experiment_config.estimation_calculator
         )
 
-        distance_from_approximation_to_estimated = \
-            count_tv_distance_error_bound_of_experiment_results(
-                outcomes_number=sampling_accuracy_experiment_config.outcomes_number,
-                samples_number=
-                self._number_of_samples_for_estimated_distribution_calculation,
-                error_probability=self._probability_of_error_in_distribution_calculation
-            )
+    def _check_if_approximation_is_within_bounds(
+        self,
+        sampling_accuracy_experiment_config: SamplingAccuracyExperimentConfiguration,
+    ) -> None:
+
+        distance_from_exact_to_estimated = self._compute_tvd_between_distribution_and_frequencies(
+            exact_distribution_calculator=sampling_accuracy_experiment_config.exact_calculator,
+            estimated_distribution_calculator=sampling_accuracy_experiment_config.estimation_calculator,
+        )
+
+        distance_from_approximation_to_estimated = count_tv_distance_error_bound_of_experiment_results(
+            outcomes_number=sampling_accuracy_experiment_config.outcomes_number,
+            samples_number=self._number_of_samples_for_estimated_distribution_calculation,
+            error_probability=self._probability_of_error_in_distribution_calculation,
+        )
 
         # Using triangle inequality of (TV) distance.
-        max_allowed_distance = \
-            sampling_accuracy_experiment_config.approximation_tvd_bound \
+        max_allowed_distance = (
+            sampling_accuracy_experiment_config.approximation_tvd_bound
             + distance_from_approximation_to_estimated
+        )
 
         self.assertLessEqual(
             distance_from_exact_to_estimated,
             max_allowed_distance,
             f"Distance from exact distribution ({distance_from_exact_to_estimated}) is "
-            f"greater than maximum distance allowed ({max_allowed_distance})."
+            f"greater than maximum distance allowed ({max_allowed_distance}).",
         )
 
-    def _generate_frequencies_calculator(self,
-                                         strategy: SimulationStrategyInterface,
-                                         outcomes: List[ndarray] = None) \
-            -> BSSampleBasedDistributionCalculator:
+    def _generate_frequencies_calculator(
+        self, strategy: SimulationStrategyInterface, outcomes: List[ndarray] = None
+    ) -> BSSampleBasedDistributionCalculator:
         estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._sampling_tvd_experiment_config,
             strategy=strategy,
-            outcomes=outcomes
+            outcomes=outcomes,
         )
         return estimated_distribution_calculator
 
     def _compute_tvd_between_distribution_and_frequencies(
-            self, exact_distribution_calculator: BSDistributionCalculatorInterface,
-            estimated_distribution_calculator: BSSampleBasedDistributionCalculator
+        self,
+        exact_distribution_calculator: BSDistributionCalculatorInterface,
+        estimated_distribution_calculator: BSSampleBasedDistributionCalculator,
     ) -> float:
         """
         Using specified calculators, it counts exact and estimated probability
@@ -241,56 +270,66 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
 
         exact_distribution = exact_distribution_calculator.calculate_distribution()
 
-        estimated_distribution_calculator.outcomes = \
+        estimated_distribution_calculator.outcomes = (
             exact_distribution_calculator.get_outcomes_in_proper_order()
+        )
 
-        if self._strategies_factory.strategy_type == StrategyType.LOSSY_NET_GCC or \
-                self._strategies_factory.strategy_type == StrategyType.BOBS:
-            self._strategies_factory.bs_permanent_calculator.matrix *= \
-                pow(self._uniform_transmissivity, 0.5)
-
-        approximated_distribution = \
-            estimated_distribution_calculator.calculate_approximate_distribution(
-                samples_number=
-                self._number_of_samples_for_estimated_distribution_calculation
+        if (
+            self._strategies_factory.strategy_type == StrategyType.LOSSY_NET_GCC
+            or self._strategies_factory.strategy_type == StrategyType.BOBS
+        ):
+            self._strategies_factory.bs_permanent_calculator.matrix *= pow(
+                self._uniform_transmissivity, 0.5
             )
 
-        return count_total_variation_distance(exact_distribution,
-                                              approximated_distribution)
+        approximated_distribution = estimated_distribution_calculator.calculate_approximate_distribution(
+            samples_number=self._number_of_samples_for_estimated_distribution_calculation
+        )
+
+        return count_total_variation_distance(
+            exact_distribution, approximated_distribution
+        )
 
     def _set_experiment_configuration_for_lossless_haar_random(self) -> None:
-        self._haar_random_experiment_configuration.initial_state = \
+        self._haar_random_experiment_configuration.initial_state = (
             self._haar_random_experiment_input_state
-        number_of_particles_in_the_experiment = \
-            sum(self._haar_random_experiment_input_state)
-        self._haar_random_experiment_configuration.initial_number_of_particles = \
+        )
+        number_of_particles_in_the_experiment = sum(
+            self._haar_random_experiment_input_state
+        )
+        self._haar_random_experiment_configuration.initial_number_of_particles = (
             number_of_particles_in_the_experiment
-        self._haar_random_experiment_configuration.number_of_particles_left = \
+        )
+        self._haar_random_experiment_configuration.number_of_particles_left = (
             number_of_particles_in_the_experiment
+        )
 
     def _prepare_lossless_distance_experiment_settings(self) -> None:
-        self._sampling_tvd_experiment_config.initial_state = \
+        self._sampling_tvd_experiment_config.initial_state = (
             self._distance_calculation_initial_state
+        )
         initial_number_of_particles = sum(self._distance_calculation_initial_state)
-        self._sampling_tvd_experiment_config.initial_number_of_particles = \
+        self._sampling_tvd_experiment_config.initial_number_of_particles = (
             initial_number_of_particles
+        )
         self._sampling_tvd_experiment_config.number_of_particles_lost = 0
-        self._sampling_tvd_experiment_config.number_of_particles_left = \
+        self._sampling_tvd_experiment_config.number_of_particles_left = (
             initial_number_of_particles
+        )
         self._sampling_tvd_experiment_config.uniform_transmissivity = 1
 
     def _test_state_average_probability_for_haar_random_matrices(
-            self, strategy_factory: SimulationStrategyFactory) -> None:
-        number_of_outcomes = \
-            calculate_number_of_possible_n_particle_m_mode_output_states(
-                n=self._haar_random_experiment_configuration.number_of_particles_left,
-                m=self._haar_random_experiment_configuration.number_of_modes
-            )
+        self, strategy_factory: SimulationStrategyFactory
+    ) -> None:
+        number_of_outcomes = calculate_number_of_possible_n_particle_m_mode_output_states(
+            n=self._haar_random_experiment_configuration.number_of_particles_left,
+            m=self._haar_random_experiment_configuration.number_of_modes,
+        )
 
         error_bound = count_tv_distance_error_bound_of_experiment_results(
             outcomes_number=number_of_outcomes,
             samples_number=self._haar_random_matrices_number,
-            error_probability=self._probability_of_error_in_distribution_calculation
+            error_probability=self._probability_of_error_in_distribution_calculation,
         )
 
         probabilities_list = []
@@ -299,22 +338,23 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         for _ in tqdm(range(self._haar_random_matrices_number)):
 
             experiment_configuration = deepcopy(
-                self._haar_random_experiment_configuration)
+                self._haar_random_experiment_configuration
+            )
             experiment_configuration.interferometer_matrix = unitary_group.rvs(
-                self._haar_random_experiment_configuration.number_of_modes)
+                self._haar_random_experiment_configuration.number_of_modes
+            )
             strategy_factory.experiment_configuration = experiment_configuration
-            self._bs_permanent_calculator.matrix = \
+            self._bs_permanent_calculator.matrix = (
                 experiment_configuration.interferometer_matrix
+            )
             strategy_factory.bs_permanent_calculator = self._bs_permanent_calculator
             distribution_calculator = BSSampleBasedDistributionCalculator(
-                experiment_configuration,
-                strategy_factory.generate_strategy())
+                experiment_configuration, strategy_factory.generate_strategy()
+            )
 
-            current_probabilities = \
-                distribution_calculator.calculate_approximate_distribution(
-                    samples_number=
-                    self._number_of_samples_for_estimated_distribution_calculation
-                )
+            current_probabilities = distribution_calculator.calculate_approximate_distribution(
+                samples_number=self._number_of_samples_for_estimated_distribution_calculation
+            )
 
             if len(probabilities_list) == 0:
                 probabilities_list = [[] for _ in range(len(current_probabilities))]
@@ -323,6 +363,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
                 probabilities_list[j].append(current_probabilities[j])
 
         random_outcome_index = randint(0, len(current_probabilities))
-        self.assertAlmostEqual(number_of_outcomes ** (-1),
-                               average(probabilities_list[random_outcome_index]),
-                               delta=error_bound)
+        self.assertAlmostEqual(
+            number_of_outcomes ** (-1),
+            average(probabilities_list[random_outcome_index]),
+            delta=error_bound,
+        )

@@ -10,14 +10,19 @@ from typing import Optional
 
 from numpy import ndarray, int64, array, asarray
 
-from ..permanent_calculators.bs_permanent_calculator_interface import BSPermanentCalculatorInterface
+from ..permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
 import abc
 
 
 class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
-
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
         if output_state is None:
             output_state = array([], dtype=int64)
         if input_state is None:
@@ -57,6 +62,8 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 
             :return: Information if the calculation can be performed.
         """
-        return self._matrix.shape[0] == self._matrix.shape[1] \
-            and len(self._output_state) == len(self._input_state) \
+        return (
+            self._matrix.shape[0] == self._matrix.shape[1]
+            and len(self._output_state) == len(self._input_state)
             and len(self._output_state) <= self._matrix.shape[0]
+        )

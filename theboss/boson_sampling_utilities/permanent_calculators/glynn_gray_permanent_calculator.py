@@ -10,6 +10,7 @@ __author__ = "Tomasz Rybotycki"
 try:
     from math import prod
 except:
+
     def prod(values):
 
         if len(values) == 0:
@@ -22,6 +23,7 @@ except:
 
         return prod
 
+
 from typing import Optional
 
 from numpy import ndarray, complex128, ones
@@ -32,9 +34,12 @@ from guancodes.GrayCode import get_gray_code_update_indices
 
 
 class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
-
-    def __init__(self, matrix: ndarray, input_state: Optional[ndarray] = None,
-                 output_state: Optional[ndarray] = None) -> None:
+    def __init__(
+        self,
+        matrix: ndarray,
+        input_state: Optional[ndarray] = None,
+        output_state: Optional[ndarray] = None,
+    ) -> None:
         super().__init__(matrix, input_state, output_state)
 
     def compute_permanent(self) -> complex128:
@@ -44,8 +49,9 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
         """
 
         # Prepare the matrix.
-        self.matrix = EffectiveScatteringMatrixCalculator(self.matrix, self.input_state,
-                                                          self.output_state).calculate()
+        self.matrix = EffectiveScatteringMatrixCalculator(
+            self.matrix, self.input_state, self.output_state
+        ).calculate()
 
         if len(self.matrix) == 0:
             return complex128(1)

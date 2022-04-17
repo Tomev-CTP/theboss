@@ -7,14 +7,25 @@ from typing import List
 from numpy import array, int64, ndarray, array_equal, isclose
 from scipy import special
 
-from .generalized_cliffords_simulation_strategy import GeneralizedCliffordsSimulationStrategy
-from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import \
-    BSPermanentCalculatorInterface
+from .generalized_cliffords_simulation_strategy import (
+    GeneralizedCliffordsSimulationStrategy,
+)
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    generate_possible_outputs,
+)
+from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
 
 
-class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
-    def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface, transmissivity: float = 0):
+class GeneralizedCliffordsUniformLossesSimulationStrategy(
+    GeneralizedCliffordsSimulationStrategy
+):
+    def __init__(
+        self,
+        bs_permanent_calculator: BSPermanentCalculatorInterface,
+        transmissivity: float = 0,
+    ):
         self._transmissivity = transmissivity
         self.distribution = []
         self.unweighted_distribution = []
@@ -40,7 +51,6 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
             samples.append(array(self.r_sample, dtype=int64))
         return samples
 
-
     def _initialize_simulation(self, input_state: ndarray) -> None:
         """"
             A method for algorithm initialization before each sampling.
@@ -54,22 +64,31 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
         distribution_initializer = 0
 
         if self.missing_values_in_distribution:
-            distribution_initializer = -1 # -1 to indicate missing spots
+            distribution_initializer = -1  # -1 to indicate missing spots
 
-        self._possible_outputs = generate_possible_outputs(sum(input_state), len(input_state), consider_loses=True)
+        self._possible_outputs = generate_possible_outputs(
+            sum(input_state), len(input_state), consider_loses=True
+        )
         self.distribution = [distribution_initializer for _ in self._possible_outputs]
-        self.unweighted_distribution = [distribution_initializer for _ in self._possible_outputs]
+        self.unweighted_distribution = [
+            distribution_initializer for _ in self._possible_outputs
+        ]
 
         n = sum(input_state)
         eta = self._transmissivity
 
         # Do note that index is actually equal to number of particles left!
-        self._binomial_weights = \
-            [pow(self._transmissivity, left) * special.binom(n, left) * pow(1 - eta, n - left) for left in range(n + 1)]
+        self._binomial_weights = [
+            pow(self._transmissivity, left)
+            * special.binom(n, left)
+            * pow(1 - eta, n - left)
+            for left in range(n + 1)
+        ]
         self.distribution[0] = self._binomial_weights[0]
 
-
-    def compute_distribution_up_to_accuracy(self, input_state: ndarray, accuracy: float = 1.0) -> List[float]:
+    def compute_distribution_up_to_accuracy(
+        self, input_state: ndarray, accuracy: float = 1.0
+    ) -> List[float]:
         """
             Returns distribution (up to given accuracy) based on given
 
@@ -85,7 +104,9 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
 
         return self.distribution
 
-    def compute_unweighted_distribution_up_to_accuracy(self, input_state: ndarray, accuracy: float = 1.0) -> List[float]:
+    def compute_unweighted_distribution_up_to_accuracy(
+        self, input_state: ndarray, accuracy: float = 1.0
+    ) -> List[float]:
         """
                     Returns distribution (up to given accuracy) based on given
 
@@ -96,7 +117,9 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
 
         self._initialize_simulation(input_state)
 
-        while not isclose(max(accuracy - sum(self.unweighted_distribution) / sum(input_state), 0), 0):
+        while not isclose(
+            max(accuracy - sum(self.unweighted_distribution) / sum(input_state), 0), 0
+        ):
             self._fill_r_sample()
 
         return self.unweighted_distribution
@@ -119,19 +142,25 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(GeneralizedCliffordsSi
     def _calculate_new_layer_of_pmfs(self) -> None:
         number_of_particle_to_sample = sum(self.r_sample) + 1
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
-        corresponding_k_vectors = [[self.input_state[i] - state[i] for i in range(len(state))]
-                                   for state in possible_input_states]
+        corresponding_k_vectors = [
+            [self.input_state[i] - state[i] for i in range(len(state))]
+            for state in possible_input_states
+        ]
 
         pmf = []
 
         weights = self._calculate_weights_from_k_vectors(corresponding_k_vectors)
         weights /= sum(weights)
-        self.possible_outputs[self.current_key] = self._generate_possible_output_states()
+        self.possible_outputs[
+            self.current_key
+        ] = self._generate_possible_output_states()
 
         for output in self.possible_outputs[self.current_key]:
             pmf.append(0)
             for i in range(len(possible_input_states)):
-                probability = self._calculate_outputs_probability(possible_input_states[i], output)
+                probability = self._calculate_outputs_probability(
+                    possible_input_states[i], output
+                )
                 probability *= weights[i]
                 pmf[-1] += probability
             for i in range(len(self._possible_outputs)):

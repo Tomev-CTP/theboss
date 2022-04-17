@@ -6,18 +6,27 @@ from typing import List, Iterable
 from numpy import ndarray
 from scipy import special
 
-from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_outputs
-from ..distribution_calculators.bs_distribution_calculator_interface import \
-    BosonSamplingExperimentConfiguration
-from ..distribution_calculators.bs_distribution_calculator_with_fixed_losses import \
-    BSDistributionCalculatorWithFixedLosses, BSPermanentCalculatorInterface
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    generate_possible_outputs,
+)
+from ..distribution_calculators.bs_distribution_calculator_interface import (
+    BosonSamplingExperimentConfiguration,
+)
+from ..distribution_calculators.bs_distribution_calculator_with_fixed_losses import (
+    BSDistributionCalculatorWithFixedLosses,
+    BSPermanentCalculatorInterface,
+)
 from multiprocessing import cpu_count, Pool
 
 
-class BSDistributionCalculatorWithUniformLosses \
-            (BSDistributionCalculatorWithFixedLosses):
-    def __init__(self, configuration: BosonSamplingExperimentConfiguration,
-                 permanent_calculator: BSPermanentCalculatorInterface) -> None:
+class BSDistributionCalculatorWithUniformLosses(
+    BSDistributionCalculatorWithFixedLosses
+):
+    def __init__(
+        self,
+        configuration: BosonSamplingExperimentConfiguration,
+        permanent_calculator: BSPermanentCalculatorInterface,
+    ) -> None:
         super().__init__(configuration, permanent_calculator)
         self.weights = self._initialize_weights()
         self.weightless = False
@@ -32,27 +41,32 @@ class BSDistributionCalculatorWithUniformLosses \
 
     def _initialize_weights(self) -> List[float]:
 
-        weight = \
+        weight = (
             lambda n, l, eta: pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)
+        )
         weights = []
 
-        for number_of_particles_left \
-                in range(self.configuration.initial_number_of_particles + 1):
+        for number_of_particles_left in range(
+            self.configuration.initial_number_of_particles + 1
+        ):
             weights.append(
-                weight(self.configuration.initial_number_of_particles,
-                       number_of_particles_left,
-                       self.configuration.uniform_transmissivity)
+                weight(
+                    self.configuration.initial_number_of_particles,
+                    number_of_particles_left,
+                    self.configuration.uniform_transmissivity,
+                )
             )
 
         return weights
 
-    def calculate_probabilities_of_outcomes(self,
-                                            outcomes: Iterable[Iterable[int]]) -> \
-    List[float]:
+    def calculate_probabilities_of_outcomes(
+        self, outcomes: Iterable[Iterable[int]]
+    ) -> List[float]:
 
         with Pool(processes=cpu_count()) as pool:
-            outcomes_probabilities = pool.map(self._calculate_probability_of_outcome,
-                                              outcomes)
+            outcomes_probabilities = pool.map(
+                self._calculate_probability_of_outcome, outcomes
+            )
 
         return outcomes_probabilities
 
@@ -70,15 +84,21 @@ class BSDistributionCalculatorWithUniformLosses \
 
         subconfiguration.number_of_particles_left = number_of_particles_left
         subconfiguration.number_of_particles_lost = n - l
-        subdistribution_calculator = \
-            BSDistributionCalculatorWithFixedLosses(subconfiguration,
-                                                    self._permanent_calculator)
+        subdistribution_calculator = BSDistributionCalculatorWithFixedLosses(
+            subconfiguration, self._permanent_calculator
+        )
 
-        probability_of_outcome = subdistribution_calculator.calculate_probabilities_of_outcomes([outcome])[0]
+        probability_of_outcome = subdistribution_calculator.calculate_probabilities_of_outcomes(
+            [outcome]
+        )[
+            0
+        ]
 
         return probability_of_outcome * self.weights[l]
 
-
     def get_outcomes_in_proper_order(self) -> List[ndarray]:
-        return generate_possible_outputs(self.configuration.initial_number_of_particles,
-                                         self.configuration.number_of_modes, consider_loses=True)
+        return generate_possible_outputs(
+            self.configuration.initial_number_of_particles,
+            self.configuration.number_of_modes,
+            consider_loses=True,
+        )
