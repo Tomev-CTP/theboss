@@ -7,12 +7,19 @@ __author__ = "Tomasz Rybotycki"
 import unittest
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import (
     BSCCCHSubmatricesPermanentCalculator,
+    BSSubmatricesPermanentCalculatorBase,
 )
 from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
     ChinHuhPermanentCalculator,
 )
+from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
+    BSCCRyserSubmatricesPermanentCalculator,
+)
+
 from scipy.stats import unitary_group
-from numpy import ones, zeros
+from numpy import ones, zeros, ndarray
+
+from typing import Callable, Optional
 
 
 class TestSubmatricesPermanentsCalculators(unittest.TestCase):
@@ -27,29 +34,43 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
         self._output_state = ones(self._dim, dtype=int)
         self._output_state[0] = 0
 
-        self._submatrices_permanents_calculator = BSCCCHSubmatricesPermanentCalculator(
-            self._matrix, self._input_state, self._output_state
-        )
-
         self._permanent_calculator = ChinHuhPermanentCalculator(self._matrix)
 
-    def test_submatrices_permanent_calculator_for_std_input(self) -> None:
+    def test_chin_huh_submatrices_permanent_calculator_for_std_input(self) -> None:
         self._input_state = ones(self._dim, dtype=int)
-        self._compute_permanents_and_assert()
+        self._compute_permanents_and_assert(BSCCCHSubmatricesPermanentCalculator)
 
-    def test_submatrices_permanent_calculator_for_collision_input(self) -> None:
+    def test_chin_huh_submatrices_permanent_calculator_for_collision_input(
+        self,
+    ) -> None:
         self._input_state = zeros(self._dim)
         self._input_state[0] = 1
         self._input_state[1] = self._dim - 1
-        self._compute_permanents_and_assert()
+        self._compute_permanents_and_assert(BSCCCHSubmatricesPermanentCalculator)
 
-    def _compute_permanents_and_assert(self) -> None:
+    def test_ryser_submatrices_permanent_calculator_for_std_input(self) -> None:
+        self._input_state = ones(self._dim, dtype=int)
+        self._compute_permanents_and_assert(BSCCRyserSubmatricesPermanentCalculator)
 
-        self._submatrices_permanents_calculator.input_state = self._input_state
+    def test_ryser_submatrices_permanent_calculator_for_collision_input(self) -> None:
+        self._input_state = zeros(self._dim)
+        self._input_state[0] = 1
+        self._input_state[1] = self._dim - 1
+        self._compute_permanents_and_assert(BSCCRyserSubmatricesPermanentCalculator)
 
-        submatrices_permanents_all = (
-            self._submatrices_permanents_calculator.compute_permanents()
+    def _compute_permanents_and_assert(
+        self,
+        calculator_constructor: Callable[
+            [ndarray, Optional[ndarray], Optional[ndarray]],
+            BSSubmatricesPermanentCalculatorBase,
+        ],
+    ) -> None:
+
+        permanents_calculator = calculator_constructor(
+            self._matrix, self._input_state, self._output_state
         )
+
+        submatrices_permanents_all = permanents_calculator.compute_permanents()
 
         submatrices_permanents_single = []
         self._permanent_calculator.output_state = self._output_state
