@@ -13,7 +13,6 @@ from .bs_permanent_calculator_interface import BSPermanentCalculatorInterface
 from .chin_huh_permanent_calculator import ChinHuhPermanentCalculator
 from .classic_permanent_calculator import ClassicPermanentCalculator
 from .parallel_chin_huh_permanent_calculator import ParallelChinHuhPermanentCalculator
-from .ryser_guan_permanent_calculator import RyserGuanPermanentCalculator
 from .ryser_permanent_calculator import RyserPermanentCalculator
 
 
@@ -22,7 +21,6 @@ class PermanentCalculatorType(enum.IntEnum):
     CHIN_HUH = enum.auto()
     PARALLEL_CHIN_HUH = enum.auto()
     RYSER = enum.auto()
-    RYSER_GUAN = enum.auto()
 
 
 class BSPermanentCalculatorFactory:
@@ -43,7 +41,6 @@ class BSPermanentCalculatorFactory:
             PermanentCalculatorType.CHIN_HUH: self._generate_chin_huh_permanent_calculator,
             PermanentCalculatorType.PARALLEL_CHIN_HUH: self._generate_parallel_chin_huh_permanent_calculator,
             PermanentCalculatorType.RYSER: self._generate_ryser_permanent_calculator,
-            PermanentCalculatorType.RYSER_GUAN: self._generate_ryser_guan_permanent_calculator,
         }
 
     @property
@@ -72,7 +69,7 @@ class BSPermanentCalculatorFactory:
 
     def generate_calculator(self) -> BSPermanentCalculatorInterface:
         """
-            Generates the permanent as specified by the provided calculator type.
+        Generates the permanent as specified by the provided calculator type.
         """
         handler = self._calculator_mapping.get(
             self._calculator_type, self._generate_parallel_chin_huh_permanent_calculator
@@ -104,13 +101,6 @@ class BSPermanentCalculatorFactory:
 
     def _generate_ryser_permanent_calculator(self) -> RyserPermanentCalculator:
         return RyserPermanentCalculator(
-            matrix=self.matrix,
-            input_state=self.input_state,
-            output_state=self.output_state,
-        )
-
-    def _generate_ryser_guan_permanent_calculator(self) -> RyserGuanPermanentCalculator:
-        return RyserGuanPermanentCalculator(
             matrix=self.matrix,
             input_state=self.input_state,
             output_state=self.output_state,

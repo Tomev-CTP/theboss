@@ -26,12 +26,10 @@ from theboss.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent
 from theboss.boson_sampling_utilities.permanent_calculators.parallel_chin_huh_permanent_calculator import (
     ParallelChinHuhPermanentCalculator,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_guan_permanent_calculator import (
-    RyserGuanPermanentCalculator,
-)
 from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
+
 from scipy.stats import unitary_group
 
 
@@ -48,10 +46,6 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         )
 
         self._r_permanent_calculator = RyserPermanentCalculator(
-            matrix=self._matrix, input_state=array([]), output_state=array([])
-        )
-
-        self._rg_permanent_calculator = RyserGuanPermanentCalculator(
             matrix=self._matrix, input_state=array([]), output_state=array([])
         )
 
@@ -75,9 +69,6 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
         self._r_permanent_calculator.input_state = input_state
         self._r_permanent_calculator.output_state = output_state
 
-        self._rg_permanent_calculator.input_state = input_state
-        self._rg_permanent_calculator.output_state = output_state
-
         self._ch_permanent_calculator.input_state = input_state
         self._ch_permanent_calculator.output_state = output_state
 
@@ -96,10 +87,6 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
         self.assertTrue(
             allclose(cl_permanent, self._r_permanent_calculator.compute_permanent())
-        )
-
-        self.assertTrue(
-            allclose(cl_permanent, self._rg_permanent_calculator.compute_permanent())
         )
 
         self.assertTrue(
@@ -144,10 +131,10 @@ class TestEffectiveScatteringMatrixPermanentsCalculators(unittest.TestCase):
 
     def test_parallel_binned_input_binned_output_case(self) -> None:
         """
-            TR: Given that the only difference between Chin-Huh and Parallel Chin-Huh is
-                the parallelization in the main method, the only thing I believe I need
-                to check is if it works. Results are expected to be the same in every
-                case.
+        TR: Given that the only difference between Chin-Huh and Parallel Chin-Huh is
+            the parallelization in the main method, the only thing I believe I need
+            to check is if it works. Results are expected to be the same in every
+            case.
         """
         self._set_input_and_output_states([2, 1, 1, 0], [1, 1, 0, 2])
         self.assertTrue(
