@@ -12,18 +12,19 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List
 
-from numpy import array, ndarray, int64, zeros_like, complex128
+from numpy import array, ndarray, int64, zeros_like
 from numpy.random import choice, randint
 
-from .generalized_cliffords_simulation_strategy import (
+from theboss.simulation_strategies.generalized_cliffords_simulation_strategy import (
     GeneralizedCliffordsSimulationStrategy,
     BSPermanentCalculatorInterface,
 )
-from ..boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities.boson_sampling_utilities import (
     modes_state_to_particle_state,
 )
-from ..boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import (
-    BSCCCHSubmatricesPermanentCalculator,
+
+from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
+    BSCCRyserSubmatricesPermanentCalculator,
 )
 
 
@@ -35,11 +36,11 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
         """
-            Returns sample from linear optics experiments given output state.
+        Returns sample from linear optics experiments given output state.
 
-            :param input_state: Input state in particle basis.
-            :param samples_number: Number of samples to simulate.
-            :return: A resultant state after traversing through interferometer.
+        :param input_state: Input state in particle basis.
+        :param samples_number: Number of samples to simulate.
+        :return: A resultant state after traversing through interferometer.
         """
         self.input_state = input_state
         self.number_of_input_photons = sum(input_state)
@@ -59,7 +60,7 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
         self.pmf = []
 
-        submatrices_permanents_calculator = BSCCCHSubmatricesPermanentCalculator(
+        submatrices_permanents_calculator = BSCCRyserSubmatricesPermanentCalculator(
             self._bs_permanent_calculator.matrix, self._current_input, self.r_sample
         )
 
