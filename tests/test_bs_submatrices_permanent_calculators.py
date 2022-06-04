@@ -7,13 +7,15 @@ __author__ = "Tomasz Rybotycki"
 import unittest
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import (
     BSCCCHSubmatricesPermanentCalculator,
-    BSSubmatricesPermanentCalculatorBase,
 )
 from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
     ChinHuhPermanentCalculator,
 )
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
     BSCCRyserSubmatricesPermanentCalculator,
+)
+from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_base import (
+    BSSubmatricesPermanentCalculatorBase,
 )
 
 from scipy.stats import unitary_group
