@@ -70,10 +70,3 @@ class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
             self._sums[j] += (
                 self._r_vector[self._index_to_update] - self._last_value_at_index
             ) * self._matrix_t[self._index_to_update][j]
-
-    def _return_permanent(self) -> complex128:
-        """
-        Given that the (-1)^n factor is taken care in the self._multiplier
-        initialization no other operations are required when returning the permanent.
-        """
-        return self.permanent

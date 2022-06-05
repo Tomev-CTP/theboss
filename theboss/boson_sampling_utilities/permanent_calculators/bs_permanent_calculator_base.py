@@ -185,7 +185,7 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
             self._update_guan_code()
 
             if self._index_to_update == len(self._r_vector):
-                return self._return_permanent()
+                return self.permanent
 
             # START PERMANENT UPDATE
             self._multiplier = -self._multiplier
@@ -193,7 +193,7 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
             self._update_binomials_product()
             self._update_permanent()
 
-        return self._return_permanent()
+        return self.permanent
 
     def _update_permanent(self) -> None:
         """Update permanent with new addend from r_vector."""
@@ -209,9 +209,4 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
     @abc.abstractmethod
     def _update_sums(self) -> None:
         """An abstract method for sums update."""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def _return_permanent(self) -> complex128:
-        """Some methods require additional operations"""
         raise NotImplementedError

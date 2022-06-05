@@ -38,6 +38,7 @@ class ChinHuhPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
     def _initialize_permanent_computation(self) -> None:
 
         super()._initialize_permanent_computation()
+        self._multiplier = 1 / pow(2, sum(self._input_state))
 
         for i in self._considered_columns_indices:
             self._sums[i] = 0
@@ -56,11 +57,3 @@ class ChinHuhPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
                 * (self._r_vector[self._index_to_update] - self._last_value_at_index)
                 * self.matrix[i][self._index_to_update]
             )
-
-    def _return_permanent(self) -> complex128:
-        """
-        In the Chin-Huh algorithm the whole permanent has to be divided by specific
-        power of 2 [2].
-        """
-        self.permanent /= pow(2, sum(self._input_state))
-        return self.permanent
