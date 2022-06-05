@@ -2,15 +2,14 @@ __author__ = "Tomasz Rybotycki"
 
 """
     This file contains the implementation of collective submatrices permanents
-    calculator 
+    calculator using Ryser's formula and Guan codes iteration.
 """
 
 from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_base import (
-    BSSubmatricesPermanentCalculatorBase,
     BSGuanBasedSubmatricesPermanentCalculatorBase,
 )
 
-from numpy import ndarray, complex128, nonzero, zeros, ones
+from numpy import ndarray, complex128, nonzero
 from typing import Optional, List
 
 
@@ -56,6 +55,8 @@ class BSCCRyserSubmatricesPermanentCalculator(
         self._matrix_t = matrix.transpose()
 
         self._sums: dict = dict()  # w_j(r)
+        self._prod: complex128
+
         self._considered_columns_indices = nonzero(self._output_state)[0]
         self._multiplier = 1
         self._binomials_product = 1
@@ -72,40 +73,28 @@ class BSCCRyserSubmatricesPermanentCalculator(
         # We store the transposed matrix to speed up the computations.
         self._matrix_t = matrix.transpose()
 
-    def compute_permanents(self) -> List[complex128]:
-        """
-        The main method of the class. Computes the permanents of the submatrices by
-        using Ryser's formula, the input-output exchange trick and the Guan codes.
-        """
-        self._initialize_permanents_computation()
-
-        while self._r_vector[-1] <= self._position_limits[-1]:
-
-            self._update_guan_code()
-
-            if self._index_to_update == len(self._r_vector):
-                return self.permanents
-
-            self._update_permanents()
-
-        return self.permanents
-
     def _initialize_permanents_computation(self) -> None:
-        """
-        A method initializing all the class fields. Should be called prior to
-        the permanents computation.
-        """
-        self.permanents = [complex128(0) for _ in range(len(self.input_state))]
-
-        self._sums = dict()
-        self._multiplier = pow(-1, sum(self.output_state))
-        self._considered_columns_indices = nonzero(self._output_state)[0]
-        self._binomials_product = 1
-
-        self.initialize_guan_codes_variables()
+        """Prepare the calculator for the computations."""
+        super()._initialize_permanents_computation()
 
         for j in self._considered_columns_indices:
             self._sums[j] = 0
+
+    def _update_sums(self) -> None:
+        """
+        Updates the sums instead of recomputing them. Notice, moreover, that the
+        product of the sums is also updated in the same loop.
+        """
+        self._prod = complex128(1)
+
+        for j in self._sums:
+            self._sums[j] += (
+                self._r_vector[self._index_to_update] - self._last_value_at_index
+            ) * self._matrix_t[self._index_to_update][j]
+
+            self._prod *= pow(self._sums[j], self.output_state[j])
+
+        self._prod *= self._multiplier
 
     def _update_permanents(self) -> None:
         """
@@ -114,22 +103,6 @@ class BSCCRyserSubmatricesPermanentCalculator(
         input_vector[i] != 0. Do note that it also requires updating the binomial
         product to
         """
-        self._multiplier = -self._multiplier
-
-        prod: complex128 = complex128(1)
-
-        # Sums update.
-        for j in self._sums:
-            self._sums[j] += (
-                self._r_vector[self._index_to_update] - self._last_value_at_index
-            ) * self._matrix_t[self._index_to_update][j]
-
-            prod *= pow(self._sums[j], self.output_state[j])
-
-        self._update_binomials_product()
-
-        prod *= self._multiplier
-
         for i in range(len(self.permanents)):
 
             # We don't want to update permanents with the wrong r-vector sums.
@@ -146,4 +119,4 @@ class BSCCRyserSubmatricesPermanentCalculator(
                     self.input_state[i] - self._r_vector[i]
                 )
 
-            self.permanents[i] += prod * updated_binomials_product
+            self.permanents[i] += self._prod * updated_binomials_product

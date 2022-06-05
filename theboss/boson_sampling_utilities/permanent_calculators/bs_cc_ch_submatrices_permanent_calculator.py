@@ -12,7 +12,7 @@ __author__ = "Tomasz Rybotycki"
     (or rather can be interpreted as that). 
 """
 
-from numpy import complex128, ndarray, array, nonzero, zeros_like
+from numpy import complex128, ndarray, array
 import operator
 from functools import reduce
 from typing import List, Optional
@@ -42,58 +42,26 @@ class BSCCCHSubmatricesPermanentCalculator(
     ) -> None:
 
         self._sums: dict = dict()
-        self.permanents: ndarray = array([], dtype=complex128)
+        self.permanents: List[complex128] = []
         self._multiplier: int = 1
         self._considered_columns_indices = array(0)
 
         super().__init__(matrix, input_state, output_state)
 
-    def compute_permanents(self) -> List[complex128]:
-
-        # TODO TR:  This method is huge and complicated. It would be smart to break
-        #           it down into smaller ones.
-
-        self._initialize_permanents_computation()
-
-        while self._r_vector[-1] <= self._position_limits[-1]:
-
-            self._update_guan_code()
-
-            if self._index_to_update == len(self._r_vector):
-                self.permanents /= pow(2, sum(self.input_state) - 1)
-                return list(self.permanents)
-
-            self._multiplier = -self._multiplier
-
-            self._update_sums()
-            self._update_binomials_product()
-            self._add_permanent_addends()
-
-        for _ in range(int(sum(self._input_state)) - 1):
-            self.permanents /= pow(2, sum(self.input_state) - 1)
-
-        return list(self.permanents)
-
     def _initialize_permanents_computation(self) -> None:
         """
         Initialize all the class fields prior to the permanents computation.
         """
-        self.permanents = zeros_like(self.input_state, dtype=complex128)
+        super()._initialize_permanents_computation()
 
-        self.initialize_guan_codes_variables()
+        self._multiplier = 1 / pow(2, sum(self.input_state) - 1)
 
-        self._sums = dict()
-        self._considered_columns_indices = nonzero(self._output_state)[0]
-
-        self._multiplier = 1
-
-        # Initialization (0-th step).
         for i in self._considered_columns_indices:
             self._sums[i] = 0
             for j in range(len(self._input_state)):
                 self._sums[i] += self._input_state[j] * self._matrix[i][j]
 
-        self._add_permanent_addends()
+        self._update_permanents()
 
     def _update_sums(self) -> None:
         """
@@ -106,11 +74,10 @@ class BSCCCHSubmatricesPermanentCalculator(
                 * self.matrix[i][self._index_to_update]
             )
 
-    def _add_permanent_addends(self) -> None:
+    def _update_permanents(self) -> None:
         """
         Update the intermediate permanents.
         """
-        # For each occupied mode
         for i in range(len(self.input_state)):
 
             if self.input_state[i] == 0 or self.input_state[i] == self._r_vector[i]:

@@ -10,7 +10,7 @@ from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_perma
     BSSubmatricesPermanentCalculatorInterface,
 )
 from typing import Optional, List
-from numpy import ndarray, int64, array, zeros, ones
+from numpy import ndarray, int64, array, zeros, ones, complex128, nonzero
 import abc
 
 
@@ -91,11 +91,11 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
         self._r_vector: ndarray
         self._code_update_information: ndarray
 
-        self.initialize_guan_codes_variables()
-
         self._binomials_product: int = 1
 
-    def initialize_guan_codes_variables(self) -> None:
+        self.permanent: complex128
+
+    def _initialize_guan_codes_variables(self) -> None:
         """
         Initializes Guan codes-related variables before the permanents computation.
         """
@@ -145,3 +145,51 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
                 self._input_state[self._index_to_update]
                 - self._r_vector[self._index_to_update]
             )
+
+    def compute_permanents(self) -> List[complex128]:
+        """
+        The main method of the class. Computes the permanents of the submatrices by
+        using Ryser's formula, the input-output exchange trick and the Guan codes.
+        """
+        self._initialize_permanents_computation()
+
+        while self._r_vector[-1] <= self._position_limits[-1]:
+
+            self._update_guan_code()
+
+            if self._index_to_update == len(self._r_vector):
+                return self.permanents
+
+            self._multiplier = -self._multiplier
+            self._update_binomials_product()
+            self._update_sums()
+
+            self._update_permanents()
+
+        return self.permanents
+
+    def _initialize_permanents_computation(self) -> None:
+        """
+        A method initializing all the class fields. Should be called prior to
+        the permanents computation.
+        """
+        self.permanents = [complex128(0) for _ in range(len(self.input_state))]
+
+        self._sums = dict()
+        self._multiplier = pow(-1, sum(self.output_state))
+        self._considered_columns_indices = nonzero(self._output_state)[0]
+        self._binomials_product = 1
+
+        self._initialize_guan_codes_variables()
+
+    @abc.abstractmethod
+    def _update_sums(self) -> None:
+        """
+        Updates the sums instead of recomputing them.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _update_permanents(self) -> None:
+        """Update permanents with new r_vector data. Notice that some of"""
+        raise NotImplementedError
