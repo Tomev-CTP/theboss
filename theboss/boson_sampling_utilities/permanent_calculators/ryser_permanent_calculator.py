@@ -2,27 +2,32 @@ __author__ = "Tomasz Rybotycki"
 
 """
     This file holds the implementation of Ryser method of permanent calculation, as
-    presented in [Cliffords2020]. I've modified it slightly, so that the permanent can
-    be used for computing permanents for bunched and not-continuous 
-    (like [1, 1, 0, 1, 0]) inputs.
+    presented in [5] with using Guan codes to speed it up. I modified it slightly, so
+    that the permanent can be used for computing permanents for bunched and 
+    not-continuous (like [1, 1, 0, 1, 0]) inputs.
 """
 
-from typing import List, Optional
+from typing import Optional, Dict
 
 from numpy import complex128, ndarray
-from scipy.special import binom
 
 from ..permanent_calculators.bs_permanent_calculator_base import (
-    BSPermanentCalculatorBase,
+    BSGuanCodeBasedPermanentCalculatorBase,
 )
 
 
-class RyserPermanentCalculator(BSPermanentCalculatorBase):
+class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
     """
-        This class is designed to calculate permanent of effective scattering matrix of
-        a boson sampling instance. Note, that it can be used to calculate permanent of
-        a given matrix. All that is required that input and output states are correct
-        representations of Fock states with proper dimensions.
+    This class is designed to calculate permanent of effective scattering matrix of
+    a boson sampling instance. Note, that it can be used to calculate permanent of
+    a given matrix. All that is required that input and output states are correct
+    representations of Fock states with proper dimensions.
+
+    An important thing to note is that in order to use general approach provided by
+    the boilerplate code in BSGuanCodeBasedPermanentCalculatorBase, we've got to
+    change the role of input and output states. This can be done if we transpose the
+    matrix. Look into BSCCRyserSubmatricesPermanentCalculator class description
+    for more details.
     """
 
     def __init__(
@@ -32,79 +37,36 @@ class RyserPermanentCalculator(BSPermanentCalculatorBase):
         output_state: Optional[ndarray] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
+        self._multiplier: int
+        self._considered_columns_indices: ndarray
+        self.permanent: complex128
+        self._sums: Dict[int, complex128]
+        self._matrix_t: ndarray = matrix.transpose()
 
-    def compute_permanent(self) -> complex128:
+    @property
+    def matrix(self) -> ndarray:
+        return self._matrix
+
+    @matrix.setter
+    def matrix(self, matrix: ndarray) -> None:
+        self._matrix = matrix
+        self._matrix_t = matrix.transpose()
+
+    def _initialize_permanent_computation(self) -> None:
+        """Prepares the calculator for permanent computation."""
+        super()._initialize_permanent_computation()
+        self._multiplier = pow(-1, sum(self._input_state))
+
+        for j in self._considered_columns_indices:
+            self._sums[j] = 0
+
+        self._update_permanent()
+
+    def _update_sums(self) -> None:
         """
-            This is the main method of the calculator. Assuming that input state,
-            output state and the matrix are defined correctly (that is we've got m x m
-            matrix, and vectors of with length m) this calculates the permanent of an
-            effective scattering matrix related to probability of obtaining output state
-            from given input state.
-
-            :return: Permanent of effective scattering matrix.
+        Update sums instead of recomputing them.
         """
-        if not self._can_calculation_be_performed():
-            raise AttributeError
-
-        r_vectors = self._calculate_r_vectors()
-
-        permanent = complex128(0)
-        for r_vector in r_vectors:
-            permanent += self._compute_permanent_addend(r_vector)
-        permanent *= pow(-1, sum(self._input_state))
-        return permanent
-
-    def _calculate_r_vectors(
-        self, input_vector: Optional[ndarray] = None
-    ) -> List[ndarray]:
-        """
-            This method is used to calculate all the r vectors that appear in the
-            Ryser's formula during permanent calculation. By r vectors I denote vectors
-            in form [r_1, r_2, ..., r_m]. This method basically takes care of the sum of
-            sum ... of sum at the beginning of the formula.
-
-            :return: List of r vectors.
-        """
-        if input_vector is None:
-            input_vector = []
-        r_vectors = []
-        for i in range(int(self._output_state[len(input_vector)]) + 1):
-            input_state = input_vector.copy()
-            input_state.append(i)
-
-            if len(input_state) == len(self._output_state):
-                r_vectors.append(input_state)
-            else:
-                r_vectors.extend(self._calculate_r_vectors(input_state))
-
-        return r_vectors
-
-    def _compute_permanent_addend(self, r_vector: ndarray) -> complex128:
-
-        addend = pow(-1, sum(r_vector))
-
-        # Binomials calculation
-        for i in range(len(r_vector)):
-            addend *= binom(self._output_state[i], r_vector[i])
-
-        # Product calculation
-        product = 1
-
-        considered_columns_indices = []
-        for mode_index in range(len(self._input_state)):
-            if self._input_state[mode_index] != 0:
-                considered_columns_indices.append(
-                    mode_index
-                )  # Consider non-standard inputs
-
-        for j in considered_columns_indices:
-            product_part = 0
-
-            for nu in range(len(self._input_state)):
-                product_part += r_vector[nu] * self._matrix[nu][j]
-
-            product *= pow(
-                product_part, self._input_state[j]
-            )  # Take into account bunching in the input
-        addend *= product
-        return addend
+        for j in self._sums:
+            self._sums[j] += (
+                self._r_vector[self._index_to_update] - self._last_value_at_index
+            ) * self._matrix_t[self._index_to_update][j]

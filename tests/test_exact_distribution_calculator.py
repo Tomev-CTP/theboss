@@ -46,7 +46,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             uniform_transmissivity=0.8,
         )
 
-        self._calculator_type = PermanentCalculatorType.PARALLEL_CHIN_HUH
+        self._calculator_type = PermanentCalculatorType.CHIN_HUH
         self._permanent_calculator_factory = BSPermanentCalculatorFactory(
             matrix=None,
             input_state=None,

@@ -1,25 +1,31 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This class should be used as a base class for all standard BS permanent calculators.
-    By standard I mean that the matrix and in(out)put states are stored in a variables.
-    It takes care of a lot of boilerplate code.
+    This script contains base(s) for BS submatrices permanents calculators that takes
+    care of the boilerplate code.
 """
 
-from typing import Optional, List
 
-import operator
-from functools import reduce
-
-from numpy import ndarray, int64, array, asarray, zeros, ones, complex128, nonzero
-
-from ..permanent_calculators.bs_permanent_calculator_interface import (
-    BSPermanentCalculatorInterface,
+from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_interface import (
+    BSSubmatricesPermanentCalculatorInterface,
 )
+from typing import Optional, List
+from numpy import ndarray, int64, array, zeros, ones, complex128, nonzero
 import abc
 
 
-class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
+class BSSubmatricesPermanentCalculatorBase(
+    BSSubmatricesPermanentCalculatorInterface, abc.ABC
+):
+    """
+    Base class for BSSubmatricesPermanentCalculator classes. It takes care of some
+    boilerplate code.
+
+    Again, it should be put into separate file were the
+    BSCCCHSubmatricesPermanentCalculator cease to be the only submatrices
+    permanent calculator.
+    """
+
     def __init__(
         self,
         matrix: ndarray,
@@ -48,7 +54,7 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 
     @input_state.setter
     def input_state(self, input_state: ndarray) -> None:
-        self._input_state = asarray(input_state, dtype=int64)
+        self._input_state = array(input_state, dtype=int64)
 
     @property
     def output_state(self) -> ndarray:
@@ -56,26 +62,16 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 
     @output_state.setter
     def output_state(self, output_state: ndarray) -> None:
-        self._output_state = asarray(output_state, dtype=int64)
-
-    def _can_calculation_be_performed(self) -> bool:
-        """
-        Checks if calculation can be performed. For this to happen sizes of given
-        matrix and states have to match.
-
-        :return: Information if the calculation can be performed.
-        """
-        return (
-            self._matrix.shape[0] == self._matrix.shape[1]
-            and len(self._output_state) == len(self._input_state)
-            and len(self._output_state) <= self._matrix.shape[0]
-        )
+        self._output_state = array(output_state, dtype=int64)
 
 
-class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC):
+class BSGuanBasedSubmatricesPermanentCalculatorBase(
+    BSSubmatricesPermanentCalculatorBase, abc.ABC
+):
     """
-    This is a base class for those permanent calculators that use Guan codes iterations.
-    It contains boilerplate code related to Guan codes iterations.
+    This is a base class for BS submatrices permanents calculators that use Guan code
+    iterations for computations. Submatrices permanents computations are usually some
+    variations of C&C idea, so it's pretty common.
     """
 
     def __init__(
@@ -84,31 +80,20 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
         input_state: Optional[ndarray] = None,
         output_state: Optional[ndarray] = None,
     ) -> None:
+
         super().__init__(matrix, input_state, output_state)
 
-        # Guan codes-related variables
-        self._r_vector: ndarray = zeros(len(self._input_state), dtype=int)  # g
-        self._code_update_information: ndarray = ones(
-            len(self._input_state), dtype=int
-        )  # u
-        self._position_limits: List[int] = list(self._input_state)  # n
+        # Guan codes related
         self._index_to_update: int = 0
         self._last_value_at_index: int = 0
 
+        self._position_limits: List[int]
+        self._r_vector: ndarray
+        self._code_update_information: ndarray
+
         self._binomials_product: int = 1
+
         self.permanent: complex128
-
-    def _initialize_permanent_computation(self) -> None:
-        """Prepares the calculator for permanent computation."""
-
-        self._multiplier = 1
-        self._considered_columns_indices = nonzero(self._output_state)[0]
-        self.permanent = complex128(0)
-
-        self._sums = dict()
-
-        self._binomials_product = 1
-        self._initialize_guan_codes_variables()
 
     def _initialize_guan_codes_variables(self) -> None:
         """
@@ -161,52 +146,50 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
                 - self._r_vector[self._index_to_update]
             )
 
-    def compute_permanent(self) -> complex128:
+    def compute_permanents(self) -> List[complex128]:
         """
-        This is the main method of the calculator. Assuming that input state,
-        output state and the matrix are defined correctly (that is we've got m x m
-        matrix, and vectors of with length m) this calculates the permanent of an
-        effective scattering matrix related to probability of obtaining output state
-        from a given input state.
-
-        Most of the Guan code-related have essentially the same structure, up to some
-        minor differences.
-
-        :return: Permanent of effective scattering matrix.
+        The main method of the class. Computes the permanents of the submatrices by
+        using Ryser's formula, the input-output exchange trick and the Guan codes.
         """
-        if not self._can_calculation_be_performed():
-            raise AttributeError
+        self._initialize_permanents_computation()
 
-        self._initialize_permanent_computation()
-
-        # Rest of the steps.
         while self._r_vector[-1] <= self._position_limits[-1]:
 
             self._update_guan_code()
 
             if self._index_to_update == len(self._r_vector):
-                return self.permanent
+                return self.permanents
 
-            # START PERMANENT UPDATE
             self._multiplier = -self._multiplier
-            self._update_sums()
             self._update_binomials_product()
-            self._update_permanent()
+            self._update_sums()
 
-        return self.permanent
+            self._update_permanents()
 
-    def _update_permanent(self) -> None:
-        """Update permanent with new addend from r_vector."""
-        self.permanent += reduce(
-            operator.mul,
-            [
-                pow(self._sums[j], self._output_state[j])
-                for j in self._considered_columns_indices
-            ],
-            self._multiplier * self._binomials_product,
-        )
+        return self.permanents
+
+    def _initialize_permanents_computation(self) -> None:
+        """
+        A method initializing all the class fields. Should be called prior to
+        the permanents computation.
+        """
+        self.permanents = [complex128(0) for _ in range(len(self.input_state))]
+
+        self._sums = dict()
+        self._multiplier = pow(-1, sum(self.output_state))
+        self._considered_columns_indices = nonzero(self._output_state)[0]
+        self._binomials_product = 1
+
+        self._initialize_guan_codes_variables()
 
     @abc.abstractmethod
     def _update_sums(self) -> None:
-        """An abstract method for sums update."""
+        """
+        Updates the sums instead of recomputing them.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def _update_permanents(self) -> None:
+        """Update permanents with new r_vector data. Notice that some of"""
         raise NotImplementedError

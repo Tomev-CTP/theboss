@@ -86,4 +86,4 @@ This project follows / uses the ideas presented in following papers:
 
 [4] Mezzadri F., [arXiv:math-ph/0609050](https://arxiv.org/abs/math-ph/0609050) [math-ph].
 
-
+[5] Clifford P., Clifford R., [arXiv:2005.04214](https://arxiv.org/abs/2005.04214) [quant-ph].
