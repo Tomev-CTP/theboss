@@ -41,16 +41,6 @@ class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
         self._considered_columns_indices: ndarray
         self.permanent: complex128
         self._sums: Dict[int, complex128]
-        self._matrix_t: ndarray = matrix.transpose()
-
-    @property
-    def matrix(self) -> ndarray:
-        return self._matrix
-
-    @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
-        self._matrix = matrix
-        self._matrix_t = matrix.transpose()
 
     def _initialize_permanent_computation(self) -> None:
         """Prepares the calculator for permanent computation."""
@@ -65,8 +55,10 @@ class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
     def _update_sums(self) -> None:
         """
         Update sums instead of recomputing them.
+
+        Notice the change of index instead of matrix transpose.
         """
         for j in self._sums:
             self._sums[j] += (
                 self._r_vector[self._index_to_update] - self._last_value_at_index
-            ) * self._matrix_t[self._index_to_update][j]
+            ) * self._matrix[j][self._index_to_update]

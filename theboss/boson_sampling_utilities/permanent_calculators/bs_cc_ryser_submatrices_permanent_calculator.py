@@ -39,7 +39,17 @@ class BSCCRyserSubmatricesPermanentCalculator(
             \\sum^m_{\\nu = 1} r_\\nu u^T_{\\nu, j}
         \\right )^{t_j}
 
-    This way we reduce the computations in case of binned outputs.
+    This way we reduce the computations in case of binned outputs. Also notice that
+    we can just switch the indices instead of transposing the matrix. The resultant
+    formula used in this implementation is
+
+    .. math:: Perm(U_{ST}) = Perm(U^T_{TS}) =
+        (-1)^k \\sum^{s_1}_{r_1} ... \\sum^{s_m}_{r_m} (-1)^{r_1 + ... r_m}
+        \\prod^m_{\\nu = 1} \\binom{s_\\nu}{r_\\nu}
+        \\prod_{j: t_j > 0} \\left (
+            \\sum^m_{\\nu = 1} r_\\nu u{j, \\nu}
+        \\right )^{t_j}.
+
     """
 
     def __init__(
@@ -51,9 +61,6 @@ class BSCCRyserSubmatricesPermanentCalculator(
 
         super().__init__(matrix, input_state, output_state)
 
-        # We store the transposed matrix to reduce the computation time.
-        self._matrix_t = matrix.transpose()
-
         self._sums: dict = dict()  # w_j(r)
         self._prod: complex128
 
@@ -62,16 +69,6 @@ class BSCCRyserSubmatricesPermanentCalculator(
         self._binomials_product = 1
 
         self.permanents: List[complex128] = []
-
-    @property
-    def matrix(self) -> ndarray:
-        return self._matrix
-
-    @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
-        self._matrix = matrix
-        # We store the transposed matrix to speed up the computations.
-        self._matrix_t = matrix.transpose()
 
     def _initialize_permanents_computation(self) -> None:
         """Prepare the calculator for the computations."""
@@ -90,7 +87,7 @@ class BSCCRyserSubmatricesPermanentCalculator(
         for j in self._sums:
             self._sums[j] += (
                 self._r_vector[self._index_to_update] - self._last_value_at_index
-            ) * self._matrix_t[self._index_to_update][j]
+            ) * self._matrix[j][self._index_to_update]
 
             self._prod *= pow(self._sums[j], self.output_state[j])
 
