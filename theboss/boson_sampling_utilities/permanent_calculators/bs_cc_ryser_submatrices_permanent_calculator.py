@@ -103,7 +103,7 @@ class BSCCRyserSubmatricesPermanentCalculator(
         for i in range(len(self.permanents)):
 
             # We don't want to update permanents with the wrong r-vector sums.
-            if 0 < self._r_vector[i] == self.input_state[i]:
+            if self.input_state[i] == 0 or self._r_vector[i] == self.input_state[i]:
                 continue
 
             # We've got to update the binomials product to ensure that it reflects

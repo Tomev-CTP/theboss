@@ -84,6 +84,7 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
         super().__init__(matrix, input_state, output_state)
 
         # Guan codes related
+        self._multiplier = None
         self._index_to_update: int = 0
         self._last_value_at_index: int = 0
 
@@ -151,6 +152,11 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
         The main method of the class. Computes the permanents of the submatrices by
         using Ryser's formula, the input-output exchange trick and the Guan codes.
         """
+
+        # Take care of the edge-case, where only 1 sub-matrix is valid (and empty).
+        if sum(self.input_state) == 1:
+            return list(self.input_state)
+
         self._initialize_permanents_computation()
 
         while self._r_vector[-1] <= self._position_limits[-1]:
