@@ -50,6 +50,12 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
         self._input_state[1] = self._dim - 1
         self._compute_permanents_and_assert(BSCCCHSubmatricesPermanentCalculator)
 
+    def test_chin_huh_submatrices_permanent_calculator_for_edge_case(self) -> None:
+        self._input_state = zeros(self._dim)
+        self._input_state[0] = 1
+        self._output_state = zeros(self._dim)
+        self._compute_permanents_and_assert(BSCCCHSubmatricesPermanentCalculator)
+
     def test_ryser_submatrices_permanent_calculator_for_std_input(self) -> None:
         self._input_state = ones(self._dim, dtype=int)
         self._compute_permanents_and_assert(BSCCRyserSubmatricesPermanentCalculator)
@@ -58,6 +64,12 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
         self._input_state = zeros(self._dim)
         self._input_state[0] = 1
         self._input_state[1] = self._dim - 1
+        self._compute_permanents_and_assert(BSCCRyserSubmatricesPermanentCalculator)
+
+    def test_ryser_submatrices_permanent_calculator_for_edge_case(self) -> None:
+        self._input_state = zeros(self._dim)
+        self._input_state[0] = 1
+        self._output_state = zeros(self._dim)
         self._compute_permanents_and_assert(BSCCRyserSubmatricesPermanentCalculator)
 
     def _compute_permanents_and_assert(
