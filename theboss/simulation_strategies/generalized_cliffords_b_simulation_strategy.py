@@ -10,7 +10,7 @@ __author__ = "Tomasz Rybotycki"
             from an easier distribution and obtain the same results.
 """
 
-from typing import List
+from typing import List, Sequence
 
 from numpy import array, ndarray, int64, zeros_like
 from numpy.random import choice, randint
@@ -20,7 +20,7 @@ from theboss.simulation_strategies.generalized_cliffords_simulation_strategy imp
     BSPermanentCalculatorInterface,
 )
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    modes_state_to_particle_state,
+    mode_occupation_to_mode_assignment,
 )
 
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
@@ -34,7 +34,7 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         self._current_input = []
         self._working_input_state = None
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(self, input_state: Sequence[int], samples_number: int = 1) -> List[Sequence[int]]:
         """
         Returns sample from linear optics experiments given output state.
 
@@ -42,10 +42,10 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         :param samples_number: Number of samples to simulate.
         :return: A resultant state after traversing through interferometer.
         """
-        self.input_state = input_state
-        self.number_of_input_photons = sum(input_state)
+        self.input_state: Sequence[int] = input_state
+        self.number_of_input_photons: int = sum(input_state)
 
-        particle_input_state = list(modes_state_to_particle_state(input_state))
+        particle_input_state = list(mode_occupation_to_mode_assignment(input_state))
 
         samples = []
 
@@ -89,11 +89,12 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._compute_pmf()
             self._sample_from_pmf()
 
-    def _update_current_input(self):
+    def _update_current_input(self) -> None:
         self._current_input[
             self._working_input_state.pop(randint(0, len(self._working_input_state)))
         ] += 1
 
     def _sample_from_pmf(self) -> None:
+        # TODO TR: Don't use numpy.random.choice, because it's slow.
         m = choice(range(len(self.input_state)), p=self.pmf)
         self.r_sample[m] += 1

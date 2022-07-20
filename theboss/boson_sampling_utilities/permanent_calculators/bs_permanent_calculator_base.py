@@ -6,12 +6,12 @@ __author__ = "Tomasz Rybotycki"
     It takes care of a lot of boilerplate code.
 """
 
-from typing import Optional, List
+from typing import Optional, List, Sequence
 
 import operator
 from functools import reduce
 
-from numpy import ndarray, int64, array, asarray, zeros, ones, complex128, nonzero
+from numpy import complex128, nonzero
 
 from ..permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
@@ -22,41 +22,41 @@ import abc
 class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex128]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         if output_state is None:
-            output_state = array([], dtype=int64)
+            output_state = list()
         if input_state is None:
-            input_state = array([], dtype=int64)
-        self._matrix = matrix
-        self._input_state = input_state
-        self._output_state = output_state
+            input_state = list()
+        self._matrix: Sequence[Sequence[complex128]] = matrix
+        self._input_state: Sequence[int] = input_state
+        self._output_state: Sequence[int] = output_state
 
     @property
-    def matrix(self) -> ndarray:
+    def matrix(self) -> Sequence[Sequence[complex128]]:
         return self._matrix
 
     @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
+    def matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
         self._matrix = matrix
 
     @property
-    def input_state(self) -> ndarray:
+    def input_state(self) -> Sequence[int]:
         return self._input_state
 
     @input_state.setter
-    def input_state(self, input_state: ndarray) -> None:
-        self._input_state = asarray(input_state, dtype=int64)
+    def input_state(self, input_state: Sequence[int]) -> None:
+        self._input_state = input_state
 
     @property
-    def output_state(self) -> ndarray:
+    def output_state(self) -> Sequence[int]:
         return self._output_state
 
     @output_state.setter
-    def output_state(self, output_state: ndarray) -> None:
-        self._output_state = asarray(output_state, dtype=int64)
+    def output_state(self, output_state: Sequence[int]) -> None:
+        self._output_state = output_state
 
     def _can_calculation_be_performed(self) -> bool:
         """
@@ -66,9 +66,9 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
         :return: Information if the calculation can be performed.
         """
         return (
-            self._matrix.shape[0] == self._matrix.shape[1]
+            len(self._matrix) == len(self._matrix[0])
             and len(self._output_state) == len(self._input_state)
-            and len(self._output_state) <= self._matrix.shape[0]
+            and len(self._output_state) <= len(self._matrix[0])
         )
 
 
@@ -80,22 +80,23 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex128]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
 
         # Guan codes-related variables
-        self._r_vector: ndarray = zeros(len(self._input_state), dtype=int)  # g
-        self._code_update_information: ndarray = ones(
-            len(self._input_state), dtype=int
-        )  # u
+        self._r_vector: List[int] = [0 for _ in range(len(self._input_state))]  # g
+        self._code_update_information: List[int] = \
+            [1 for _ in range(len(self._input_state))]  # u
+
         self._position_limits: List[int] = list(self._input_state)  # n
         self._index_to_update: int = 0
         self._last_value_at_index: int = 0
 
         self._binomials_product: int = 1
+        self._multiplier: int = 1
         self.permanent: complex128
 
     def _initialize_permanent_computation(self) -> None:
@@ -112,10 +113,10 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
 
     def _initialize_guan_codes_variables(self) -> None:
         """
-        Initializes Guan codes-related variables before the permanents computation.
+        Initializes Guan codes-related variables before the permanent computation.
         """
-        self._r_vector = zeros(len(self._input_state), dtype=int)  # g
-        self._code_update_information = ones(len(self._input_state), dtype=int)  # u
+        self._r_vector = [0 for _ in range(len(self._input_state))]   # g
+        self._code_update_information = [1 for _ in range(len(self._input_state))]   # u
         self._position_limits = list(self._input_state)  # n
 
     def _update_guan_code(self) -> None:
@@ -148,8 +149,8 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
 
     def _update_binomials_product(self) -> None:
         """
-        Update the binomials product to reflect the new Guan code instead of recomputing
-        it.
+        Update the binomial coefficients product to reflect the new Guan code instead of
+        recomputing it.
         """
         if self._r_vector[self._index_to_update] > self._last_value_at_index:
             self._binomials_product *= (

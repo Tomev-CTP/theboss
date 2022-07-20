@@ -6,7 +6,7 @@ from numpy import float64, ndarray, zeros
 
 from ..boson_sampling_simulator import BosonSamplingSimulator
 from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_outputs,
+    generate_possible_states,
 )
 from ..distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
@@ -85,7 +85,7 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
         if self._outcomes is not None:
             possible_outcomes = self._outcomes
         else:
-            possible_outcomes = generate_possible_outputs(
+            possible_outcomes = generate_possible_states(
                 self.configuration.number_of_particles_left,
                 self.configuration.number_of_modes,
             )

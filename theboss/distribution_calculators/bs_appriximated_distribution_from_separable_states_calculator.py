@@ -15,7 +15,7 @@ from .bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
 )
 from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_outputs,
+    generate_possible_states,
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
     prepare_interferometer_matrix_in_expanded_space,
@@ -94,7 +94,7 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
         """
             Computes whole distribution basing on configuration.
         """
-        possible_outcomes = generate_possible_outputs(
+        possible_outcomes = generate_possible_states(
             self.configuration.number_of_particles_left,
             self.configuration.number_of_modes,
         )
@@ -170,10 +170,10 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
             all m-mode (n-k)-particles states and just hstack them with output.
         """
         considered_outcomes = []
-        possible_m_mode_outputs_with_less_particles = generate_possible_outputs(
-            number_of_particles=self._configuration.initial_number_of_particles
-            - sum(outcome),
-            number_of_modes=self._configuration.number_of_modes,
+        possible_m_mode_outputs_with_less_particles = generate_possible_states(
+            particles_number=self._configuration.initial_number_of_particles
+                             - sum(outcome),
+            modes_number=self._configuration.number_of_modes,
         )
 
         for possible_output in possible_m_mode_outputs_with_less_particles:
@@ -186,7 +186,7 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
             Returns states in the same order that distribution probabilities were
             calculated in.
         """
-        return generate_possible_outputs(
+        return generate_possible_states(
             self._configuration.number_of_particles_left,
             self._configuration.number_of_modes,
         )

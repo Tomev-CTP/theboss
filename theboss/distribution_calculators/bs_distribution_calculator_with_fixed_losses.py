@@ -9,7 +9,7 @@ from scipy.special import binom
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
     generate_lossy_inputs,
-    generate_possible_outputs,
+    generate_possible_states,
 )
 from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
@@ -44,7 +44,7 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         :return:    All the possible outcomes of BS experiment specified by the
                     configuration.
         """
-        return generate_possible_outputs(
+        return generate_possible_states(
             self.configuration.number_of_particles_left,
             self.configuration.number_of_modes,
         )

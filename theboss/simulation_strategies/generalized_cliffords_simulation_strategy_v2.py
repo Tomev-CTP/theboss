@@ -6,7 +6,7 @@ from typing import List
 from numpy import append, array, int64, ndarray
 
 from ..boson_sampling_utilities.boson_sampling_utilities import (
-    particle_state_to_modes_state,
+    mode_assignment_to_mode_occupation,
 )
 from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
@@ -40,7 +40,7 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
         while len(samples) < samples_number:
             self._fill_r_sample()
             samples.append(
-                particle_state_to_modes_state(
+                mode_assignment_to_mode_occupation(
                     array(self.r_sample, dtype=int64), len(self.input_state)
                 )
             )
@@ -75,7 +75,7 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
         ] = self._generate_possible_output_states()
 
         for output in self.possible_outputs[self.current_key]:
-            output = particle_state_to_modes_state(output, len(self.input_state))
+            output = mode_assignment_to_mode_occupation(output, len(self.input_state))
             pmf.append(0)
             for i in range(len(possible_input_states)):
                 probability = self._calculate_outputs_probability(

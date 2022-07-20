@@ -13,7 +13,7 @@ __author__ = "Tomasz Rybotycki"
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
     GeneralizedCliffordsBSimulationStrategy,
     BSPermanentCalculatorInterface,
-    modes_state_to_particle_state,
+    mode_occupation_to_mode_assignment,
 )
 from numpy import ndarray, array, int64, zeros_like
 from typing import List
@@ -95,7 +95,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
         self.number_of_input_photons = sum(input_state)
         self._compute_particle_numbers_probabilities()
 
-        particle_input_state = list(modes_state_to_particle_state(input_state))
+        particle_input_state = list(mode_occupation_to_mode_assignment(input_state))
 
         samples = []
 

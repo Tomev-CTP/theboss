@@ -1,36 +1,68 @@
 __author__ = "Tomasz Rybotycki"
 
-from numpy import delete, ndarray, vstack, zeros_like
+"""
+A class for exact BS simulation using generalized C&C algorithm (version B).
+"""
 
-from .generalized_cliffords_simulation_strategy import (
-    GeneralizedCliffordsSimulationStrategy,
+from numpy import delete, ndarray, vstack, zeros_like, complex128
+from typing import Sequence
+
+from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
+    GeneralizedCliffordsBSimulationStrategy, BSPermanentCalculatorInterface
 )
-from .simulation_strategy_interface import SimulationStrategyInterface
-from ..boson_sampling_utilities.boson_sampling_utilities import (
+
+from theboss.simulation_strategies.simulation_strategy_interface import(
+    SimulationStrategyInterface
+)
+
+from theboss.boson_sampling_utilities.boson_sampling_utilities import (
     prepare_interferometer_matrix_in_expanded_space,
-)
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
-    BSPermanentCalculatorInterface,
 )
 
 
 class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
+    """
+    This class implements the generalized C&C algorithm for the optical networks with
+    non-uniform (mode-dependent) losses. It utilizes the fact that we can interpret
+    the losses as transferring the particle to an inaccessible mode in the expanded
+    space. This, in turn, is done, by transforming the initial :math:`m \\cross m`
+    matrix into a :math:`2m \\times 2m` matrix. For more details see and analyse the
+    prepare_interferometer_matrix_in_expanded_space method.
+
+    It expects the lossy interferometer matrix to be passed in bs_permanent_calculator.
+
+    Note: Let :math:`l_i` denote the losses on the :math:`i`-th mode and
+    :math:`t_i = 1 - l_i` denote transmissivity of the :math:`i`-th mode. Then, to
+    apply losses to the lossless interferometer matrix one has to multiply it by
+    a matrix with :math:`\\sqrt{t_i}` on diagonal.
+    """
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(
             bs_permanent_calculator.matrix
         )
-        self._helper_strategy = GeneralizedCliffordsSimulationStrategy(
-            bs_permanent_calculator
-        )
+        self._helper_strategy: SimulationStrategyInterface = \
+            GeneralizedCliffordsBSimulationStrategy(
+                bs_permanent_calculator
+            )
 
     def simulate(self, input_state: ndarray, samples_number: int = 1) -> [ndarray]:
+        """
+        The main method of the class. It returns desired number of samples from the
+        (potentially non-uniformly lossy) BS experiment with given input state and
+        interferometer matrix (specified previously).
+
+        :param input_state:     Input state of the BS experiment.
+        :param samples_number:  The number of samples to be returned.
+
+        :return:                Samples of output states of the BS experiment.
+        """
         expansion_zeros = zeros_like(input_state, dtype=int)
         expanded_state = vstack([input_state, expansion_zeros])
         expanded_state = expanded_state.reshape(2 * len(input_state),)
         expanded_samples = self._helper_strategy.simulate(
             expanded_state, samples_number
         )
-        # Trim output state
+        # Trim the output states.
         samples = []
 
         for output_state in expanded_samples:
@@ -40,5 +72,7 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
 
         return samples
 
-    def set_new_matrix(self, matrix: ndarray) -> None:
-        self._helper_strategy.set_new_matrix(matrix)
+    def set_new_matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
+        self._helper_strategy.set_new_matrix(
+            prepare_interferometer_matrix_in_expanded_space(matrix)
+        )

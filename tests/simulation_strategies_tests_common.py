@@ -35,7 +35,7 @@ from theboss.simulation_strategies.simulation_strategy_factory import (
     SimulationStrategyInterface,
 )
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    calculate_number_of_possible_n_particle_m_mode_output_states,
+    bosonic_space_dimension,
 )
 from tqdm import tqdm
 
@@ -321,7 +321,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
     def _test_state_average_probability_for_haar_random_matrices(
         self, strategy_factory: SimulationStrategyFactory
     ) -> None:
-        number_of_outcomes = calculate_number_of_possible_n_particle_m_mode_output_states(
+        number_of_outcomes = bosonic_space_dimension(
             n=self._haar_random_experiment_configuration.number_of_particles_left,
             m=self._haar_random_experiment_configuration.number_of_modes,
         )

@@ -18,7 +18,7 @@ from rpy2 import robjects
 from rpy2.robjects import packages
 
 from ..boson_sampling_utilities.boson_sampling_utilities import (
-    particle_state_to_modes_state,
+    mode_assignment_to_mode_occupation,
 )
 
 
@@ -78,7 +78,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
 
         for sample in samples_in_particle_states:
             samples_in_occupation_description.append(
-                particle_state_to_modes_state(sample, len(initial_state))
+                mode_assignment_to_mode_occupation(sample, len(initial_state))
             )
 
         return samples_in_occupation_description
@@ -114,7 +114,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
             sample_in_particle_states = array_split(python_result, 1)[0]
 
             sample = tuple(
-                particle_state_to_modes_state(
+                mode_assignment_to_mode_occupation(
                     sample_in_particle_states, len(initial_state)
                 )
             )
@@ -162,7 +162,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
             sample_in_particle_states = array_split(python_result, 1)[0]
 
             sample = tuple(
-                particle_state_to_modes_state(
+                mode_assignment_to_mode_occupation(
                     sample_in_particle_states, len(initial_state)
                 )
             )

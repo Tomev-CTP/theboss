@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    calculate_number_of_possible_n_particle_m_mode_output_states,
+    bosonic_space_dimension,
     calculate_number_of_possible_lossy_n_particle_m_mode_output_states,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
@@ -35,7 +35,7 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
             estimation_calculator=self._generate_frequencies_calculator(
                 self._strategies_factory.generate_strategy()
             ),
-            outcomes_number=calculate_number_of_possible_n_particle_m_mode_output_states(
+            outcomes_number=bosonic_space_dimension(
                 n=self._sampling_tvd_experiment_config.number_of_particles_left,
                 m=self._sampling_tvd_experiment_config.number_of_modes,
             ),
