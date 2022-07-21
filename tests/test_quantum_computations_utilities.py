@@ -1,18 +1,24 @@
 __author__ = "Tomasz Rybotycki"
 
+"""
+    This file contains   
+"""
+
 import unittest
 
 from numpy import conjugate, identity, ndarray, transpose, allclose
 from scipy.stats import unitary_group
+
+# TODO TR: Add 1st Q -> 2nd Q -> 1st Q test, and vice 2 -> 1 -> 2 test.
+# TODO TR: Test if the number of possible n-mode m-particle states are correct.
 
 
 class TestQuantumComputationsUtilities(unittest.TestCase):
     def setUp(self) -> None:
         self.matrix_size = 5
         self.number_of_matrices_for_distinct_elements_check = 10  # Should be >= 2.
-        pass
 
-    def test_unitarity_of_matrices_generated_by_haar_random_unitary_method(
+    def test_if_matrices_generated_by_haar_random_unitary_method_are_unitary(
         self,
     ) -> None:
         random_matrix = unitary_group.rvs(self.matrix_size)
@@ -24,14 +30,13 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         identity_matrix = identity(self.matrix_size, dtype=complex)
 
         self.assertTrue(
-            self.__are_matrices_elementwise_close(
+            self._are_rectangular_matrices_elementwise_close(
                 identity_matrix, product_of_matrix_and_hermitian_adjoint
             )
         )
 
     @staticmethod
-    def __are_matrices_elementwise_close(matrix1: ndarray, matrix2: ndarray) -> bool:
-        #  I assume that there are only rectangular matrices
+    def _are_rectangular_matrices_elementwise_close(matrix1: ndarray, matrix2: ndarray) -> bool:
         if len(matrix2) != len(matrix1):
             return False
         if len(matrix2[0]) != len(matrix1[0]):
@@ -40,7 +45,7 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         return allclose(matrix1, matrix2)
 
     def test_haar_random_unitary_matrices_generation_differences(self) -> None:
-        generated_unitaries_matrices = [
+        generated_unitary_matrices = [
             unitary_group.rvs(self.matrix_size)
             for _ in range(self.number_of_matrices_for_distinct_elements_check)
         ]
@@ -50,8 +55,8 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         for i in range(self.number_of_matrices_for_distinct_elements_check):
             for j in range(i + 1, self.number_of_matrices_for_distinct_elements_check):
                 are_all_matrices_different.append(
-                    self.__are_matrices_elementwise_close(
-                        generated_unitaries_matrices[i], generated_unitaries_matrices[j]
+                    self._are_rectangular_matrices_elementwise_close(
+                        generated_unitary_matrices[i], generated_unitary_matrices[j]
                     )
                 )
         self.assertTrue(not any(are_all_matrices_different))

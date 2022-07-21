@@ -322,8 +322,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self, strategy_factory: SimulationStrategyFactory
     ) -> None:
         number_of_outcomes = bosonic_space_dimension(
-            n=self._haar_random_experiment_configuration.number_of_particles_left,
-            m=self._haar_random_experiment_configuration.number_of_modes,
+            particles_number=self._haar_random_experiment_configuration.number_of_particles_left,
+            modes_number=self._haar_random_experiment_configuration.number_of_modes,
         )
 
         error_bound = count_tv_distance_error_bound_of_experiment_results(

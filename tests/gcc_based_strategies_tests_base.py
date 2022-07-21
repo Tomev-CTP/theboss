@@ -8,7 +8,7 @@ __author__ = "Tomasz Rybotycki"
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
     bosonic_space_dimension,
-    calculate_number_of_possible_lossy_n_particle_m_mode_output_states,
+    lossy_bosonic_space_dimension,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
     BSDistributionCalculatorWithFixedLosses,
@@ -36,8 +36,8 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
                 self._strategies_factory.generate_strategy()
             ),
             outcomes_number=bosonic_space_dimension(
-                n=self._sampling_tvd_experiment_config.number_of_particles_left,
-                m=self._sampling_tvd_experiment_config.number_of_modes,
+                particles_number=self._sampling_tvd_experiment_config.number_of_particles_left,
+                modes_number=self._sampling_tvd_experiment_config.number_of_modes,
             ),
             approximation_tvd_bound=0,  # This strategy returns exact solution.
         )
@@ -79,9 +79,9 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
                 self._strategies_factory.generate_strategy(),
                 outcomes=exact_calculator.get_outcomes_in_proper_order(),
             ),
-            outcomes_number=calculate_number_of_possible_lossy_n_particle_m_mode_output_states(
-                n=self._sampling_tvd_experiment_config.initial_number_of_particles,
-                m=self._sampling_tvd_experiment_config.number_of_modes,
+            outcomes_number=lossy_bosonic_space_dimension(
+                maximal_particles_number=self._sampling_tvd_experiment_config.initial_number_of_particles,
+                modes_number=self._sampling_tvd_experiment_config.number_of_modes,
             ),
             approximation_tvd_bound=approximation_bound,
         )
