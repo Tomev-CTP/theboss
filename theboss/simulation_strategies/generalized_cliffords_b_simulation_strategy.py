@@ -34,7 +34,9 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
         self._current_input = []
         self._working_input_state = None
 
-    def simulate(self, input_state: Sequence[int], samples_number: int = 1) -> List[Sequence[int]]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Sequence[int]]:
         """
         Returns sample from linear optics experiments given output state.
 

@@ -10,9 +10,7 @@ from scipy import special
 from .generalized_cliffords_simulation_strategy import (
     GeneralizedCliffordsSimulationStrategy,
 )
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_states,
-)
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_states
 from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )

@@ -5,9 +5,7 @@ from typing import List, Iterable
 from numpy import float64, ndarray, zeros
 
 from ..boson_sampling_simulator import BosonSamplingSimulator
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_states,
-)
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_states
 from ..distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
     BSDistributionCalculatorInterface,

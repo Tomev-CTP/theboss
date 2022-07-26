@@ -34,6 +34,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
     TODO TR:    The permanent calculator should not be necessary for GCCB algorithms, as
                 they use something the submatrices calculator and .
     """
+
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,

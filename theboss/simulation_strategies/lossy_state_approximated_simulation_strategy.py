@@ -27,7 +27,9 @@ from numpy import (
 from numpy.random import choice, rand, shuffle
 from typing import List
 from scipy.special import binom
-from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_n_particle_input_states
+from ..boson_sampling_utilities.boson_sampling_utilities import (
+    generate_lossy_n_particle_input_states,
+)
 from multiprocessing import cpu_count
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool

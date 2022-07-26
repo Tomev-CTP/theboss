@@ -172,7 +172,7 @@ class BSApproximatedLossyDistributionCalculator(BSDistributionCalculatorInterfac
         considered_outcomes = []
         possible_m_mode_outputs_with_less_particles = generate_possible_states(
             particles_number=self._configuration.initial_number_of_particles
-                             - sum(outcome),
+            - sum(outcome),
             modes_number=self._configuration.number_of_modes,
         )
 

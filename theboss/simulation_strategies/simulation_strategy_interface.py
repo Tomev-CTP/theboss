@@ -10,7 +10,9 @@ class SimulationStrategyInterface(abc.ABC):
         return hasattr(subclass, "simulate") and callable(subclass.simulate)
 
     @abc.abstractmethod
-    def simulate(self, input_state: Sequence[int], samples_number: int = 1) -> List[Sequence[int]]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Sequence[int]]:
         """
             Simulate the lossy boson sampling experiment.
 

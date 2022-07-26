@@ -73,7 +73,7 @@ def mode_occupation_to_mode_assignment(mode_occupation: Sequence[int]) -> Tuple[
 
     for i in range(len(mode_occupation)):
         for j in range(mode_occupation[i]):
-            mode_assignment += (i, )
+            mode_assignment += (i,)
 
     return mode_assignment
 
@@ -107,14 +107,14 @@ def generate_possible_states(
         starting_number_of_particles = 0
 
     for particles_number in range(starting_number_of_particles, particles_number + 1):
-        states.extend(_generate_possible_n_particle_states(particles_number, modes_number))
+        states.extend(
+            _generate_possible_n_particle_states(particles_number, modes_number)
+        )
 
     return states
 
 
-def _generate_possible_n_particle_states(
-    n: int, modes_number: int
-) -> List[Tuple[int]]:
+def _generate_possible_n_particle_states(n: int, modes_number: int) -> List[Tuple[int]]:
     """
     Generates all possible :math:`n` particle states.
 
@@ -188,9 +188,7 @@ def generate_lossy_n_particle_input_states(
     for combination in itertools.combinations(
         list(range(initial_number_of_particles)), number_of_particles_left
     ):
-        lossy_input_in_particle_basis = array(
-            [x0[el] for el in combination], dtype=int
-        )
+        lossy_input_in_particle_basis = array([x0[el] for el in combination], dtype=int)
 
         lossy_input = mode_assignment_to_mode_occupation(
             lossy_input_in_particle_basis, number_of_modes
@@ -205,7 +203,9 @@ def generate_lossy_n_particle_input_states(
     return lossy_inputs_list
 
 
-def bosonic_space_dimension(particles_number: int, modes_number: int, losses: bool = False) -> int:
+def bosonic_space_dimension(
+    particles_number: int, modes_number: int, losses: bool = False
+) -> int:
     """
         Calculates the number of possible states with specified number of modes and
         maximal number of particles.
@@ -261,9 +261,7 @@ def get_modes_transmissivity_values_from_matrix(
     return square(flip(singular_values))
 
 
-def _compute_loss_transfer_matrix_expansion(
-    transmissivities: ndarray,
-) -> ndarray:
+def _compute_loss_transfer_matrix_expansion(transmissivities: ndarray,) -> ndarray:
     """
     Returns extension part of the singular values' matrix resulting from the SVD
     decomposition of the (presumably lossy) interferometer.
@@ -316,13 +314,17 @@ def prepare_interferometer_matrix_in_expanded_space(
     extension_identity_matrix = eye(len(v_matrix))
 
     expanded_v = block(
-        [[v_matrix, extension_zeros_matrix],
-         [extension_zeros_matrix, extension_identity_matrix]]
+        [
+            [v_matrix, extension_zeros_matrix],
+            [extension_zeros_matrix, extension_identity_matrix],
+        ]
     )
 
     expanded_u = block(
-        [[u_matrix, extension_zeros_matrix],
-         [extension_zeros_matrix, extension_identity_matrix]]
+        [
+            [u_matrix, extension_zeros_matrix],
+            [extension_zeros_matrix, extension_identity_matrix],
+        ]
     )
 
     transmissivities = array([s ** 2 for s in singular_values])
@@ -357,6 +359,7 @@ def generate_state_types(
     :return:
         A list of (possibly lossy) state types given by the lists of ints.
     """
+
     def _partitions(n, I=1):
         """
         A method for generating integer partitions.

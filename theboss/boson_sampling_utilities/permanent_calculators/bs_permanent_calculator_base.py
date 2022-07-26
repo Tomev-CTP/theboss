@@ -88,8 +88,9 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
 
         # Guan codes-related variables
         self._r_vector: List[int] = [0 for _ in range(len(self._input_state))]  # g
-        self._code_update_information: List[int] = \
-            [1 for _ in range(len(self._input_state))]  # u
+        self._code_update_information: List[int] = [
+            1 for _ in range(len(self._input_state))
+        ]  # u
 
         self._position_limits: List[int] = list(self._input_state)  # n
         self._index_to_update: int = 0
@@ -115,8 +116,8 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
         """
         Initializes Guan codes-related variables before the permanent computation.
         """
-        self._r_vector = [0 for _ in range(len(self._input_state))]   # g
-        self._code_update_information = [1 for _ in range(len(self._input_state))]   # u
+        self._r_vector = [0 for _ in range(len(self._input_state))]  # g
+        self._code_update_information = [1 for _ in range(len(self._input_state))]  # u
         self._position_limits = list(self._input_state)  # n
 
     def _update_guan_code(self) -> None:

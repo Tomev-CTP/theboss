@@ -8,11 +8,12 @@ from numpy import delete, ndarray, vstack, zeros_like, complex128
 from typing import Sequence
 
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
-    GeneralizedCliffordsBSimulationStrategy, BSPermanentCalculatorInterface
+    GeneralizedCliffordsBSimulationStrategy,
+    BSPermanentCalculatorInterface,
 )
 
-from theboss.simulation_strategies.simulation_strategy_interface import(
-    SimulationStrategyInterface
+from theboss.simulation_strategies.simulation_strategy_interface import (
+    SimulationStrategyInterface,
 )
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
@@ -36,29 +37,38 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
     apply losses to the lossless interferometer matrix one has to multiply it by
     a matrix with :math:`\\sqrt{t_i}` on diagonal.
     """
+
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(
             bs_permanent_calculator.matrix
         )
-        self._helper_strategy: SimulationStrategyInterface = \
-            GeneralizedCliffordsBSimulationStrategy(
-                bs_permanent_calculator
-            )
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> [ndarray]:
+        # If for whatever reason one would like to run Clifford & Clifford A algorithm
+        # for non-uniformly lossy networks using the expanded dimension approach, one
+        # only has to change the helper strategy here.
+        self._helper_strategy: GeneralizedCliffordsBSimulationStrategy = GeneralizedCliffordsBSimulationStrategy(
+            bs_permanent_calculator
+        )
+
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> [ndarray]:
         """
         The main method of the class. It returns desired number of samples from the
         (potentially non-uniformly lossy) BS experiment with given input state and
         interferometer matrix (specified previously).
 
-        :param input_state:     Input state of the BS experiment.
-        :param samples_number:  The number of samples to be returned.
+        :param input_state:
+            Input state of the BS experiment.
+        :param samples_number:
+            The number of samples to be returned.
 
-        :return:                Samples of output states of the BS experiment.
+        :return:
+            Samples from the exact BS distribution.
         """
-        expansion_zeros = zeros_like(input_state, dtype=int)
-        expanded_state = vstack([input_state, expansion_zeros])
+        expanded_state = vstack([input_state, zeros_like(input_state, dtype=int)])
         expanded_state = expanded_state.reshape(2 * len(input_state),)
+
         expanded_samples = self._helper_strategy.simulate(
             expanded_state, samples_number
         )
