@@ -27,7 +27,7 @@ from numpy import (
 from numpy.random import choice, rand, shuffle
 from typing import List
 from scipy.special import binom
-from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_inputs
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_lossy_n_particle_input_states
 from multiprocessing import cpu_count
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
@@ -111,7 +111,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             sum(not_approximated_input_state_part) + 1
         ):
             self._not_approximated_lossy_mixed_state_parts.extend(
-                generate_lossy_inputs(
+                generate_lossy_n_particle_input_states(
                     not_approximated_input_state_part, number_of_particles_left
                 )
             )

@@ -6,7 +6,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 import itertools
-from typing import List, Optional, Sequence, Tuple, Set
+from typing import List, Optional, Sequence, Tuple
 
 from numpy import (
     ndarray,
@@ -15,7 +15,6 @@ from numpy import (
     complex128,
     diag,
     eye,
-    power,
     sqrt,
     transpose,
     zeros_like,
@@ -49,7 +48,7 @@ def mode_assignment_to_mode_occupation(
         The state in a mode occupation representation (as a tuple).
     """
     if observed_modes_number == 0:
-        observed_modes_number = max(modes_assignment)
+        observed_modes_number = max(modes_assignment) + 1
 
     modes_occupation = [0 for _ in range(observed_modes_number)]
 
@@ -97,7 +96,7 @@ def generate_possible_states(
         A list of possible (lossy) states (as tuples).
     """
     if particles_number < 0 or modes_number < 1:
-        return []
+        return list()
     if particles_number == 0:
         return [tuple([0 for _ in range(modes_number)])]
 
@@ -130,7 +129,8 @@ def _generate_possible_n_particle_states(
     """
     states = []
 
-    state = [0 for _ in range(modes_number)]
+    state: List[int] = [0 for _ in range(modes_number)]
+
     state[0] = n
     states.append(state)
 
@@ -142,7 +142,10 @@ def _generate_possible_n_particle_states(
 
         state = states[-1].copy()
         state[k - 1] -= 1
-        state[k:] = 0
+
+        for i in range(k, len(state)):
+            state[i] = 0
+
         state[k] = n - sum(state)
 
         states.append(state)
@@ -152,11 +155,14 @@ def _generate_possible_n_particle_states(
     return sorted_states
 
 
-def generate_lossy_inputs(
+def generate_lossy_n_particle_input_states(
     initial_state: Sequence[int], number_of_particles_left: int
 ) -> List[Tuple[int]]:
     """
-        From initial state generate all possible input states after losses application.
+        From initial state generate all possible input states, with required number of
+        particles after losses application.
+
+        Notice that it can also be done using the Guan Codes!
 
         :param initial_state:
             The state we start with.
@@ -199,47 +205,36 @@ def generate_lossy_inputs(
     return lossy_inputs_list
 
 
-def bosonic_space_dimension(particles_number: int, modes_number: int) -> int:
+def bosonic_space_dimension(particles_number: int, modes_number: int, losses: bool = False) -> int:
     """
-        Calculates the number of possible states with specified number of particles and
-        modes.
+        Calculates the number of possible states with specified number of modes and
+        maximal number of particles.
 
         This is basically the same answer as to in how many possible combinations can we
-        put n objects in m bins. It's also a dimension of n-particle m-mode bosonic
-        space. Stars-and-bars argument applies here.
+        put :math:`n` objects in :math:`m` bins. It's also a dimension of :math:`m`-mode
+        bosonic space with at most :math:`n` particles, or exactly :math:`n` if we don't
+        consider losses. Stars-and-bars argument applies here.
 
         :param particles_number:
-            Number :math:`n` of particles.
+            Number :math:`n` of particles. If lossy states are considered, this is the
+            maximal number of particles.
         :param modes_number:
-            Number :math:`m` of modes.
+            Number :math:`m` of considered modes.
 
         :return:
-            Dimension of n-particle m-mode bosonic space.
+            Dimension of (possibly lossy) :math:`m`-mode bosonic space with at most
+            :math:`n` particles.
     """
-    return round(binom(particles_number + modes_number - 1, particles_number))
 
+    dimension: int = round(binom(particles_number + modes_number - 1, particles_number))
 
-def lossy_bosonic_space_dimension(
-    maximal_particles_number: int, modes_number: int
-) -> int:
-    """
-        Computes the number of different states with given number of modes and the
-        number of particles lower or equal to the specified maximal number of particles.
-        This is basically a sum of bosonic space dimension with :math:`m` modes and
-        :math:`n <=` maximal number of particles.
+    if not losses:
+        return dimension
 
-        :param maximal_particles_number:
-            Maximal number of particles.
-        :param modes_number:
-            The number of considered modes.
+    for n in range(particles_number):
+        dimension += round(binom(n + modes_number - 1, n))
 
-        :return:
-            Dimension of lossy n-particle m-mode bosonic space.
-    """
-    states_number = 0
-    for N in range(maximal_particles_number + 1):
-        states_number += round(binom(N + modes_number - 1, N))
-    return states_number
+    return dimension
 
 
 def get_modes_transmissivity_values_from_matrix(
@@ -311,6 +306,7 @@ def prepare_interferometer_matrix_in_expanded_space(
 
     :param interferometer_matrix:
         An (possibly lossy) interferometer matrix to be expanded.
+
     :return:
         Given interferometer in the expanded sampling space.
     """
@@ -344,9 +340,9 @@ def prepare_interferometer_matrix_in_expanded_space(
     return expanded_v @ expanded_singular_values_matrix @ expanded_u
 
 
-def compute_state_types(
+def generate_state_types(
     modes_number: int, particles_number: int, losses: bool = False
-) -> List[List[int]]:
+) -> List[Tuple[int, ...]]:
     """
     Returns a list of (possibly lossy) state types understood in the same sense as
     in [1]. We also assume that the modes occupations of the state types are ordered
@@ -361,7 +357,7 @@ def compute_state_types(
     :return:
         A list of (possibly lossy) state types given by the lists of ints.
     """
-    def partitions(n, I=1):
+    def _partitions(n, I=1):
         """
         A method for generating integer partitions.
         Credits to
@@ -376,14 +372,14 @@ def compute_state_types(
         """
         yield (n,)
         for i in range(I, n // 2 + 1):
-            for p in partitions(n - i, i):
+            for p in _partitions(n - i, i):
                 yield (i,) + p
 
-    all_partitions = list(partitions(particles_number))
+    all_partitions = list(_partitions(particles_number))
 
     if losses:
         for i in range(particles_number):
-            all_partitions += list(partitions(i))
+            all_partitions += list(_partitions(i))
 
     state_types = []
 
@@ -398,7 +394,7 @@ def compute_state_types(
         while len(state_types[i]) < modes_number:
             state_types[i].append(0)
 
-    return state_types
+    return [tuple(state_type) for state_type in state_types]
 
 
 def compute_number_of_state_types(
@@ -442,33 +438,6 @@ def compute_number_of_state_types(
     return state_types_number
 
 
-def compute_number_of_k_element_integer_partitions_of_n(k: int, n: int) -> int:
-    """
-    Return the number of :math:`k`-element partitions of integer :math:`n`.
-
-    :param k:
-        The size of the partitions.
-    :param n:
-        The number for which the number of :math:`k`-element partitions is computed.
-    :return:
-        The number of :math:`k`-element partitions of :math:`n`.
-    """
-    if k == 1:
-        return 1
-
-    if k > n or n == 0 or k < 1:
-        return 0
-
-    integer_partitions_number = compute_number_of_k_element_integer_partitions_of_n(
-        k, n - k
-    )
-    integer_partitions_number += compute_number_of_k_element_integer_partitions_of_n(
-        k - 1, n - 1
-    )
-
-    return integer_partitions_number
-
-
 def compute_number_of_states_of_given_type(state_type: Sequence[int]) -> int:
     """
     Returns the number of possible states of given type. The two states are of the same
@@ -501,6 +470,33 @@ def compute_number_of_states_of_given_type(state_type: Sequence[int]) -> int:
         number_of_states_of_given_type //= factorial(count)
 
     return number_of_states_of_given_type
+
+
+def compute_number_of_k_element_integer_partitions_of_n(k: int, n: int) -> int:
+    """
+    Return the number of :math:`k`-element partitions of integer :math:`n`.
+
+    :param k:
+        The size of the partitions.
+    :param n:
+        The number for which the number of :math:`k`-element partitions is computed.
+    :return:
+        The number of :math:`k`-element partitions of :math:`n`.
+    """
+    if k == 1:
+        return 1
+
+    if k > n or n == 0 or k < 1:
+        return 0
+
+    integer_partitions_number = compute_number_of_k_element_integer_partitions_of_n(
+        k, n - k
+    )
+    integer_partitions_number += compute_number_of_k_element_integer_partitions_of_n(
+        k - 1, n - 1
+    )
+
+    return integer_partitions_number
 
 
 def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndarray:

@@ -8,7 +8,7 @@ from numpy import ndarray
 from scipy.special import binom
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    generate_lossy_inputs,
+    generate_lossy_n_particle_input_states,
     generate_possible_states,
 )
 from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
@@ -119,7 +119,7 @@ class BSDistributionCalculatorWithFixedLosses(BSDistributionCalculatorInterface)
         probability_of_outcome = 0
 
         # Symmetrize the input.
-        lossy_inputs_list = generate_lossy_inputs(
+        lossy_inputs_list = generate_lossy_n_particle_input_states(
             self.configuration.initial_state,
             self.configuration.number_of_particles_left,
         )
