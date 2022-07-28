@@ -4,9 +4,11 @@ __author__ = "Tomasz Rybotycki"
     This file holds an implementation of generic boson sampling experiment simulator.
 """
 
-from typing import List
+# TODO TR: Expand the simulator to justify it's existence.
+#   - Add frequencies counting
+#   - ???
 
-from numpy import ndarray
+from typing import List, Sequence
 
 from .simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
@@ -18,6 +20,6 @@ class BosonSamplingSimulator:
         self._simulation_strategy = simulation_strategy
 
     def get_classical_simulation_results(
-        self, input_state: ndarray, samples_number: int = 1
-    ) -> List[ndarray]:
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Sequence[int]]:
         return self._simulation_strategy.simulate(input_state, samples_number)

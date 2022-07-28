@@ -213,7 +213,6 @@ class SimulationStrategyFactory:
         return NonuniformLossesApproximationStrategy(
             bs_permanent_calculator=deepcopy(self.bs_permanent_calculator),
             approximated_modes_number=approximated_modes_number,
-            modes_transmissivity=self._experiment_configuration.uniform_transmissivity,
         )
 
     def _generate_uniform_losses_bobs_strategy(
