@@ -6,7 +6,6 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    lossy_bosonic_space_dimension,
     bosonic_space_dimension,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
@@ -158,9 +157,11 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
 
         tvd_bound = self._compute_uniform_loss_approximation_tvd_bound()
 
-        outcomes_number = lossy_bosonic_space_dimension(
-            maximal_particles_number=self._sampling_tvd_experiment_config.number_of_particles_left,
+        outcomes_number = \
+            bosonic_space_dimension(
+            particles_number=self._sampling_tvd_experiment_config.number_of_particles_left,
             modes_number=self._sampling_tvd_experiment_config.number_of_modes,
+            losses=True
         )
 
         self._perform_full_approximation_strategies_test(
