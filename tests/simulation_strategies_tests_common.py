@@ -9,8 +9,8 @@ __author__ = "Tomasz Rybotycki"
 import unittest
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import List
-from numpy import array, ndarray, average
+from typing import List, Tuple
+from numpy import array, average
 from numpy.random import randint
 from scipy.stats import unitary_group
 from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import (
@@ -78,7 +78,6 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._calculator_initial_state = None
 
     def setUp(self) -> None:
-        print(f"\nIn method {self._testMethodName}. Test start!\n")
         self._permutation_matrix = array(
             [
                 [0, 0, 1, 0, 0],
@@ -108,7 +107,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
 
         self._sampling_tvd_experiment_config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._permutation_matrix,
-            initial_state=array(self._distance_calculation_initial_state, dtype=int),
+            initial_state=self._distance_calculation_initial_state,
             initial_number_of_particles=distance_calculation_initial_number_of_particles,
             number_of_modes=len(self._distance_calculation_initial_state),
             number_of_particles_lost=self._distance_calculation_number_of_particles_lost,
@@ -136,7 +135,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         haar_random_number_of_particles_lost = 2
         self._haar_random_experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=array([], dtype=complex),
-            initial_state=array(self._haar_random_experiment_input_state, dtype=int),
+            initial_state=self._haar_random_experiment_input_state,
             initial_number_of_particles=haar_random_number_of_particles_lost,
             number_of_modes=len(self._haar_random_experiment_input_state),
             number_of_particles_lost=haar_random_number_of_particles_lost,
@@ -146,9 +145,6 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]
 
         self._calculator_initial_state = self._distance_calculation_initial_state
-
-    def tearDown(self) -> None:
-        print("\nTest finished!\n")
 
     def _prepare_lossless_distance_experiments_settings_with_binned_inputs(
         self,
@@ -241,7 +237,9 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         )
 
     def _generate_frequencies_calculator(
-        self, strategy: SimulationStrategyInterface, outcomes: List[ndarray] = None
+        self,
+        strategy: SimulationStrategyInterface,
+        outcomes: List[Tuple[int, ...]] = None,
     ) -> BSSampleBasedDistributionCalculator:
         estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._sampling_tvd_experiment_config,

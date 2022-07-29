@@ -21,13 +21,25 @@ from theboss.simulation_strategies.simulation_strategy_factory import StrategyTy
 
 
 class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
+    """
+    A base class for GCC based tests. It takes care of some boilerplate code.
+    """
+
     def _perform_lossless_test(self, strategy: StrategyType = StrategyType.GCC) -> None:
+        """
+        Boilerplate code taking care of performing common part of the uniform losses
+        tests.
+
+        :param strategy:
+            Strategy to test.
+        """
         self._strategies_factory.experiment_configuration = (
             self._sampling_tvd_experiment_config
         )
         self._strategies_factory.strategy_type = strategy
         distance_experiment_configuration = SamplingAccuracyExperimentConfiguration(
-            # This exact calculator, when there are no losses, will do the work just fine.
+            # This exact calculator, when there are no losses, will do the work just
+            # fine.
             exact_calculator=BSDistributionCalculatorWithFixedLosses(
                 self._sampling_tvd_experiment_config, self._bs_permanent_calculator
             ),
@@ -47,7 +59,15 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
         strategy: StrategyType = StrategyType.UNIFORM_LOSSES_GCC,
         approximation_bound: int = 0,
     ) -> None:
+        """
+        Boilerplate code taking care of performing common part of the uniform losses
+        tests.
 
+        :param strategy:
+            Strategy to test.
+        :param approximation_bound:
+            Approximation tvd upperbound.
+        """
         self._strategies_factory.experiment_configuration = (
             self._sampling_tvd_experiment_config
         )
@@ -82,7 +102,7 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
             outcomes_number=bosonic_space_dimension(
                 particles_number=self._sampling_tvd_experiment_config.initial_number_of_particles,
                 modes_number=self._sampling_tvd_experiment_config.number_of_modes,
-                losses=True
+                losses=True,
             ),
             approximation_tvd_bound=approximation_bound,
         )

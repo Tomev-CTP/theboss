@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 import unittest
 
-from numpy import array, complex128, int64, allclose
+from numpy import array, complex128, allclose
 
 from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import (
     BSPermanentCalculatorFactory,
@@ -17,7 +17,8 @@ from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses 
 
 class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
     def setUp(self) -> None:
-        # Define some additional variables for more clear experiment configuration assignment.
+        # Define some additional variables for more clear experiment configuration
+        # assignment.
         self.number_of_particles_lost = 2
 
         # Generate permutation matrix and define initial state.
@@ -32,7 +33,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             dtype=complex128,
         )
 
-        self.initial_state = array([1, 1, 1, 0, 0], dtype=int64)
+        self.initial_state = [1, 1, 1, 0, 0]
 
         # Create configuration object.
         self.experiment_configuration = BosonSamplingExperimentConfiguration(
