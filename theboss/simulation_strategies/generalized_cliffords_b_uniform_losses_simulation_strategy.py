@@ -13,7 +13,7 @@ __author__ = "Tomasz Rybotycki"
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
     GeneralizedCliffordsBSimulationStrategy,
     BSPermanentCalculatorInterface,
-    modes_state_to_particle_state,
+    mode_occupation_to_mode_assignment,
 )
 from numpy import ndarray, array, int64, zeros_like
 from typing import List
@@ -32,8 +32,9 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
     TODO TR:    Write tests for this method.
 
     TODO TR:    The permanent calculator should not be necessary for GCCB algorithms, as
-                they use something the submatrices calculator and .
+                they use the submatrices calculator instead.
     """
+
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
@@ -95,7 +96,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
         self.number_of_input_photons = sum(input_state)
         self._compute_particle_numbers_probabilities()
 
-        particle_input_state = list(modes_state_to_particle_state(input_state))
+        particle_input_state = list(mode_occupation_to_mode_assignment(input_state))
 
         samples = []
 

@@ -2,9 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 import abc
 from dataclasses import dataclass
-from typing import List, Iterable
-
-from numpy import ndarray
+from typing import List, Sequence
 
 from ..network_simulation_strategy import network_simulation_strategy
 
@@ -12,13 +10,15 @@ from ..network_simulation_strategy import network_simulation_strategy
 # TODO TR: MO doesn't approve of this class. It should be changed somehow.
 @dataclass
 class BosonSamplingExperimentConfiguration:
-    interferometer_matrix: ndarray  # A matrix describing interferometer.
-    initial_state: ndarray
+    interferometer_matrix: Sequence[
+        Sequence[complex]
+    ]  # A matrix describing interferometer.
+    initial_state: Sequence[int]
     initial_number_of_particles: int
     number_of_modes: int
     number_of_particles_lost: int
     number_of_particles_left: int
-    uniform_transmissivity: float = 0
+    uniform_transmissivity: float = 1
     network_simulation_strategy: network_simulation_strategy = None
     # TODO TR:  Previously we've used the number of approximated modes instead of the
     #           the hierarchy level. There may be some errors after the changes, that
@@ -36,12 +36,17 @@ class BSDistributionCalculatorInterface(abc.ABC):
 
     @abc.abstractmethod
     def calculate_probabilities_of_outcomes(
-        self, outcomes: Iterable[Iterable[int]]
+        self, outcomes: List[Sequence[int]]
     ) -> List[float]:
-        """ This method allows one to compute probabilities of only selected outcomes. """
+        """
+        This method allows one to compute probabilities of only selected outcomes.
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_outcomes_in_proper_order(self) -> List[ndarray]:
-        """ One also has to know the order of objects that returned probabilities correspond to """
+    def get_outcomes_in_proper_order(self) -> List[Sequence[int]]:
+        """
+        One also has to know the order of objects that returned probabilities correspond
+        to.
+        """
         raise NotImplementedError

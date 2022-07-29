@@ -14,8 +14,8 @@ from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses 
     BosonSamplingExperimentConfiguration,
 )
 
-from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
-    ChinHuhPermanentCalculator,
+from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+    RyserPermanentCalculator,
 )
 
 
@@ -31,17 +31,17 @@ class TestDistributionCalculators(unittest.TestCase):
 
         self._matrix = unitary_group.rvs(self._m)
 
-        self._permanent_calculator = ChinHuhPermanentCalculator(self._matrix)
+        self._permanent_calculator = RyserPermanentCalculator(self._matrix)
 
-        self._config: BosonSamplingExperimentConfiguration = None
-
-    def _prepare_binned_input_test_setup(self) -> None:
-        self._prepare_test_setup(self._binned_input)
-
-    def _prepare_std_input_test_setup(self) -> None:
-        self._prepare_test_setup(self._std_input)
+        self._config: BosonSamplingExperimentConfiguration
 
     def _prepare_test_setup(self, input_state) -> None:
+        """
+        Boilerplate code for preparing the experiment configuration.
+
+        :param input_state:
+            Input state (in 2nd quantization representation).
+        """
         self._config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._matrix,
             initial_state=input_state,
@@ -54,7 +54,10 @@ class TestDistributionCalculators(unittest.TestCase):
         self._permanent_calculator.input_state = input_state
 
     def test_uniform_losses_calc_distribution_sum_for_standard_input(self) -> None:
-        self._prepare_std_input_test_setup()
+        """
+        Test uniform losses calculator for standard input.
+        """
+        self._prepare_test_setup(self._std_input)
         calc = BSDistributionCalculatorWithUniformLosses(
             self._config, self._permanent_calculator
         )
@@ -63,7 +66,10 @@ class TestDistributionCalculators(unittest.TestCase):
         self.assertTrue(isclose(sum(distribution), 1))
 
     def test_fixed_losses_calc_distribution_sum_for_standard_input(self) -> None:
-        self._prepare_std_input_test_setup()
+        """
+        Test fixed losses calculator for standard input.
+        """
+        self._prepare_test_setup(self._std_input)
         calc = BSDistributionCalculatorWithFixedLosses(
             self._config, self._permanent_calculator
         )
@@ -71,7 +77,10 @@ class TestDistributionCalculators(unittest.TestCase):
         self.assertTrue(isclose(sum(distribution), 1))
 
     def test_uniform_losses_calc_distribution_sum_for_binned_input(self) -> None:
-        self._prepare_binned_input_test_setup()
+        """
+        Test uniform losses calculator for binned input.
+        """
+        self._prepare_test_setup(self._binned_input)
         calc = BSDistributionCalculatorWithUniformLosses(
             self._config, self._permanent_calculator
         )
@@ -79,7 +88,10 @@ class TestDistributionCalculators(unittest.TestCase):
         self.assertTrue(isclose(sum(distribution), 1))
 
     def test_fixed_losses_calc_distribution_sum_for_binned_input(self) -> None:
-        self._prepare_binned_input_test_setup()
+        """
+        Test fixed losses calculator for standard input.
+        """
+        self._prepare_test_setup(self._binned_input)
         calc = BSDistributionCalculatorWithFixedLosses(
             self._config, self._permanent_calculator
         )

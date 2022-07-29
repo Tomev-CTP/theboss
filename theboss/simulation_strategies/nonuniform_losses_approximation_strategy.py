@@ -1,105 +1,244 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This file contains implementation of approximate boson sampling strategy subject to non-uniform losses. This can be
-    well used to approximate boson sampling experiments with non-balanced network. More details can be found in [2].
+    This file contains the implementation of approximate boson sampling strategy subject
+    to non-uniform losses. This can be used to approximate boson sampling experiments
+    with non-balanced networks. More details can be found in [2].
 """
 
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
 from copy import deepcopy
-from itertools import repeat
 from math import sqrt
 from multiprocessing import cpu_count
-from typing import List
+from typing import List, Sequence, Dict, Tuple
 
-from numpy import ndarray, diag, ones_like
-from numpy.random import choice
-from scipy import special
+from numpy import ndarray, diag, isclose
+from numpy.random import random, randint
+from numpy.linalg import svd
+from scipy.special import binom
 
 from .lossy_networks_generalized_cliffords_simulation_strategy import (
     BSPermanentCalculatorInterface,
     LossyNetworksGeneralizedCliffordsSimulationStrategy,
 )
 from ..boson_sampling_utilities.boson_sampling_utilities import (
-    prepare_interferometer_matrix_in_expanded_space,
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
 )
 
 
+# I implement my version of choice, as it seems that numpy.random.choice is very slow.
+def choice(values: Sequence[int], weights: Sequence[float] = None) -> int:
+    """
+    Returns one of the values according to specified weights. If weights aren't
+    specified properly, the method samples value uniformly at random.
+
+    Notice that in this scenario I only want to get the number of particles left after
+    application of uniform losses, hence the values are of type int and weights of
+    type float.
+
+    :param values:
+        Values to sample from.
+
+    :param weights:
+        Weights according to which the sampling will be performed.
+
+    :return:
+        Sampled value.
+    """
+    if weights is None:
+        weights = list()
+
+    if len(values) != len(weights):
+        return values[randint(0, len(values))]
+
+    weights_sum: float = 0
+    random_number: float = random()
+
+    for i in range(len(values)):
+        weights_sum += weights[i]
+        if weights_sum > random_number:
+            return values[i]
+
+
 class NonuniformLossesApproximationStrategy:
+    """
+    This is an implementation of the algorithm presented by Brod and Oszmaniec in their
+    2020 work [2]. Without the loss of generalization we assume that the first :math:`k`
+    modes will be approximated.
+    """
+
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
         approximated_modes_number: int,
-        modes_transsmisivity: float,
         threads_number: int = -1,
     ) -> None:
 
         self._approximated_modes_number = self._get_proper_approximated_modes_number(
             bs_permanent_calculator, approximated_modes_number
         )
-        self._modes_transmissivity = modes_transsmisivity
 
-        self._initial_matrix = self._prepare_initial_matrix(bs_permanent_calculator)
+        self._uniform_losses: float = 0
+        self._initial_matrix: Sequence[Sequence[complex]] = list(list())
 
-        self._binom_weights = self._compute_binomial_weights()
+        self._extract_losses_from_the_interferometer(bs_permanent_calculator.matrix)
 
+        # Fill weights at the beginning of the simulation, when input is given.
+        self._binomial_weights: Dict[int, List[float]] = dict()
         self._threads_number = self._get_proper_threads_number(threads_number)
-
         self._permanent_calculator = bs_permanent_calculator
+
+        self._state_without_approximated_modes: List[int] = list()
+        self._approximated_modes_particles_number: int = 0
 
     @staticmethod
     def _get_proper_approximated_modes_number(
         bs_permanent_calculator: BSPermanentCalculatorInterface,
         approximated_modes_number: int,
     ):
-        if approximated_modes_number > bs_permanent_calculator.matrix.shape[0]:
-            approximated_modes_number = bs_permanent_calculator.matrix.shape[0]
+        """
+        Bounds the approximated modes number to the proper values.
+
+        :param bs_permanent_calculator:
+            Permanent calculator. Required do assess the total number of modes.
+        :param approximated_modes_number:
+            Number of approximated modes specified by the user.
+
+        :return:
+            Properly bounded number of approximated modes.
+        """
+        total_number_of_modes: int = len(bs_permanent_calculator.matrix)
+
+        if approximated_modes_number > total_number_of_modes:
+            approximated_modes_number = total_number_of_modes
         if approximated_modes_number < 0:
             approximated_modes_number = 0
         return approximated_modes_number
 
-    def _prepare_initial_matrix(
-        self, bs_permanent_calculator: BSPermanentCalculatorInterface
-    ):
+    def _extract_losses_from_the_interferometer(
+        self, interferometer_matrix: Sequence[Sequence[complex]]
+    ) -> None:
+        """
+        Extracts maximal amount of uniform losses from the interferometer_matrix.
 
-        loss_removing_matrix = ones_like(bs_permanent_calculator.matrix[0])
-        loss_removing_matrix[: self._approximated_modes_number] = 1.0 / sqrt(
-            self._modes_transmissivity
-        )  # This here assumes uniform losses
-        loss_removing_matrix = diag(loss_removing_matrix)
+        :param interferometer_matrix:
+            Possibly lossy (sub)unitary interferometer matrix.
+        """
+        u: ndarray
+        s: List[float]
+        v: ndarray
+        u, s, v = svd(interferometer_matrix)
 
-        initial_matrix = bs_permanent_calculator.matrix @ loss_removing_matrix
+        # Extract uniform losses from the matrix
+        transmissivities: List[float] = [singular_value ** 2 for singular_value in s]
+        losses: List[float] = [1 - eta for eta in transmissivities]
+        self._uniform_losses = min(losses)
 
-        initial_matrix = prepare_interferometer_matrix_in_expanded_space(initial_matrix)
+        # Form the interferometer_matrx with losses extracted.
+        transmissivities = [
+            eta / (1 - self._uniform_losses) for eta in transmissivities
+        ]
+        s = [sqrt(eta) for eta in transmissivities]
+        self._initial_matrix = u @ diag(s) @ v
 
-        return initial_matrix
+    def _compute_binomial_weights(
+        self, max_particles_number: int
+    ) -> Dict[int, List[float]]:
+        """
+        Prepares a dict of list of binomial weights for sampling proper number of
+        particles in a mode after application of uniform losses extracted from the
+        interferometer matrix.
 
-    def _compute_binomial_weights(self):
+        :param max_particles_number:
+            Maximal number of particles in a single mode of the input state. Recall that
+            we expect the input state to already be in the proper form, e.g. with the
+            bunching prepared according to the algorithm specification [2].
 
-        eta = self._modes_transmissivity
-        k = self._approximated_modes_number
+        :return:
+            A dict of lists of binomial weights that one can use to sample the number
+            of particles left after application of the uniform losses.
+        """
+        eta = 1 - self._uniform_losses  # Uniform transmissivity
 
-        binom_weights = []
+        binomial_weights: Dict[int, List[float]] = {}
 
-        weight = lambda l: pow(eta, l) * special.binom(k, l) * pow(1.0 - eta, k - l)
-        for i in range(k + 1):
-            binom_weights.append(weight(i))
+        # Just a shorthand notation.
+        def binomial_weight(total_particles: int, particles_left: int) -> float:
+            """
 
-        return binom_weights
+            :param total_particles:
+                Total number of particles.
+            :param particles_left:
+                Number of particles left.
+            :return:
+                Probability of getting :math:`l` particles after application of uniform
+                losses to :math:`n` particles given transmissivity :math:`\\eta`.
+            """
+            return (
+                pow(eta, particles_left)
+                * binom(total_particles, particles_left)
+                * pow(1.0 - eta, total_particles - particles_left)
+            )
 
-    def _get_proper_threads_number(self, threads_number: int) -> int:
+        for n in range(1, max_particles_number + 1):
+            binomial_weights[n] = []
+            for particles_left in range(n + 1):
+                binomial_weights[n].append(binomial_weight(n, particles_left))
+
+        return binomial_weights
+
+    @staticmethod
+    def _get_proper_threads_number(threads_number: int) -> int:
+        """
+        For multithreading. Shorthand notation for is that for the number exceeding
+        the total cpu_count() or the specified threads number is negative, then maximal
+        possible threads number (cpu_count()) is computed.
+
+        :param threads_number:
+             Threads number given by the user.
+
+        :return:
+            Possibly fixed number of threads.
+        """
         if threads_number < 1 or threads_number > cpu_count():
             return cpu_count()
         else:
             return threads_number
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Sequence[int]]:
+        """
+        Main method of the simulator. It samples from the approximate BS distribution
+        that is specified by the input_state and the previously given interferometer
+        matrix.
 
+        :param input_state:
+            Fock state in the 2nd quantization description.
+        :param samples_number:
+            The number of samples that will be returned.
+
+        :return:
+            Specified number of samples from the approximate BS distribution.
+        """
         if samples_number < 1:
-            return []
+            return list()
+
+        # Prepare the state used in the approximate simulation.
+        self._state_without_approximated_modes = list(input_state)
+
+        for i in range(self._approximated_modes_number):
+            self._approximated_modes_particles_number += input_state[i]
+            self._state_without_approximated_modes[i] = 0
+
+        maximum_particles_in_mode: int = max(
+            max(input_state), self._approximated_modes_particles_number
+        )
+        self._binomial_weights = self._compute_binomial_weights(
+            maximum_particles_in_mode
+        )
 
         # Get samples number per thread
         samples_per_thread = (
@@ -110,62 +249,99 @@ class NonuniformLossesApproximationStrategy:
         samples_per_thread = int(samples_per_thread / self._threads_number)
         samples_for_threads = [samples_per_thread] * self._threads_number
 
-        # Context is required on Linux systems, as the default (fork) produces undesired results! Spawn is default
-        # on osX and Windows and works as expected.
+        # Context is required on Linux systems, as the default (fork) produces undesired
+        # results! Spawn is default on osX and Windows and works as expected.
         multiprocessing_context = multiprocessing.get_context("spawn")
 
         with Pool(mp_context=multiprocessing_context) as p:
-            samples_lists = p.map(
-                self._simulate_in_parallel, repeat(input_state), samples_for_threads
-            )
+            samples_lists = p.map(self._simulate_in_parallel, samples_for_threads)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
 
         return samples
 
-    def _simulate_in_parallel(self, input_state: ndarray, samples_number: int = 1):
+    def _simulate_in_parallel(self, samples_number: int = 1) -> List[Sequence[int]]:
+        """
+        A part of simulation that can be performed independently in separate threads. It
+        creates samples using GCCB strategy destined for lossy networks.
+
+        :param samples_number:
+            The number of samples that a single thread should sample.
+
+        :return:
+            A list of sampled output states.
+        """
         samples = []
 
-        helper_strategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(
+        helper_strategy: LossyNetworksGeneralizedCliffordsSimulationStrategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(
             deepcopy(self._permanent_calculator)
         )
 
         for _ in range(samples_number):
-            lossy_input = self._compute_lossy_input(input_state)
+            approximate_state = deepcopy(self._state_without_approximated_modes)
 
-            # if not array_equal(lossy_input, input_state):
-            #    print(f"Got {lossy_input.__str__()}, expected: {input_state.__str__()}") # For k = # modes
+            # Symmetrization.
+            if self._approximated_modes_number > 0:
+                approximate_state[
+                    randint(0, self._approximated_modes_number)
+                ] = self._approximated_modes_particles_number
+
+            lossy_approximate_input_state = self._compute_lossy_input(approximate_state)
 
             approximate_sampling_matrix = self._get_matrix_for_approximate_sampling()
 
-            # if not array_equal(approximate_sampling_matrix, self._initial_matrix):
-            # print(f"Got {approximate_sampling_matrix.__str__()}, expected: {self._initial_matrix.__str__()}")  # For k = # modes
-
             helper_strategy.set_new_matrix(approximate_sampling_matrix)
-            samples.append(helper_strategy.simulate(lossy_input)[0])
+            samples.append(helper_strategy.simulate(lossy_approximate_input_state)[0])
 
         return samples
 
-    def _compute_lossy_input(self, input_state: ndarray) -> ndarray:
+    def _compute_lossy_input(self, input_state: Sequence[int]) -> Tuple[int, ...]:
+        """
+        Applies the initial channel of extracted uniform losses to the input state.
 
-        if self._approximated_modes_number < 1:
-            return input_state
+        :param input_state:
+            Input state to which uniform losses channel will be applied.
 
-        lossy_input = deepcopy(input_state)
+        :return:
+            Lossy input state.
+        """
 
-        binned_input_index = self._approximated_modes_number - 1
-        lossy_input[binned_input_index] = choice(
-            range(self._approximated_modes_number + 1), p=self._binom_weights
-        )
+        # If there are no uniform losses at the beginning, then the input cannot be
+        # lossy. All potential losses are in the network.
+        if isclose(self._uniform_losses, 0):
+            return tuple(input_state)
+
+        lossy_input = tuple()
+
+        for mode in range(len(input_state)):
+
+            if input_state[mode] == 0:
+                lossy_input += (0,)
+                continue
+
+            lossy_input += (
+                choice(
+                    list(range(input_state[mode] + 1)),
+                    self._binomial_weights[input_state[mode]],
+                ),
+            )
 
         return lossy_input
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
+        """
+        Generates the matrix for the approximate simulation. Do note that this matrix
+        has to be computed for each sample, as we have to apply random phases for
+        each sample.
+
+        :return:
+            Returns an array for the matrix
+        """
         qft_matrix = generate_qft_matrix_for_first_m_modes(
-            self._approximated_modes_number, self._initial_matrix.shape[0]
+            self._approximated_modes_number, len(self._initial_matrix)
         )
         random_phases_matrix = generate_random_phases_matrix_for_first_m_modes(
-            self._approximated_modes_number, self._initial_matrix.shape[0]
+            self._approximated_modes_number, len(self._initial_matrix)
         )
 
         return self._initial_matrix @ random_phases_matrix @ qft_matrix

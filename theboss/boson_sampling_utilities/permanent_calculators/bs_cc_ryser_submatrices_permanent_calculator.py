@@ -9,8 +9,8 @@ from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_perma
     BSGuanBasedSubmatricesPermanentCalculatorBase,
 )
 
-from numpy import ndarray, complex128, nonzero
-from typing import Optional, List
+from numpy import complex128, nonzero
+from typing import Optional, List, Sequence
 
 
 class BSCCRyserSubmatricesPermanentCalculator(
@@ -54,9 +54,9 @@ class BSCCRyserSubmatricesPermanentCalculator(
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
 
         super().__init__(matrix, input_state, output_state)

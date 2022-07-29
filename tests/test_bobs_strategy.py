@@ -1,7 +1,9 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    The aim of this script is to test the BOBS strategy accuracy.
+    The aim of this script is to test the BOBS strategy accuracy. This script tests
+    only simulations with uniform or no losses. Nonuniform losses have been placed
+    in another script.
 """
 
 from tests.gcc_based_strategies_tests_base import GCCBasedStrategiesTestsBase

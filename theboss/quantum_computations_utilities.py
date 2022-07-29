@@ -5,7 +5,7 @@ __author__ = "Tomasz Rybotycki"
 
 # TODO TR: Consider releasing this file as a separate package.
 
-from typing import List, Union
+from typing import List, Union, Dict, DefaultDict, Tuple, Set
 
 from numpy import (
     abs,
@@ -18,10 +18,37 @@ from numpy import (
     asarray,
     tile,
     power,
-    diag,
-    dot,
 )
-from numpy.random import randn
+from collections import defaultdict
+
+
+def count_total_variation_distance_dicts(
+    distribution_1: Dict[Tuple[int, ...], float],
+    distribution_2: Dict[Tuple[int, ...], float],
+) -> float:
+    """
+    This method compute TVD between two distributions. We assume that both distributions
+    sums up to 1.
+
+    :param distribution_1:
+        First distribution.
+    :param distribution_2:
+        Second distribution.
+
+    :return:
+        Total variation distance between the given distributions.
+    """
+    # Get common keys.
+    keys: Set[Tuple[int, ...]] = set()
+    keys.update(distribution_1.keys())
+    keys.update(distribution_2.keys())
+
+    # Wrap distributions into defaultdicts to take care of missing keys.
+    distribution1: DefaultDict[Tuple[int, ...], float] = defaultdict(lambda: 0)
+    distribution2: DefaultDict[Tuple[int, ...], float] = defaultdict(lambda: 0)
+
+    # Compute the tvd.
+    return 0.5 * sum([abs(distribution1[key] - distribution2[key]) for key in keys])
 
 
 def count_total_variation_distance(

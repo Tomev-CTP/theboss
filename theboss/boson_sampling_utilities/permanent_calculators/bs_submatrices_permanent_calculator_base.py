@@ -9,7 +9,7 @@ __author__ = "Tomasz Rybotycki"
 from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_interface import (
     BSSubmatricesPermanentCalculatorInterface,
 )
-from typing import Optional, List
+from typing import Optional, List, Sequence
 from numpy import ndarray, int64, array, zeros, ones, complex128, nonzero
 import abc
 
@@ -28,41 +28,41 @@ class BSSubmatricesPermanentCalculatorBase(
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         if output_state is None:
-            output_state = array([], dtype=int64)
+            output_state = []
         if input_state is None:
-            input_state = array([], dtype=int64)
-        self._matrix = matrix
-        self._input_state = input_state
-        self._output_state = output_state
+            input_state = []
+        self._matrix: Sequence[Sequence[complex]] = matrix
+        self._input_state: Sequence[int] = input_state
+        self._output_state: Sequence[int] = output_state
 
     @property
-    def matrix(self) -> ndarray:
+    def matrix(self) -> Sequence[Sequence[complex]]:
         return self._matrix
 
     @matrix.setter
-    def matrix(self, matrix: ndarray) -> None:
+    def matrix(self, matrix: Sequence[Sequence[complex]]) -> None:
         self._matrix = matrix
 
     @property
-    def input_state(self) -> ndarray:
+    def input_state(self) -> Sequence[int]:
         return self._input_state
 
     @input_state.setter
-    def input_state(self, input_state: ndarray) -> None:
-        self._input_state = array(input_state, dtype=int64)
+    def input_state(self, input_state: Sequence[int]) -> None:
+        self._input_state = input_state
 
     @property
-    def output_state(self) -> ndarray:
+    def output_state(self) -> Sequence[int]:
         return self._output_state
 
     @output_state.setter
-    def output_state(self, output_state: ndarray) -> None:
-        self._output_state = array(output_state, dtype=int64)
+    def output_state(self, output_state: Sequence[int]) -> None:
+        self._output_state = output_state
 
 
 class BSGuanBasedSubmatricesPermanentCalculatorBase(
@@ -76,9 +76,9 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
 
         super().__init__(matrix, input_state, output_state)
@@ -98,7 +98,7 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
 
     def _initialize_guan_codes_variables(self) -> None:
         """
-        Initializes Guan codes-related variables before the permanents computation.
+        Initializes Guan codes-related variables before the permanent computation.
         """
         self._r_vector = zeros(len(self._input_state), dtype=int)  # g
         self._code_update_information = ones(len(self._input_state), dtype=int)  # u
@@ -155,7 +155,7 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
 
         # Take care of the edge-case, where only 1 sub-matrix is valid (and empty).
         if sum(self.input_state) == 1:
-            return list(self.input_state)
+            return [complex128(v) for v in self.input_state]
 
         self._initialize_permanents_computation()
 

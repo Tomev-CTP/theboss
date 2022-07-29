@@ -1,15 +1,15 @@
 __author__ = "Tomasz Rybotycki"
 
 from copy import deepcopy
-from typing import List, Iterable
+from typing import List, Iterable, Tuple
 
 from numpy import ndarray
 from scipy import special
 
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_outputs,
+from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+    generate_possible_states,
 )
-from ..distribution_calculators.bs_distribution_calculator_interface import (
+from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
 )
 from ..distribution_calculators.bs_distribution_calculator_with_fixed_losses import (
@@ -96,9 +96,9 @@ class BSDistributionCalculatorWithUniformLosses(
 
         return probability_of_outcome * self.weights[l]
 
-    def get_outcomes_in_proper_order(self) -> List[ndarray]:
-        return generate_possible_outputs(
+    def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
+        return generate_possible_states(
             self.configuration.initial_number_of_particles,
             self.configuration.number_of_modes,
-            consider_loses=True,
+            losses=True,
         )

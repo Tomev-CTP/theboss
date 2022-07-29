@@ -10,9 +10,9 @@ __author__ = "Tomasz Rybotycki"
             from an easier distribution and obtain the same results.
 """
 
-from typing import List
+from typing import List, Sequence, Tuple
 
-from numpy import array, ndarray, int64, zeros_like
+from numpy import zeros_like
 from numpy.random import choice, randint
 
 from theboss.simulation_strategies.generalized_cliffords_simulation_strategy import (
@@ -20,7 +20,7 @@ from theboss.simulation_strategies.generalized_cliffords_simulation_strategy imp
     BSPermanentCalculatorInterface,
 )
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    modes_state_to_particle_state,
+    mode_occupation_to_mode_assignment,
 )
 
 from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
@@ -29,23 +29,33 @@ from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatri
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
+    """
+    An implementation of generalized Clifford & Clifford strategy in its B version.
+    """
+
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(bs_permanent_calculator)
         self._current_input = []
         self._working_input_state = None
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Tuple[int, ...]]:
         """
         Returns sample from linear optics experiments given output state.
 
-        :param input_state: Input state in particle basis.
-        :param samples_number: Number of samples to simulate.
-        :return: A resultant state after traversing through interferometer.
-        """
-        self.input_state = input_state
-        self.number_of_input_photons = sum(input_state)
+        :param input_state:
+            Input state in particle basis.
+        :param samples_number:
+            Number of samples to simulate.
 
-        particle_input_state = list(modes_state_to_particle_state(input_state))
+        :return:
+            A list of samples from the interferometer.
+        """
+        self.input_state: Sequence[int] = input_state
+        self.number_of_input_photons: int = sum(input_state)
+
+        particle_input_state = list(mode_occupation_to_mode_assignment(input_state))
 
         samples = []
 
@@ -53,7 +63,7 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._current_input = zeros_like(input_state)
             self._working_input_state = particle_input_state.copy()
             self._fill_r_sample()
-            samples.append(array(self.r_sample, dtype=int64))
+            samples.append(tuple(self.r_sample))
         return samples
 
     def _compute_pmf(self) -> None:
@@ -89,11 +99,12 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._compute_pmf()
             self._sample_from_pmf()
 
-    def _update_current_input(self):
+    def _update_current_input(self) -> None:
         self._current_input[
             self._working_input_state.pop(randint(0, len(self._working_input_state)))
         ] += 1
 
     def _sample_from_pmf(self) -> None:
+        # TODO TR: Don't use numpy.random.choice, because it's slow.
         m = choice(range(len(self.input_state)), p=self.pmf)
         self.r_sample[m] += 1

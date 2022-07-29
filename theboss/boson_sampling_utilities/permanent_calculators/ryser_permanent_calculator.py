@@ -7,9 +7,9 @@ __author__ = "Tomasz Rybotycki"
     not-continuous (like [1, 1, 0, 1, 0]) inputs.
 """
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Sequence
 
-from numpy import complex128, ndarray
+from numpy import complex128
 
 from ..permanent_calculators.bs_permanent_calculator_base import (
     BSGuanCodeBasedPermanentCalculatorBase,
@@ -32,13 +32,13 @@ class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex128]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
         self._multiplier: int
-        self._considered_columns_indices: ndarray
+        self._considered_columns_indices: Sequence[int]
         self.permanent: complex128
         self._sums: Dict[int, complex128]
 

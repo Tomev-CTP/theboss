@@ -6,8 +6,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    calculate_number_of_possible_lossy_n_particle_m_mode_output_states,
-    calculate_number_of_possible_n_particle_m_mode_output_states,
+    bosonic_space_dimension,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
     BSDistributionCalculatorWithUniformLosses,
@@ -132,9 +131,9 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
             self._sampling_tvd_experiment_config.number_of_particles_left,
         )
 
-        outcomes_number = calculate_number_of_possible_n_particle_m_mode_output_states(
-            n=self._sampling_tvd_experiment_config.number_of_particles_left,
-            m=self._sampling_tvd_experiment_config.number_of_modes,
+        outcomes_number = bosonic_space_dimension(
+            particles_number=self._sampling_tvd_experiment_config.number_of_particles_left,
+            modes_number=self._sampling_tvd_experiment_config.number_of_modes,
         )
 
         self._perform_full_approximation_strategies_test(
@@ -158,9 +157,10 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
 
         tvd_bound = self._compute_uniform_loss_approximation_tvd_bound()
 
-        outcomes_number = calculate_number_of_possible_lossy_n_particle_m_mode_output_states(
-            n=self._sampling_tvd_experiment_config.number_of_particles_left,
-            m=self._sampling_tvd_experiment_config.number_of_modes,
+        outcomes_number = bosonic_space_dimension(
+            particles_number=self._sampling_tvd_experiment_config.number_of_particles_left,
+            modes_number=self._sampling_tvd_experiment_config.number_of_modes,
+            losses=True,
         )
 
         self._perform_full_approximation_strategies_test(

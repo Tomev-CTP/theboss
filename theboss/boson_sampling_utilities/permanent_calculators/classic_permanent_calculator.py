@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Optional
 
-from numpy import complex128, ndarray
+from numpy import complex128, ndarray, asarray
 
 from ..boson_sampling_utilities import EffectiveScatteringMatrixCalculator
 from ...boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import (
@@ -36,7 +36,7 @@ class ClassicPermanentCalculator(BSPermanentCalculatorBase):
             self._matrix, self._input_state, self._output_state
         )
         scattering_matrix = scattering_matrix_calculator.calculate()
-        return self._compute_permanent_recursively(scattering_matrix)
+        return self._compute_permanent_recursively(asarray(scattering_matrix))
 
     def _compute_permanent_recursively(self, matrix: ndarray) -> complex128:
         """

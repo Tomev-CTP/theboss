@@ -10,9 +10,7 @@ from scipy import special
 from .generalized_cliffords_simulation_strategy import (
     GeneralizedCliffordsSimulationStrategy,
 )
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_outputs,
-)
+from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_states
 from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
@@ -66,8 +64,8 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
         if self.missing_values_in_distribution:
             distribution_initializer = -1  # -1 to indicate missing spots
 
-        self._possible_outputs = generate_possible_outputs(
-            sum(input_state), len(input_state), consider_loses=True
+        self._possible_outputs = generate_possible_states(
+            sum(input_state), len(input_state), losses=True
         )
         self.distribution = [distribution_initializer for _ in self._possible_outputs]
         self.unweighted_distribution = [
@@ -149,7 +147,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
 
         pmf = []
 
-        weights = self._calculate_weights_from_k_vectors(corresponding_k_vectors)
+        weights = self._compute_weights_from_k_vectors(corresponding_k_vectors)
         weights /= sum(weights)
         self.possible_outputs[
             self.current_key
