@@ -2,7 +2,7 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Iterable
 
-from numpy import float64, ndarray, zeros
+from numpy import float64, ndarray, zeros, asarray
 
 from ..boson_sampling_simulator import BosonSamplingSimulator
 from ..boson_sampling_utilities.boson_sampling_utilities import generate_possible_states
@@ -75,8 +75,9 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
         self, samples_number: int = 5000
     ) -> List[float]:
         """
-            Prepares the approximate distribution using boson sampling simulation method described by
-            Oszmaniec and Brod. Obviously higher number of samples will generate better approximation.
+            Prepares the approximate distribution using boson sampling simulation method
+            described by Oszmaniec and Brod. Obviously higher number of samples will
+            generate better approximation.
             :return: Approximate distribution as a list.
         """
 
@@ -99,7 +100,7 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
             for j in range(len(possible_outcomes)):
                 # Check if obtained result is one of possible outcomes.
                 if all(
-                    sample == possible_outcomes[j]
+                    asarray(sample) == possible_outcomes[j]
                 ):  # Expect all elements of resultant list to be True.
                     outcomes_probabilities[j] += 1
                     break

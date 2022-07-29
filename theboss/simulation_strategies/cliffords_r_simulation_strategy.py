@@ -10,12 +10,13 @@ __author__ = "Tomasz Rybotycki"
 from numpy import arange, array, array_split, int64, ndarray, isclose
 from scipy.special import binom
 from collections import defaultdict
-from typing import List, Dict, Tuple, DefaultDict
-
-from .simulation_strategy_interface import SimulationStrategyInterface
-
+from typing import List, Dict, Tuple, DefaultDict, Sequence
 from rpy2 import robjects
 from rpy2.robjects import packages
+
+from theboss.simulation_strategies.simulation_strategy_interface import (
+    SimulationStrategyInterface,
+)
 
 from ..boson_sampling_utilities.boson_sampling_utilities import (
     mode_assignment_to_mode_occupation,
@@ -23,17 +24,36 @@ from ..boson_sampling_utilities.boson_sampling_utilities import (
 
 
 class CliffordsRSimulationStrategy(SimulationStrategyInterface):
-    def __init__(self, interferometer_matrix: ndarray) -> None:
+    """
+    A wrapper for C&C R implementation of their algorithm.
+    """
+
+    def __init__(self, interferometer_matrix: Sequence[Sequence[complex]]) -> None:
         self.interferometer_matrix = interferometer_matrix
 
         boson_sampling_package = packages.importr("BosonSampling")
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
 
-    def set_matrix(self, interferometer_matrix: ndarray) -> None:
+    def set_matrix(self, interferometer_matrix: Sequence[Sequence[int]]) -> None:
+        """
+        Sets new interferometer matrix.
+
+        :param interferometer_matrix:
+            New interferometer matrix.
+        """
         self.interferometer_matrix = interferometer_matrix
 
     @staticmethod
     def _numpy_array_to_r_matrix(numpy_array: ndarray) -> robjects.r.matrix:
+        """
+        Transforms numpy.ndarray into the robjects.r.matrix object.
+
+        :param numpy_array:
+            The numpy.ndarray object to be transformed into robjects.r.matrix.
+
+        :return:
+            The matrix given in the input as the robjects.r.matrix object.
+        """
         rows_number, columns_number = numpy_array.shape
         # Transposition is required as R inserts columns, not rows.
         r_values = robjects.ComplexVector(
@@ -42,24 +62,26 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         return robjects.r.matrix(r_values, nrow=rows_number, ncol=columns_number)
 
     def simulate(
-        self, initial_state: ndarray, samples_number: int = 1
-    ) -> List[ndarray]:
+        self, initial_state: Sequence[int], samples_number: int = 1
+    ) -> List[Tuple[int, ...]]:
         """
-            Simulate BS experiment for given input.
+        Simulate BS experiment for given input.
 
-            Note:   The results of Clifford & Clifford method are given in the first
-                    quantization description (mode assignment)!
+        Note:   The results of Clifford & Clifford method are given in the first
+                quantization description (mode assignment)!
 
-            :param initial_state:   Input state in the modes occupation description.
-            :param samples_number:  Number of samples to sample.
+        :param initial_state:
+            Input state in the modes occupation description.
+        :param samples_number:
+            Number of samples to sample.
 
-            :return:    List of samples in the first quantization description (mode
-                        assignment)
+        :return:
+            List of samples in the mode occupation representation.
         """
         number_of_bosons = int(sum(initial_state))
 
         boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
-            self.interferometer_matrix[:, arange(number_of_bosons)]
+            array(self.interferometer_matrix)[:, arange(number_of_bosons)]
         )
 
         result, permanent, probability_mass_function = self.cliffords_r_sampler(
@@ -84,8 +106,21 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         return samples_in_occupation_description
 
     def find_probabilities(
-        self, initial_state: ndarray, outcomes_of_interest: List[ndarray]
+        self, initial_state: Sequence[int], outcomes_of_interest: List[Tuple[int, ...]]
     ) -> Dict[Tuple[int, ...], float]:
+        """
+        An additional "sanity-check" method that uses C&C strategy to compute the
+        probabilities of the outcomes of interest.
+
+        :param initial_state:
+            Input state of the BS experiment.
+
+        :param outcomes_of_interest:
+            The outcomes of which probabilities will be returned.
+
+        :return:
+            Probabilities of the specified outcomes.
+        """
 
         number_of_bosons = int(sum(initial_state))
 
@@ -94,7 +129,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         outcomes_probabilities: dict = {}
 
         boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
-            self.interferometer_matrix[:, arange(number_of_bosons)]
+            array(self.interferometer_matrix)[:, arange(number_of_bosons)]
         )
 
         number_of_samplings = 0
@@ -113,10 +148,8 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
             )
             sample_in_particle_states = array_split(python_result, 1)[0]
 
-            sample = tuple(
-                mode_assignment_to_mode_occupation(
-                    sample_in_particle_states, len(initial_state)
-                )
+            sample = mode_assignment_to_mode_occupation(
+                sample_in_particle_states, len(initial_state)
             )
 
             if sample in outcomes_of_interest:
@@ -128,14 +161,31 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         return outcomes_probabilities
 
     def find_probabilities_of_n_random_states(
-        self, initial_state: ndarray, number_of_random_states: int
+        self, initial_state: Tuple[int, ...], number_of_random_states: int
     ) -> DefaultDict[Tuple[int, ...], float]:
+        """
+        An additional "sanity-check" method that uses C&C strategy to compute the
+        probabilities of the outcomes of interest.
+
+        Note: This method may run infinitely if the number of specified states is
+        impossible to achieve in given experiment config.
+
+        :param initial_state:
+            Input state of the BS experiment.
+
+        :param number_of_random_states:
+            The number of first distinct output states sampled using C&C method of
+            which the probabilities will be returned.
+
+        :return:
+            Probabilities of the specified outcomes.
+        """
 
         n = int(sum(initial_state))
         m = len(initial_state)
 
         boson_sampler_input_matrix = self._numpy_array_to_r_matrix(
-            self.interferometer_matrix[:, arange(n)]
+            array(self.interferometer_matrix)[:, arange(n)]
         )
 
         if int(binom(n + m - 1, m - 1)) < number_of_random_states:

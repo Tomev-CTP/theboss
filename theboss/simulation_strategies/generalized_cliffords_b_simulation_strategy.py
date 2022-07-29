@@ -10,9 +10,9 @@ __author__ = "Tomasz Rybotycki"
             from an easier distribution and obtain the same results.
 """
 
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
-from numpy import array, ndarray, int64, zeros_like
+from numpy import zeros_like
 from numpy.random import choice, randint
 
 from theboss.simulation_strategies.generalized_cliffords_simulation_strategy import (
@@ -29,6 +29,10 @@ from theboss.boson_sampling_utilities.permanent_calculators.bs_cc_ryser_submatri
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
+    """
+    An implementation of generalized Clifford & Clifford strategy in its B version.
+    """
+
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(bs_permanent_calculator)
         self._current_input = []
@@ -36,13 +40,17 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
 
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
-    ) -> List[Sequence[int]]:
+    ) -> List[Tuple[int, ...]]:
         """
         Returns sample from linear optics experiments given output state.
 
-        :param input_state: Input state in particle basis.
-        :param samples_number: Number of samples to simulate.
-        :return: A resultant state after traversing through interferometer.
+        :param input_state:
+            Input state in particle basis.
+        :param samples_number:
+            Number of samples to simulate.
+
+        :return:
+            A list of samples from the interferometer.
         """
         self.input_state: Sequence[int] = input_state
         self.number_of_input_photons: int = sum(input_state)
@@ -55,7 +63,7 @@ class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStra
             self._current_input = zeros_like(input_state)
             self._working_input_state = particle_input_state.copy()
             self._fill_r_sample()
-            samples.append(array(self.r_sample, dtype=int64))
+            samples.append(tuple(self.r_sample))
         return samples
 
     def _compute_pmf(self) -> None:

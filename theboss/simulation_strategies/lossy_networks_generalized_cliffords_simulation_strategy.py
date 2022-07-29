@@ -4,8 +4,8 @@ __author__ = "Tomasz Rybotycki"
 A class for exact BS simulation using generalized C&C algorithm (version B).
 """
 
-from numpy import delete, ndarray, vstack, zeros_like, complex128
-from typing import Sequence
+from numpy import delete, vstack, zeros_like, complex128
+from typing import Sequence, Tuple
 
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
     GeneralizedCliffordsBSimulationStrategy,
@@ -52,7 +52,7 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
 
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
-    ) -> [ndarray]:
+    ) -> [Tuple[int, ...]]:
         """
         The main method of the class. It returns desired number of samples from the
         (potentially non-uniformly lossy) BS experiment with given input state and
@@ -78,7 +78,7 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
         for output_state in expanded_samples:
             while len(output_state) > len(input_state):
                 output_state = delete(output_state, len(output_state) - 1)
-            samples.append(output_state)
+            samples.append(tuple(output_state))
 
         return samples
 

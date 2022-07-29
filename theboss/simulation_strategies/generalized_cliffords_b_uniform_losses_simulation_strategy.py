@@ -32,7 +32,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
     TODO TR:    Write tests for this method.
 
     TODO TR:    The permanent calculator should not be necessary for GCCB algorithms, as
-                they use something the submatrices calculator and .
+                they use the submatrices calculator instead.
     """
 
     def __init__(

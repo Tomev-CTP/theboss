@@ -285,7 +285,7 @@ def _compute_loss_transfer_matrix_expansion(transmissivities: ndarray,) -> ndarr
 
 
 def prepare_interferometer_matrix_in_expanded_space(
-    interferometer_matrix: Sequence[Sequence[complex128]],
+    interferometer_matrix: Sequence[Sequence[complex]],
 ) -> ndarray:
     """
     This operation is required for the simulation of BS experiment with mode dependent

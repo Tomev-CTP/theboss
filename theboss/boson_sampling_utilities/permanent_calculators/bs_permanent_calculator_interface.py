@@ -12,24 +12,23 @@ __author__ = "Tomasz Rybotycki"
 
 import abc
 
-from numpy import complex128
 from typing import Sequence
 
 
 class BSPermanentCalculatorInterface(abc.ABC):
     @abc.abstractmethod
-    def compute_permanent(self) -> complex128:
+    def compute_permanent(self) -> complex:
         """Computes permanent of a matrix given before."""
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
-    def matrix(self) -> Sequence[Sequence[complex128]]:
+    def matrix(self) -> Sequence[Sequence[complex]]:
         raise NotImplementedError
 
     @matrix.setter
     @abc.abstractmethod
-    def matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
+    def matrix(self, matrix: Sequence[Sequence[complex]]) -> None:
         raise NotImplementedError
 
     @property

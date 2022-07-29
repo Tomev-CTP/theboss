@@ -1,7 +1,7 @@
 __author__ = "Tomasz Rybotycki"
 
 import abc
-from typing import Sequence, List
+from typing import Sequence, List, Tuple
 
 
 class SimulationStrategyInterface(abc.ABC):
@@ -12,7 +12,7 @@ class SimulationStrategyInterface(abc.ABC):
     @abc.abstractmethod
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
-    ) -> List[Sequence[int]]:
+    ) -> List[Tuple[int]]:
         """
             Simulate the lossy boson sampling experiment.
 

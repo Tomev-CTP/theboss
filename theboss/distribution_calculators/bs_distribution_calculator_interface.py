@@ -18,7 +18,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_modes: int
     number_of_particles_lost: int
     number_of_particles_left: int
-    uniform_transmissivity: float = 0
+    uniform_transmissivity: float = 1
     network_simulation_strategy: network_simulation_strategy = None
     # TODO TR:  Previously we've used the number of approximated modes instead of the
     #           the hierarchy level. There may be some errors after the changes, that

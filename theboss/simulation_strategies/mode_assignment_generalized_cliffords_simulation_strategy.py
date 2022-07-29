@@ -1,9 +1,6 @@
 __author__ = "Tomasz Rybotycki"
 
-from copy import copy
-from typing import List
-
-from numpy import append, array, int64, ndarray
+from typing import List, Tuple, Sequence
 
 from ..boson_sampling_utilities.boson_sampling_utilities import (
     mode_assignment_to_mode_occupation,
@@ -16,19 +13,30 @@ from .generalized_cliffords_simulation_strategy import (
 )
 
 
-class GeneralizedCliffordsSimulationStrategyInterfaceV2(
+class ModeAssignmentGeneralizedCliffordsSimulationStrategyInterface(
     GeneralizedCliffordsSimulationStrategy
 ):
+    """
+    An implementation generalized C&C algorithm that works in the mode assignment
+    description of the states (as the original C&C and the [2] description).
+    """
+
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
         super().__init__(bs_permanent_calculator)
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Tuple[int, ...]]:
         """
-            Returns sample from linear optics experiments given output state.
+            Returns sample from linear optics experiments given input state.
 
-            :param input_state: Input state in particle basis.
-            :param samples_number: Number of samples to simulate.
-            :return: A resultant state after traversing through interferometer.
+            :param input_state:
+                Input state in the mode occupation representation.
+            :param samples_number:
+                Number of samples to simulate.
+
+            :return:
+                A list of sampled output states in the mode occupation description.
         """
         self.input_state = input_state
         self.number_of_input_photons = sum(input_state)
@@ -40,15 +48,16 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
         while len(samples) < samples_number:
             self._fill_r_sample()
             samples.append(
-                mode_assignment_to_mode_occupation(
-                    array(self.r_sample, dtype=int64), len(self.input_state)
-                )
+                mode_assignment_to_mode_occupation(self.r_sample, len(self.input_state))
             )
         return samples
 
     def _fill_r_sample(self) -> None:
-        self.r_sample = []
-        self.current_key = tuple(self.r_sample)
+        """
+        Creates a sample according to the generalized C&C algorithm.
+        """
+        self.r_sample = tuple()
+        self.current_key = self.r_sample
         self.current_sample_probability = 1
 
         while self.number_of_input_photons > len(self.r_sample):
@@ -57,6 +66,9 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
             self._sample_from_latest_pmf()
 
     def _calculate_new_layer_of_pmfs(self) -> None:
+        """
+        Adds new layer, from which new particle will be sampled, to the pmfs dict.
+        """
         number_of_particle_to_sample = len(self.r_sample) + 1
         possible_input_states = self._labeled_states[number_of_particle_to_sample]
         corresponding_k_vectors = [
@@ -66,9 +78,7 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
 
         pmf = []
 
-        weights = self._calculate_weights_from_k_vectors(
-            array(corresponding_k_vectors, dtype=float)
-        )
+        weights = self._compute_weights_from_k_vectors(corresponding_k_vectors)
         weights /= sum(weights)
         self.possible_outputs[
             self.current_key
@@ -86,12 +96,17 @@ class GeneralizedCliffordsSimulationStrategyInterfaceV2(
 
         self.pmfs[self.current_key] = pmf
 
-    def _generate_possible_output_states(self) -> List[ndarray]:
-        possible_output_states = []
+    def _generate_possible_output_states(self) -> List[Tuple[int, ...]]:
+        """
+        Generates a list of possible output states in the current step of the algorithm
+        basing on the current r_sample.
+
+        :return:
+            A list of the output state that one may get in the current algorithm's step.
+        """
+        possible_output_states: List[Tuple[int, ...]] = []
 
         for i in range(len(self.input_state)):
-            new_possible_output = copy(self.r_sample)
-            new_possible_output = append(new_possible_output, [i])
-            possible_output_states.append(array(new_possible_output, dtype=int64))
+            possible_output_states.append(self.r_sample + (i,))
 
         return possible_output_states

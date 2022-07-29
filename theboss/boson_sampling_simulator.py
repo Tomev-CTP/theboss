@@ -8,7 +8,7 @@ __author__ = "Tomasz Rybotycki"
 #   - Add frequencies counting
 #   - ???
 
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 from .simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
@@ -21,5 +21,5 @@ class BosonSamplingSimulator:
 
     def get_classical_simulation_results(
         self, input_state: Sequence[int], samples_number: int = 1
-    ) -> List[Sequence[int]]:
+    ) -> List[Tuple[int]]:
         return self._simulation_strategy.simulate(input_state, samples_number)
