@@ -47,6 +47,9 @@ def count_total_variation_distance_dicts(
     distribution1: DefaultDict[Tuple[int, ...], float] = defaultdict(lambda: 0)
     distribution2: DefaultDict[Tuple[int, ...], float] = defaultdict(lambda: 0)
 
+    distribution1.update(distribution_1)
+    distribution2.update(distribution_2)
+
     # Compute the tvd.
     return 0.5 * sum([abs(distribution1[key] - distribution2[key]) for key in keys])
 
