@@ -34,7 +34,6 @@ from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses 
 from theboss.simulation_strategies.simulation_strategy_factory import (
     StrategyType,
     SimulationStrategyFactory,
-    SimulationStrategyInterface,
 )
 
 
@@ -54,6 +53,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         # Interferometer matrix preparation.
         self._blocks_transmissivities: List[float] = [0.5, 0.2]
         block_matrices: List[ndarray] = [unitary_group.rvs(self._m) for _ in range(2)]
+
         self._interferometer_matrix: ndarray = self._get_interferometer_matrix(
             block_matrices
         )
@@ -67,22 +67,19 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
 
         self._config: BosonSamplingExperimentConfiguration
         self._config = BosonSamplingExperimentConfiguration(
-            self._interferometer_matrix,
-            self._initial_state,
-            self._m * 2,
-            self._m * 2,
-            0,
-            self._m * 2,
+            interferometer_matrix=self._interferometer_matrix,
+            initial_state=self._initial_state,
+            initial_number_of_particles=self._m * 2,
+            number_of_modes=self._m * 2,
+            number_of_particles_lost=0,
+            number_of_particles_left=self._m * 2,
+            hierarchy_level=2 * self._m,
         )
         self._permanent_calculator: RyserPermanentCalculator = RyserPermanentCalculator(
             self._interferometer_matrix, self._initial_state, None
         )
-        self._strategy_factory = SimulationStrategyFactory(
-            experiment_configuration=self._config,
-            bs_permanent_calculator=self._permanent_calculator,
-        )
 
-        self._strategy: SimulationStrategyInterface
+        self._strategy_type: StrategyType = StrategyType.BOBS
 
     def _get_samples_number(self, modes_number: int) -> int:
         """
@@ -240,7 +237,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         n = 2 * self._m
 
         bound = pow(eta_eff, 2) / 2
-        bound *= n - self._strategy_factory._experiment_configuration.hierarchy_level
+        bound *= n - self._config.hierarchy_level
         bound += eta_eff * (1 - eta_eff) / 2
 
         return bound
@@ -254,11 +251,16 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         :return:
         """
         # Prepare strategy.
-        self._strategy = self._strategy_factory.generate_strategy()
+        strategy_factory: SimulationStrategyFactory = SimulationStrategyFactory(
+            experiment_configuration=self._config,
+            bs_permanent_calculator=self._permanent_calculator,
+            strategy_type=self._strategy_type,
+        )
+        strategy = strategy_factory.generate_strategy()
 
         # Get samples.
         samples_number: int = self._get_samples_number(self._m)
-        samples = self._strategy.simulate(self._initial_state, samples_number)
+        samples = strategy.simulate(self._initial_state, samples_number)
 
         # Get counts.
         counts: DefaultDict[Tuple[int, ...], int] = defaultdict(lambda: 0)
@@ -276,7 +278,8 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         self.assertTrue(
             tvd < self._desired_statistical_accuracy + approximation_distance_bound,
             f"TVD ({tvd}) is greater than expected ("
-            f"{self._desired_statistical_accuracy + approximation_distance_bound})!",
+            f"{self._desired_statistical_accuracy + approximation_distance_bound})!\n\n"
+            f"Tested matrix was: {self._interferometer_matrix}",
         )
 
     def test_lossy_net_gcc_accuracy(self) -> None:
@@ -284,7 +287,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         Test accuracy of the non-uniform lossy net GCC Strategy in the presence of the
         non-uniform losses.
         """
-        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GCC
+        self._strategy_type = StrategyType.LOSSY_NET_GCC
         self._perform_accuracy_test()
 
     def test_exact_bobs_accuracy(self) -> None:
@@ -292,8 +295,6 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         Test accuracy of the general BOBS Strategy in the presence of the non-uniform
         losses without approximations.
         """
-        self._strategy_factory.strategy_type = StrategyType.BOBS
-        self._strategy_factory.experiment_configuration.hierarchy_level = self._m
         self._perform_accuracy_test()
 
     def test_small_approximation_bobs_accuracy(self) -> None:
@@ -301,8 +302,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         Test accuracy of the general BOBS strategy in the presence of the non-uniform
         losses with small approximation.
         """
-        self._strategy_factory.strategy_type = StrategyType.BOBS
-        self._strategy_factory.experiment_configuration.hierarchy_level = 2
+        self._config.hierarchy_level = 2
         approximation_bound: float = self._compute_bobs_approximation_tvd_bound()
         self._perform_accuracy_test(approximation_bound)
 
@@ -311,7 +311,6 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         Test accuracy of the general BOBS strategy in the presence of the non-uniform
         losses with high approximation.
         """
-        self._strategy_factory.strategy_type = StrategyType.BOBS
-        self._strategy_factory.experiment_configuration.hierarchy_level = 1
+        self._config.hierarchy_level = 1
         approximation_bound: float = self._compute_bobs_approximation_tvd_bound()
         self._perform_accuracy_test(approximation_bound)
