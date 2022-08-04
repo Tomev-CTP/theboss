@@ -87,3 +87,7 @@ This project follows / uses the ideas presented in following papers:
 [4] Mezzadri F., [arXiv:math-ph/0609050](https://arxiv.org/abs/math-ph/0609050) [math-ph].
 
 [5] Clifford P., Clifford R., [arXiv:2005.04214](https://arxiv.org/abs/2005.04214) [quant-ph].
+
+[6] Neville A., Sparrow C., Clifford R., Johnston E., Birchall P. M., Montanaro A., Laing A. [arXiv:1705.00686
+](https://arxiv.org/abs/1705.00686) [quant-ph].
+

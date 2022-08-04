@@ -7,7 +7,7 @@ __author__ = "Tomasz Rybotycki"
     not-continuous (like [1, 1, 0, 1, 0]) inputs.
 """
 
-from typing import Optional, Dict, Sequence
+from typing import Optional, Dict, Sequence, Union
 
 from numpy import complex128
 
@@ -32,7 +32,7 @@ class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
 
     def __init__(
         self,
-        matrix: Sequence[Sequence[complex128]],
+        matrix: Sequence[Sequence[Union[complex128, complex]]],
         input_state: Optional[Sequence[int]] = None,
         output_state: Optional[Sequence[int]] = None,
     ) -> None:
