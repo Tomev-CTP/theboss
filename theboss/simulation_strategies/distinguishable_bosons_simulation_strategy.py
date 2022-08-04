@@ -29,7 +29,6 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
         matrix: Sequence[Sequence[complex]],
     ):
         self._matrix: Sequence[Sequence[complex]] = matrix
-        pass
 
     @property
     def matrix(self) -> Sequence[Sequence[complex]]:
@@ -67,7 +66,7 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
         """
         sample: Tuple[int, ...] = tuple()
 
-        for mode in input_state:
+        for mode in range(len(input_state)):
 
             if input_state[mode] == 0:
                 continue
@@ -77,17 +76,21 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
             for particle in range(input_state[mode]):
                 sample += (self._sample_output_mode(probability_distribution),)
 
-            raise NotImplementedError
-
         return mode_assignment_to_mode_occupation(sample, len(input_state))
 
     def _get_probabilities(self, mode: int) -> List[float]:
         """
-        Computes the probabilities
+        Computes the probabilities of a particle, starting in the mode, to
+        end up in any observed modes.
+
         :param mode:
+            Mode in which the input particle(s) for the sampling is (are)>
+
         :return:
+            The probabilities of the particle from the mode ending up in any
+            of the output modes.
         """
-        raise NotImplementedError
+        return [abs(self._matrix[mode][i])**2 for i in range(len(self._matrix))]
 
     @staticmethod
     def _sample_output_mode(probabilities: List[float]) -> int:
