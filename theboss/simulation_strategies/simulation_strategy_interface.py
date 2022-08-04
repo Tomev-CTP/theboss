@@ -12,12 +12,12 @@ class SimulationStrategyInterface(abc.ABC):
     @abc.abstractmethod
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
-    ) -> List[Tuple[int]]:
+    ) -> List[Tuple[int, ...]]:
         """
-            Simulate the lossy boson sampling experiment.
+        Simulate the lossy boson sampling experiment.
 
-            :param input_state: Input state of the simulation.
-            :param samples_number: Number of samples one wants to simulate.
-            :return:
+        :param input_state: Input state of the simulation.
+        :param samples_number: Number of samples one wants to simulate.
+        :return:
         """
         raise NotImplementedError
