@@ -26,7 +26,7 @@ from numpy import (
 )
 from numpy.linalg import svd
 from scipy.special import binom, factorial
-from numpy.random import rand
+from numpy.random import rand, random
 
 from theboss.quantum_computations_utilities import compute_qft_matrix
 
@@ -540,6 +540,28 @@ def generate_random_phases_matrix_for_first_m_modes(
     random_phases = ones(all_modes_number, dtype=complex128)  # [1, 1, 1, 1, 1, 1]
     random_phases[0:m] = exp(1j * 2 * pi * rand(m))
     return diag(random_phases)
+
+
+def apply_uniform_losses_to_the_state(
+    state: Sequence[int], transmissivity: float
+) -> Tuple[int, ...]:
+    """
+    Applies uniform losses to the given state.
+
+    :param state:
+        State to which losses will be applied.
+
+    :return:
+        Lossy input state.
+    """
+    lossy_input = [0 for _ in state]
+
+    for mode in range(len(state)):
+        for particle in range(state[mode]):
+            if random() <= transmissivity:
+                lossy_input[mode] += 1
+
+    return tuple(lossy_input)
 
 
 class EffectiveScatteringMatrixCalculator:

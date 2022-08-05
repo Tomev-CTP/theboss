@@ -9,8 +9,8 @@ __author__ = "Tomasz Rybotycki"
 from theboss.simulation_strategies.distinguishable_bosons_simulation_strategy import (
     DistinguishableBosonsSimulationStrategy,
 )
+from theboss.boson_sampling_utilities import apply_uniform_losses_to_the_state
 from typing import Sequence, Tuple
-from numpy.random import random
 
 
 class DistinguishableBosonsUniformLossesSimulationStrategy(
@@ -35,24 +35,7 @@ class DistinguishableBosonsUniformLossesSimulationStrategy(
         :return:
             An output state from the BS experiment with distinguishable photons.
         """
-        lossy_input: Tuple[int, ...] = self._apply_losses(input_state)
+        lossy_input: Tuple[int, ...] = apply_uniform_losses_to_the_state(
+            input_state, self._transmissivity
+        )
         return super()._get_new_sample(lossy_input)
-
-    def _apply_losses(self, input_state: Sequence[int]) -> Tuple[int, ...]:
-        """
-        Applies uniform losses to the given input state.
-
-        :param input_state:
-            Input state to which losses will be applied.
-
-        :return:
-            Lossy input state.
-        """
-        lossy_input = [0 for _ in input_state]
-
-        for mode in range(len(input_state)):
-            for particle in range(input_state[mode]):
-                if random() <= self._transmissivity:
-                    lossy_input[mode] += 1
-
-        return tuple(lossy_input)
