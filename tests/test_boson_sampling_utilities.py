@@ -5,7 +5,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 import unittest
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     mode_assignment_to_mode_occupation,
     mode_occupation_to_mode_assignment,
     bosonic_space_dimension,

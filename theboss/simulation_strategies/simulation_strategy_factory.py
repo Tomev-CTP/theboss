@@ -25,7 +25,7 @@ from .nonuniform_losses_approximation_strategy import (
 )
 from .simulation_strategy_interface import SimulationStrategyInterface
 from .uniform_loss_simulation_strategy import UniformLossSimulationStrategy
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
 from ..distribution_calculators.bs_distribution_calculator_interface import (

@@ -18,9 +18,7 @@ from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
 
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    mode_assignment_to_mode_occupation,
-)
+from theboss.boson_sampling_utilities import mode_assignment_to_mode_occupation
 
 
 class CliffordsRSimulationStrategy(SimulationStrategyInterface):

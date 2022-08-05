@@ -9,19 +9,19 @@ from typing import Optional
 
 from numpy import ndarray
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.classic_permanent_calculator import (
+from theboss.permanent_calculators.classic_permanent_calculator import (
     ClassicPermanentCalculator,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.glynn_gray_permanent_calculator import (
+from theboss.permanent_calculators.glynn_gray_permanent_calculator import (
     GlynnGrayPermanentCalculator,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.chin_huh_permanent_calculator import (
+from theboss.permanent_calculators.chin_huh_permanent_calculator import (
     ChinHuhPermanentCalculator,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
 

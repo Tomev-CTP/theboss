@@ -13,7 +13,7 @@ from typing import List, Tuple
 from numpy import array, average
 from numpy.random import randint
 from scipy.stats import unitary_group
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import (
+from theboss.permanent_calculators.bs_permanent_calculator_factory import (
     BSPermanentCalculatorFactory,
 )
 from theboss.simulation_strategies.simulation_strategy_factory import (
@@ -34,9 +34,7 @@ from theboss.simulation_strategies.simulation_strategy_factory import (
     StrategyType,
     SimulationStrategyInterface,
 )
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    bosonic_space_dimension,
-)
+from theboss.boson_sampling_utilities import bosonic_space_dimension
 from tqdm import tqdm
 
 

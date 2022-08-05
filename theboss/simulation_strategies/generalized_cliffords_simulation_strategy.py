@@ -6,15 +6,13 @@ from math import factorial
 from typing import List, Sequence, Tuple, DefaultDict
 from scipy.special import binom
 
-from numpy import array, delete, float64, insert, int64, ndarray
+from numpy import array, delete, insert, int64, ndarray
 from numpy.random import random
 
 from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
-    BSPermanentCalculatorInterface,
-)
+from theboss.permanent_calculators import BSPermanentCalculatorInterface
 
 
 class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):

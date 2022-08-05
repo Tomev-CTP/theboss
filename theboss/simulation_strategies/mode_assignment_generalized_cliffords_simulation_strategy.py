@@ -2,10 +2,8 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Tuple, Sequence
 
-from ..boson_sampling_utilities.boson_sampling_utilities import (
-    mode_assignment_to_mode_occupation,
-)
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+from theboss.boson_sampling_utilities import mode_assignment_to_mode_occupation
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
 from .generalized_cliffords_simulation_strategy import (

@@ -14,7 +14,7 @@ from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses 
     BosonSamplingExperimentConfiguration,
 )
 
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
 

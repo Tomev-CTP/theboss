@@ -6,11 +6,11 @@ __author__ = "Tomasz Rybotycki"
 """
 
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_interface import (
+from theboss.permanent_calculators.bs_submatrices_permanent_calculator_interface import (
     BSSubmatricesPermanentCalculatorInterface,
 )
 from typing import Optional, List, Sequence
-from numpy import ndarray, int64, array, zeros, ones, complex128, nonzero
+from numpy import ndarray, zeros, ones, complex128, nonzero
 import abc
 
 

@@ -9,8 +9,8 @@ from typing import List, Optional
 
 from numpy import complex128, ndarray, asarray
 
-from ..boson_sampling_utilities import EffectiveScatteringMatrixCalculator
-from ...boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import (
+from theboss.boson_sampling_utilities import EffectiveScatteringMatrixCalculator
+from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSPermanentCalculatorBase,
 )
 

@@ -6,9 +6,7 @@ from typing import List, Iterable, Tuple
 from numpy import ndarray
 from scipy import special
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    generate_possible_states,
-)
+from theboss.boson_sampling_utilities import generate_possible_states
 from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
 )

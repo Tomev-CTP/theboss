@@ -10,7 +10,7 @@ from theboss.simulation_strategies.distinguishable_bosons_simulation_strategy im
     DistinguishableBosonsSimulationStrategy,
 )
 from typing import Sequence, Tuple, List
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     prepare_interferometer_matrix_in_expanded_space,
 )
 

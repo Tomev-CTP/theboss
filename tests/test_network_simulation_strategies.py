@@ -9,7 +9,7 @@ from numpy import eye, ndarray
 from scipy.stats import unitary_group
 
 from theboss.boson_sampling_simulator import BosonSamplingSimulator
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_factory import (
+from theboss.permanent_calculators.bs_permanent_calculator_factory import (
     BSPermanentCalculatorFactory,
 )
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (

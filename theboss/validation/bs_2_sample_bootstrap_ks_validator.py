@@ -6,7 +6,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 from typing import Tuple, List, Sequence, Set, Dict
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
 from numpy import log, sqrt

@@ -6,9 +6,7 @@ __author__ = "Tomasz Rybotycki"
     will make pytest run all of the tests, from both sub and superclass.
 """
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    bosonic_space_dimension,
-)
+from theboss.boson_sampling_utilities import bosonic_space_dimension
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
     BSDistributionCalculatorWithFixedLosses,
     BSDistributionCalculatorWithUniformLosses,

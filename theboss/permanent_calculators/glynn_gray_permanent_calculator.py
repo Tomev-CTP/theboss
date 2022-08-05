@@ -14,12 +14,10 @@ from typing import Optional, List
 
 from numpy import ndarray, complex128, ones
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import (
+from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSPermanentCalculatorBase,
 )
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    EffectiveScatteringMatrixCalculator,
-)
+from theboss.boson_sampling_utilities import EffectiveScatteringMatrixCalculator
 
 from guancodes.GrayCode import get_gray_code_update_indices
 

@@ -14,13 +14,13 @@ from .bs_distribution_calculator_interface import (
     BSDistributionCalculatorInterface,
     BosonSamplingExperimentConfiguration,
 )
-from ..boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     generate_possible_states,
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
     prepare_interferometer_matrix_in_expanded_space,
 )
-from ..boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
 

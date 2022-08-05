@@ -22,7 +22,7 @@ from numpy import (
 from numpy.random import choice, shuffle
 from typing import List, Tuple, Sequence
 from scipy.special import binom
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     generate_lossy_n_particle_input_states,
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,

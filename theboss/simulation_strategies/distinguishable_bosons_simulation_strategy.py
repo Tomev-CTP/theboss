@@ -10,9 +10,7 @@ from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    mode_assignment_to_mode_occupation,
-)
+from theboss.boson_sampling_utilities import mode_assignment_to_mode_occupation
 
 from typing import Sequence, List, Tuple
 
@@ -25,8 +23,7 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
     """
 
     def __init__(
-        self,
-        matrix: Sequence[Sequence[complex]],
+        self, matrix: Sequence[Sequence[complex]],
     ):
         self._matrix: Sequence[Sequence[complex]] = matrix
 
@@ -90,7 +87,7 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
             The probabilities of the particle from the mode ending up in any
             of the output modes.
         """
-        return [abs(self._matrix[mode][i])**2 for i in range(len(self._matrix))]
+        return [abs(self._matrix[mode][i]) ** 2 for i in range(len(self._matrix))]
 
     @staticmethod
     def _sample_output_mode(probabilities: List[float]) -> int:

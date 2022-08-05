@@ -5,9 +5,7 @@ __author__ = "Tomasz Rybotycki"
     that for various reasons aren't important for the ongoing research anymore.
 """
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
-    bosonic_space_dimension,
-)
+from theboss.boson_sampling_utilities import bosonic_space_dimension
 from theboss.distribution_calculators.bs_exact_distribution_with_uniform_losses import (
     BSDistributionCalculatorWithUniformLosses,
     BSDistributionCalculatorWithFixedLosses,

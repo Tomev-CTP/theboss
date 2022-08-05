@@ -10,7 +10,7 @@ from typing import Optional, Dict
 
 from numpy import complex128, ndarray
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_base import (
+from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSGuanCodeBasedPermanentCalculatorBase,
 )
 

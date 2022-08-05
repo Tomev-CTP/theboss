@@ -22,7 +22,7 @@ from .lossy_networks_generalized_cliffords_simulation_strategy import (
     BSPermanentCalculatorInterface,
     LossyNetworksGeneralizedCliffordsSimulationStrategy,
 )
-from ..boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
 )

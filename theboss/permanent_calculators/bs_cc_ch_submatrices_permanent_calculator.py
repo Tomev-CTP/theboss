@@ -17,7 +17,7 @@ import operator
 from functools import reduce
 from typing import List, Optional
 
-from theboss.boson_sampling_utilities.permanent_calculators.bs_submatrices_permanent_calculator_base import (
+from theboss.permanent_calculators.bs_submatrices_permanent_calculator_base import (
     BSGuanBasedSubmatricesPermanentCalculatorBase,
 )
 

@@ -16,7 +16,7 @@ from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     prepare_interferometer_matrix_in_expanded_space,
 )
 

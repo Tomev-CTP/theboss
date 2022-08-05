@@ -9,7 +9,7 @@ __author__ = "Tomasz Rybotycki"
 
 import unittest
 from scipy.stats import unitary_group
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     bosonic_space_dimension,
     generate_possible_states,
 )
@@ -22,7 +22,7 @@ from numpy import ndarray, zeros_like, block, sqrt
 from numpy.linalg import svd
 from collections import defaultdict
 
-from theboss.boson_sampling_utilities.permanent_calculators.ryser_permanent_calculator import (
+from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
 

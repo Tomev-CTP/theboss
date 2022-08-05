@@ -7,13 +7,11 @@ from typing import List, Iterable
 from numpy import ndarray
 from scipy.special import binom
 
-from theboss.boson_sampling_utilities.boson_sampling_utilities import (
+from theboss.boson_sampling_utilities import (
     generate_lossy_n_particle_input_states,
     generate_possible_states,
 )
-from theboss.boson_sampling_utilities.permanent_calculators.bs_permanent_calculator_interface import (
-    BSPermanentCalculatorInterface,
-)
+from theboss.permanent_calculators import BSPermanentCalculatorInterface
 from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
     BSDistributionCalculatorInterface,
