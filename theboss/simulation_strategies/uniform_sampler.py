@@ -1,7 +1,8 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-        
+This script contains an implementation of a class for uniform sampling of the BS output
+states basing on the input states. It has been implemented for the tests and validators.
 """
 
 from theboss.simulation_strategies.simulation_strategy_interface import (
@@ -24,7 +25,19 @@ class UniformSamplingStrategy(SimulationStrategyInterface):
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
     ) -> List[Tuple[int, ...]]:
+        """
+        Draws required number of elements from the BS output space.
 
+        :param input_state:
+            A state that would be at the input of the interferometer. It serves as a
+            source of knowledge about particles number and the modes number, thus
+            generally about the output states space.
+        :param samples_number:
+            The number of samples to return.
+
+        :return:
+            Uniformly sampled required number of output states.
+        """
         possible_output_states: List[Tuple[int, ...]] = generate_possible_states(
             sum(input_state), len(input_state)
         )
