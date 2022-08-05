@@ -48,6 +48,7 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
 
         :return:
             Required number of samples of the BS experiment with the distinguishable
+            bosons.
         """
         return [self._get_new_sample(input_state) for _ in range(samples_number)]
 
