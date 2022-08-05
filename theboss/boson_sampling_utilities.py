@@ -542,6 +542,7 @@ def generate_random_phases_matrix_for_first_m_modes(
     return diag(random_phases)
 
 
+# TODO TR:  Ensure that
 def apply_uniform_losses_to_the_state(
     state: Sequence[int], transmissivity: float
 ) -> Tuple[int, ...]:
@@ -549,7 +550,9 @@ def apply_uniform_losses_to_the_state(
     Applies uniform losses to the given state.
 
     :param state:
-        State to which losses will be applied.
+        State to which uniform losses will be applied.
+    :param transmissivity:
+        Uniform transmissivity.
 
     :return:
         Lossy input state.
@@ -562,6 +565,36 @@ def apply_uniform_losses_to_the_state(
                 lossy_input[mode] += 1
 
     return tuple(lossy_input)
+
+
+# TODO TR:  This is possibly use in many places. Find these places and use this method
+#           instead.
+def compute_binomial_weights(
+    total_particles_number: int, transmissivity: float
+) -> List[float]:
+    """
+    Computes the binomial weights for a given, uniformly lossy, BS experiment instance.
+
+    :param total_particles_number:
+        The initial number of particles in the input state.
+    :param transmissivity:
+        The uniform transmissivity of the network.
+
+    :return:
+        The binomial weights describing the probabilities of loosing a number of
+        particles specified by the index.
+    """
+    weights: List[float] = []
+
+    def binomial_weight(n: int, l: int, eta: float) -> float:
+        return pow(eta, l) * pow(1 - eta, n - l) * binom(n, l)
+
+    for particles_left in range(total_particles_number + 1):
+        weights.append(
+            binomial_weight(total_particles_number, particles_left, transmissivity)
+        )
+
+    return weights
 
 
 class EffectiveScatteringMatrixCalculator:
