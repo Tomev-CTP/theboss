@@ -2,9 +2,11 @@ __author__ = "Tomasz Rybotycki"
 
 import abc
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
-from ..network_simulation_strategy import network_simulation_strategy
+from theboss.network_simulation_strategy.network_simulation_strategy import (
+    NetworkSimulationStrategy,
+)
 
 
 # TODO TR: MO doesn't approve of this class. It should be changed somehow.
@@ -19,7 +21,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_lost: int
     number_of_particles_left: int
     uniform_transmissivity: float = 1
-    network_simulation_strategy: network_simulation_strategy = None
+    network_simulation_strategy: NetworkSimulationStrategy = None
     # TODO TR:  Previously we've used the number of approximated modes instead of the
     #           the hierarchy level. There may be some errors after the changes, that
     #           we should fix.
@@ -44,7 +46,7 @@ class BSDistributionCalculatorInterface(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_outcomes_in_proper_order(self) -> List[Sequence[int]]:
+    def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
         """
         One also has to know the order of objects that returned probabilities correspond
         to.

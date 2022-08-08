@@ -1,9 +1,8 @@
 __author__ = "Tomasz Rybotycki"
 
 from copy import deepcopy
-from typing import List, Iterable, Tuple
+from typing import List, Sequence, Tuple
 
-from numpy import ndarray
 from scipy import special
 
 from theboss.boson_sampling_utilities import generate_possible_states
@@ -58,7 +57,7 @@ class BSDistributionCalculatorWithUniformLosses(
         return weights
 
     def calculate_probabilities_of_outcomes(
-        self, outcomes: Iterable[Iterable[int]]
+        self, outcomes: Sequence[Tuple[int, ...]]
     ) -> List[float]:
 
         with Pool(processes=cpu_count()) as pool:
@@ -68,7 +67,7 @@ class BSDistributionCalculatorWithUniformLosses(
 
         return outcomes_probabilities
 
-    def _calculate_probability_of_outcome(self, outcome: ndarray) -> float:
+    def _calculate_probability_of_outcome(self, outcome: Tuple[int, ...]) -> float:
 
         number_of_particles_left = int(sum(outcome))
         l = number_of_particles_left
