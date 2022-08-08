@@ -8,8 +8,6 @@ lossy distinguishable BS experiments.
 from copy import deepcopy
 from typing import List, Sequence, Tuple
 
-from scipy import special
-
 from theboss.boson_sampling_utilities import (
     generate_possible_states,
     compute_binomial_weights,
