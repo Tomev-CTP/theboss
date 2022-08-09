@@ -12,7 +12,9 @@ from numpy.random import random
 from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
-from theboss.permanent_calculators import BSPermanentCalculatorInterface
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
+    BSPermanentCalculatorInterface,
+)
 
 
 class GeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):

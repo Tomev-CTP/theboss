@@ -21,7 +21,9 @@ from theboss.simulation_strategies.generalized_cliffords_simulation_strategy imp
 )
 from theboss.boson_sampling_utilities import mode_occupation_to_mode_assignment
 
-from theboss.permanent_calculators import BSCCRyserSubmatricesPermanentCalculator
+from theboss.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
+    BSCCRyserSubmatricesPermanentCalculator,
+)
 
 
 class GeneralizedCliffordsBSimulationStrategy(GeneralizedCliffordsSimulationStrategy):
