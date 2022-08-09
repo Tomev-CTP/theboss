@@ -16,9 +16,15 @@ from typing import List
 
 from numpy import allclose, array
 
-from theboss.permanent_calculators import ChinHuhPermanentCalculator
-from theboss.permanent_calculators import ClassicPermanentCalculator
-from theboss.permanent_calculators import GlynnGrayPermanentCalculator
+from theboss.permanent_calculators.chin_huh_permanent_calculator import (
+    ChinHuhPermanentCalculator,
+)
+from theboss.permanent_calculators.classic_permanent_calculator import (
+    ClassicPermanentCalculator,
+)
+from theboss.permanent_calculators.glynn_gray_permanent_calculator import (
+    GlynnGrayPermanentCalculator,
+)
 from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )

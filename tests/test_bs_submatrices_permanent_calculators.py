@@ -8,8 +8,12 @@ import unittest
 from theboss.permanent_calculators.bs_cc_ch_submatrices_permanent_calculator import (
     BSCCCHSubmatricesPermanentCalculator,
 )
-from theboss.permanent_calculators import ChinHuhPermanentCalculator
-from theboss.permanent_calculators import BSCCRyserSubmatricesPermanentCalculator
+from theboss.permanent_calculators.ryser_permanent_calculator import (
+    RyserPermanentCalculator,
+)
+from theboss.permanent_calculators.bs_cc_ryser_submatrices_permanent_calculator import (
+    BSCCRyserSubmatricesPermanentCalculator,
+)
 from theboss.permanent_calculators.bs_submatrices_permanent_calculator_base import (
     BSSubmatricesPermanentCalculatorBase,
 )
@@ -32,7 +36,7 @@ class TestSubmatricesPermanentsCalculators(unittest.TestCase):
         self._output_state = ones(self._dim, dtype=int)
         self._output_state[0] = 0
 
-        self._permanent_calculator = ChinHuhPermanentCalculator(self._matrix)
+        self._permanent_calculator = RyserPermanentCalculator(self._matrix)
 
     def test_chin_huh_submatrices_permanent_calculator_for_std_input(self) -> None:
         self._input_state = ones(self._dim, dtype=int)
