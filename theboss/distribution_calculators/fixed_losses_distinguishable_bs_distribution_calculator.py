@@ -134,7 +134,7 @@ class FixedLossesDistinguishableBSDistributionCalculator(
 
         self._permanent_calculator.matrix = (
             array(self.configuration.interferometer_matrix)
-            @ array(self.configuration.interferometer_matrix).conj()
+            * array(self.configuration.interferometer_matrix).conj()
         )
         self._permanent_calculator.output_state = outcome_state
 

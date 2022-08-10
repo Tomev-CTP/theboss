@@ -5,7 +5,10 @@ from typing import List, Sequence, Tuple
 
 from scipy import special
 
-from theboss.boson_sampling_utilities import generate_possible_states
+from theboss.boson_sampling_utilities import (
+    generate_possible_states,
+    compute_binomial_weights,
+)
 from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
 )
@@ -23,38 +26,25 @@ class BSDistributionCalculatorWithUniformLosses(
         self,
         configuration: BosonSamplingExperimentConfiguration,
         permanent_calculator: BSPermanentCalculatorInterface,
+        weightless: bool = False,
     ) -> None:
         super().__init__(configuration, permanent_calculator)
-        self.weights = self._initialize_weights()
-        self.weightless = False
+        # self.weights = self._initialize_weights()
+        self.weights = compute_binomial_weights(
+            configuration.initial_number_of_particles,
+            configuration.uniform_transmissivity,
+        )
+        self.set_weightless(weightless)
 
     def set_weightless(self, weightless: bool) -> None:
-        if not weightless:
-            self.weights = self._initialize_weights()
-        else:
+        if weightless:
             self.weights = [1 for _ in self.weights]
-
-        self.weightless = weightless
-
-    def _initialize_weights(self) -> List[float]:
-
-        weight = (
-            lambda n, l, eta: pow(eta, l) * special.binom(n, l) * pow(1.0 - eta, n - l)
-        )
-        weights = []
-
-        for number_of_particles_left in range(
-            self.configuration.initial_number_of_particles + 1
-        ):
-            weights.append(
-                weight(
-                    self.configuration.initial_number_of_particles,
-                    number_of_particles_left,
-                    self.configuration.uniform_transmissivity,
-                )
+        else:
+            self.weights = compute_binomial_weights(
+                self.configuration.initial_number_of_particles,
+                self.configuration.uniform_transmissivity,
             )
-
-        return weights
+        self._weightless = weightless
 
     def calculate_probabilities_of_outcomes(
         self, outcomes: Sequence[Tuple[int, ...]]

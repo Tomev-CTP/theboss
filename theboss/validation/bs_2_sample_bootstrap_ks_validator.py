@@ -11,6 +11,8 @@ from theboss.permanent_calculators.ryser_permanent_calculator import (
 )
 from numpy import log, sqrt
 
+# TODO TR: Check the scipy package for 2-sample KS test.
+
 
 class BS2SampleBootstrapKSValidator:
     """

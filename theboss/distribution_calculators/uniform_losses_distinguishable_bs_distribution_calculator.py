@@ -32,8 +32,8 @@ class UniformLossesDistinguishableBSDistributionCalculator(
         weightless: bool = False,
     ) -> None:
         super().__init__(configuration, permanent_calculator)
-        self.weights = self._initialize_weights()
-        self.weightless = False
+        self.weights: List[float]
+        self.set_weightless(weightless)
 
     def set_weightless(self, weightless: bool) -> None:
         """
@@ -97,6 +97,7 @@ class UniformLossesDistinguishableBSDistributionCalculator(
 
         subconfiguration.number_of_particles_left = number_of_particles_left
         subconfiguration.number_of_particles_lost = n - l
+
         subdistribution_calculator = FixedLossesDistinguishableBSDistributionCalculator(
             subconfiguration, self._permanent_calculator
         )
@@ -119,7 +120,7 @@ class UniformLossesDistinguishableBSDistributionCalculator(
             All the possible outcomes of BS experiment specified by the configuration.
         """
         return generate_possible_states(
-            self.configuration.initial_number_of_particles,
+            sum(self.configuration.initial_state),
             self.configuration.number_of_modes,
             losses=True,
         )
