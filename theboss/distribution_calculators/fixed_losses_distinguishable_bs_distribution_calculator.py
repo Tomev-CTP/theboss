@@ -147,10 +147,6 @@ class FixedLossesDistinguishableBSDistributionCalculator(
             self._permanent_calculator.input_state = lossy_input
 
             subprobability = abs(self._permanent_calculator.compute_permanent())
-
-            for mode_occupation_number in lossy_input:
-                subprobability /= math.factorial(mode_occupation_number)
-
             probability_of_outcome += subprobability * lossy_input_multiplicity
 
         # Normalization (see [2]).

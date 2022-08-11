@@ -103,22 +103,6 @@ class TestDistributionCalculators(unittest.TestCase):
             self._config, self._permanent_calculator
         )
         distribution = calc.calculate_distribution()
-
-        print()
-        print(len(distribution))
-
-        from theboss.boson_sampling_utilities import generate_possible_states
-
-        print(len(calc.get_outcomes_in_proper_order()))
-        print(
-            len(
-                generate_possible_states(
-                    sum(self._binned_input) - self._config.number_of_particles_lost,
-                    self._m,
-                )
-            )
-        )
-
         self.assertTrue(
             isclose(sum(distribution), 1), f"Distribution sum is {sum(distribution)}"
         )
