@@ -16,7 +16,9 @@ from theboss.boson_sampling_utilities import (
 )
 
 
-class UniformlyLossyUniformBSDistributionCalculator(BSDistributionCalculatorInterface):
+class UniformDistributionCalculatorForUniformlyLossyBS(
+    BSDistributionCalculatorInterface
+):
     """
     A class for computing the output probabilities of the uniformly lossy uniform
     sampling from BS distribution with a fixed number of initial particles and modes.
