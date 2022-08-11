@@ -17,7 +17,7 @@ from typing import Sequence, List, Tuple
 from numpy.random import random
 
 
-class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
+class DistinguishableParticlesSimulationStrategy(SimulationStrategyInterface):
     """
     A simulation strategy for lossless BS simulation with fully distinguishable bosons.
     """
@@ -88,7 +88,7 @@ class DistinguishableBosonsSimulationStrategy(SimulationStrategyInterface):
             The probabilities of the particle from the mode ending up in any
             of the output modes.
         """
-        return [abs(self._matrix[mode][i]) ** 2 for i in range(len(self._matrix))]
+        return [abs(self._matrix[i][mode]) ** 2 for i in range(len(self._matrix))]
 
     @staticmethod
     def _sample_output_mode(probabilities: List[float]) -> int:

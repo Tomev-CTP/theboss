@@ -25,7 +25,7 @@ from theboss.distribution_calculators.bs_distribution_calculator_interface impor
 )
 
 
-class FixedLossesDistinguishableBSDistributionCalculator(
+class FixedLossesDistinguishableParticlesDistributionCalculator(
     BSDistributionCalculatorInterface
 ):
     """
@@ -108,6 +108,10 @@ class FixedLossesDistinguishableBSDistributionCalculator(
         )
         for i in range(self.configuration.number_of_modes):
             outcome_probability /= math.factorial(outcome[i])
+
+        if outcome_probability > 1:
+            print("O LOL")
+            print()
 
         return outcome_probability
 

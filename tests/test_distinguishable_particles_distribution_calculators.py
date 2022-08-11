@@ -7,11 +7,16 @@ __author__ = "Tomasz Rybotycki"
 
 from scipy.stats import unitary_group
 import unittest
-from numpy import isclose
+from numpy import isclose, diag
+from numpy.random import random
 
-from theboss.distribution_calculators.uniform_losses_distinguishable_bs_distribution_calculator import (
-    UniformLossesDistinguishableBSDistributionCalculator,
-    FixedLossesDistinguishableBSDistributionCalculator,
+from theboss.distribution_calculators.nonuniform_losses_distinguishable_particles_distribution_calculator import (
+    NonUniformlyLossyDistinguishableParticlesDistributionCalculator,
+)
+
+from theboss.distribution_calculators.uniform_losses_distinguishable_particles_distribution_calculator import (
+    UniformLossesDistinguishableParticlesDistributionCalculator,
+    FixedLossesDistinguishableParticlesDistributionCalculator,
     BosonSamplingExperimentConfiguration,
 )
 
@@ -59,7 +64,7 @@ class TestDistributionCalculators(unittest.TestCase):
         Test uniform losses calculator for standard input.
         """
         self._prepare_test_setup(self._std_input)
-        calc = UniformLossesDistinguishableBSDistributionCalculator(
+        calc = UniformLossesDistinguishableParticlesDistributionCalculator(
             self._config, self._permanent_calculator
         )
         distribution = calc.calculate_distribution()
@@ -73,7 +78,7 @@ class TestDistributionCalculators(unittest.TestCase):
         Test fixed losses calculator for standard input.
         """
         self._prepare_test_setup(self._std_input)
-        calc = FixedLossesDistinguishableBSDistributionCalculator(
+        calc = FixedLossesDistinguishableParticlesDistributionCalculator(
             self._config, self._permanent_calculator
         )
         distribution = calc.calculate_distribution()
@@ -86,7 +91,7 @@ class TestDistributionCalculators(unittest.TestCase):
         Test uniform losses calculator for binned input.
         """
         self._prepare_test_setup(self._binned_input)
-        calc = UniformLossesDistinguishableBSDistributionCalculator(
+        calc = UniformLossesDistinguishableParticlesDistributionCalculator(
             self._config, self._permanent_calculator
         )
         distribution = calc.calculate_distribution()
@@ -99,8 +104,34 @@ class TestDistributionCalculators(unittest.TestCase):
         Test fixed losses calculator for binned input.
         """
         self._prepare_test_setup(self._binned_input)
-        calc = FixedLossesDistinguishableBSDistributionCalculator(
+        calc = FixedLossesDistinguishableParticlesDistributionCalculator(
             self._config, self._permanent_calculator
+        )
+        distribution = calc.calculate_distribution()
+        self.assertTrue(
+            isclose(sum(distribution), 1), f"Distribution sum is {sum(distribution)}"
+        )
+
+    def test_nonuniform_losses_calc_for_standard_input(self) -> None:
+        """
+            Test non-uniform losses calculator for standard input.
+        """
+        self._prepare_test_setup(self._std_input)
+        calc = NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
+            self._matrix @ diag(random(self._m)), self._std_input
+        )
+        distribution = calc.calculate_distribution()
+        self.assertTrue(
+            isclose(sum(distribution), 1), f"Distribution sum is {sum(distribution)}"
+        )
+
+    def test_nonuniform_losses_calc_for_binned_input(self) -> None:
+        """
+            Test non-uniform losses calculator for binned input.
+        """
+        self._prepare_test_setup(self._binned_input)
+        calc = NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
+            self._matrix @ diag(random(self._m)), self._binned_input
         )
         distribution = calc.calculate_distribution()
         self.assertTrue(

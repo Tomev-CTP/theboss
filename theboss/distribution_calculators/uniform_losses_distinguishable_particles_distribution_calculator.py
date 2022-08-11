@@ -15,15 +15,15 @@ from theboss.boson_sampling_utilities import (
 from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
 )
-from theboss.distribution_calculators.fixed_losses_distinguishable_bs_distribution_calculator import (
-    FixedLossesDistinguishableBSDistributionCalculator,
+from theboss.distribution_calculators.fixed_losses_distinguishable_particles_distribution_calculator import (
+    FixedLossesDistinguishableParticlesDistributionCalculator,
     BSPermanentCalculatorInterface,
 )
 from multiprocessing import cpu_count, Pool
 
 
-class UniformLossesDistinguishableBSDistributionCalculator(
-    FixedLossesDistinguishableBSDistributionCalculator
+class UniformLossesDistinguishableParticlesDistributionCalculator(
+    FixedLossesDistinguishableParticlesDistributionCalculator
 ):
     def __init__(
         self,
@@ -98,7 +98,7 @@ class UniformLossesDistinguishableBSDistributionCalculator(
         subconfiguration.number_of_particles_left = number_of_particles_left
         subconfiguration.number_of_particles_lost = n - l
 
-        subdistribution_calculator = FixedLossesDistinguishableBSDistributionCalculator(
+        subdistribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
             subconfiguration, self._permanent_calculator
         )
 

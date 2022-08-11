@@ -18,8 +18,8 @@ from theboss.permanent_calculators.ryser_permanent_calculator import (
     RyserPermanentCalculator,
 )
 
-from theboss.distribution_calculators.uniform_losses_distinguishable_bs_distribution_calculator import (
-    UniformLossesDistinguishableBSDistributionCalculator,
+from theboss.distribution_calculators.fixed_losses_distinguishable_particles_distribution_calculator import (
+    FixedLossesDistinguishableParticlesDistributionCalculator,
     BosonSamplingExperimentConfiguration,
 )
 
@@ -29,7 +29,9 @@ from typing import List, Sequence, Tuple, Set, Dict
 #           non-uniform losses.
 
 
-class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterface):
+class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
+    BSDistributionCalculatorInterface
+):
     """
     A class that contains the calculator for computing non-uniformly lossy
     distinguishable BS distribution.
@@ -88,21 +90,21 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
 
         config: BosonSamplingExperimentConfiguration
         config = BosonSamplingExperimentConfiguration(
-            expanded_matrix,
-            expanded_input,
-            sum(self._input_state),
-            len(expanded_input),
-            0,
-            sum(self._input_state),
-            1,
+            interferometer_matrix=expanded_matrix,
+            initial_state=expanded_input,
+            initial_number_of_particles=sum(self._input_state),
+            number_of_modes=len(expanded_input),
+            number_of_particles_lost=0,
+            number_of_particles_left=sum(self._input_state),
+            uniform_transmissivity=1,
         )
 
         permanent_calculator: RyserPermanentCalculator = RyserPermanentCalculator(
             expanded_matrix, expanded_input, None
         )
 
-        helper_distribution_calculator: UniformLossesDistinguishableBSDistributionCalculator
-        helper_distribution_calculator = UniformLossesDistinguishableBSDistributionCalculator(
+        helper_distribution_calculator: FixedLossesDistinguishableParticlesDistributionCalculator
+        helper_distribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
             config, permanent_calculator
         )
 
@@ -152,6 +154,11 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
             missing_particles_numbers.add(sum(self._input_state) - sum(outcome))
 
         outputs_extensions: Dict[int, List[Tuple[int, ...]]] = {}
+
+        for missing_particles_number in missing_particles_numbers:
+            outputs_extensions[missing_particles_number] = generate_possible_states(
+                missing_particles_number, len(outcomes[0])
+            )
 
         # Append proper extensions to each output state
         for outcome in outcomes:

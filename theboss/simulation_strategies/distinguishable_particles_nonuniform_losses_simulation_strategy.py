@@ -6,8 +6,8 @@ __author__ = "Tomasz Rybotycki"
 """
 
 
-from theboss.simulation_strategies.distinguishable_bosons_simulation_strategy import (
-    DistinguishableBosonsSimulationStrategy,
+from theboss.simulation_strategies.distinguishable_particles_simulation_strategy import (
+    DistinguishableParticlesSimulationStrategy,
 )
 from typing import Sequence, Tuple, List
 from theboss.boson_sampling_utilities import (
@@ -15,8 +15,8 @@ from theboss.boson_sampling_utilities import (
 )
 
 
-class DistinguishableBosonsNonuniformLossesSimulationStrategy(
-    DistinguishableBosonsSimulationStrategy
+class DistinguishableParticlesNonuniformLossesSimulationStrategy(
+    DistinguishableParticlesSimulationStrategy
 ):
     """
     A simulation strategy for BS simulation with fully distinguishable
