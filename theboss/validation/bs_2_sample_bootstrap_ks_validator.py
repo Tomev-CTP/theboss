@@ -117,7 +117,10 @@ class BS2SampleBootstrapKSValidator:
         n: int = len(first_sample)
         m: int = len(second_sample)
 
-        value_for_comparison /= sqrt((n + m) / (n * m))
+        value_for_comparison *= sqrt((n + m) / (n * m))
+
+        print(ks_statistic)
+        print(value_for_comparison)
 
         return ks_statistic <= value_for_comparison
 
