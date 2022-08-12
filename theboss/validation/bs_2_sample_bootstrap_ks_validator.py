@@ -119,9 +119,6 @@ class BS2SampleBootstrapKSValidator:
 
         value_for_comparison *= sqrt((n + m) / (n * m))
 
-        print(ks_statistic)
-        print(value_for_comparison)
-
         return ks_statistic <= value_for_comparison
 
     def _compute_required_permanent_coefficients(
