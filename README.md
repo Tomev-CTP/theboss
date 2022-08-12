@@ -91,3 +91,5 @@ This project follows / uses the ideas presented in following papers:
 [6] Neville A., Sparrow C., Clifford R., Johnston E., Birchall P. M., Montanaro A., Laing A. [arXiv:1705.00686
 ](https://arxiv.org/abs/1705.00686) [quant-ph].
 
+[7] Agresti I., Viggianiello N., Flamini F., Spagnolo N., Crespi A., Osellame R., Wiebe N., Sciarrino F. [https://arxiv.org/abs/1712.06863](https://arxiv.org/abs/1712.06863) [quant-ph].
+
