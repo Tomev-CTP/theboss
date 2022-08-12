@@ -1,7 +1,7 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This script contains test for the distinguishable BS simulation strategies.
+    This script contains test for the distinguishable particles sampling strategies.
 """
 
 import unittest
