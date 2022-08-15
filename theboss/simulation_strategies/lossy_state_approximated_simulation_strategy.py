@@ -116,6 +116,8 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             samples_number
         )
 
+        print(number_of_samples_for_each_thread)
+
         # Context is required on Linux systems, as the default (fork) produces undesired
         # results! Spawn is default on osX and Windows and works as expected.
         multiprocessing_context = multiprocessing.get_context("spawn")
@@ -124,6 +126,9 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             samples_lists = p.map(
                 self._simulate_in_parallel, number_of_samples_for_each_thread
             )
+
+            for l in samples_lists:
+                print(l)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
 
@@ -329,7 +334,7 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
                 p=self._not_approximated_lossy_mixed_state_parts_weights,
             )
         ]
-        return hstack([not_approximated_part, approximated_part])
+        return array(hstack([not_approximated_part, approximated_part]), dtype=int)
 
     def _permuted_interferometer_matrix(self) -> ndarray:
         """
@@ -352,9 +357,13 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         :return:
             A matrix for the approximate sampling.
         """
+        if self._hierarchy_level == 0:
+            return self._permuted_interferometer_matrix()
+
         random_phases_matrix = generate_random_phases_matrix_for_first_m_modes(
             len(self._qft_matrix) - self._hierarchy_level, len(self._qft_matrix)
         )
+
         return (
             self._permuted_interferometer_matrix()
             @ random_phases_matrix
