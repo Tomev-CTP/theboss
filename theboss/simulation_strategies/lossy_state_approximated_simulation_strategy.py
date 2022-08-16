@@ -60,8 +60,8 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             bs_permanent_calculator  # Should contain a UNITARY (no losses here!)
         )
         self._qft_matrix = generate_qft_matrix_for_first_m_modes(
-            len(bs_permanent_calculator.input_state) - hierarchy_level,
-            len(bs_permanent_calculator.input_state),
+            len(bs_permanent_calculator.matrix) - hierarchy_level,
+            len(bs_permanent_calculator.matrix),
         )
 
     @staticmethod
@@ -116,8 +116,6 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             samples_number
         )
 
-        print(number_of_samples_for_each_thread)
-
         # Context is required on Linux systems, as the default (fork) produces undesired
         # results! Spawn is default on osX and Windows and works as expected.
         multiprocessing_context = multiprocessing.get_context("spawn")
@@ -126,9 +124,6 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
             samples_lists = p.map(
                 self._simulate_in_parallel, number_of_samples_for_each_thread
             )
-
-            for l in samples_lists:
-                print(l)
 
         samples = [sample for samples_list in samples_lists for sample in samples_list]
 
@@ -182,8 +177,19 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
 
         for state_part in self._not_approximated_lossy_mixed_state_parts:
             self._not_approximated_lossy_mixed_state_parts_weights.append(
-                possible_weights[int(sum(state_part))] / binom(n, sum(state_part))
+                possible_weights[sum(state_part)] / binom(n, sum(state_part))
             )
+
+            # In the case of binned input we have to also consider multiplicities.
+            multiplicity_weight: float = 1
+            for i in range(len(state_part)):
+                multiplicity_weight *= binom(
+                    self._not_approximated_lossy_mixed_state_parts[-1][i], state_part[i]
+                )
+
+            self._not_approximated_lossy_mixed_state_parts_weights[
+                -1
+            ] *= multiplicity_weight
 
     def _get_possible_lossy_inputs_weights(
         self, input_state: Sequence[int]
@@ -344,11 +350,16 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         :return:
             The interferometer matrix with permuted columns.
         """
-        permutation = arange(
+        columns_arrangement = arange(
             len(self._permanent_calculator.matrix)
         )  # We work with unitary matrices.
+        permutation = arange(
+            len(self._permanent_calculator.matrix) - self._hierarchy_level
+        )
         shuffle(permutation)
-        return array(self._permanent_calculator.matrix)[:, permutation]
+        columns_arrangement[0 : len(permutation)] = permutation
+
+        return array(self._permanent_calculator.matrix)[:, columns_arrangement]
 
     def _get_matrix_for_approximate_sampling(self) -> ndarray:
         """
@@ -357,9 +368,6 @@ class LossyStateApproximationSimulationStrategy(SimulationStrategyInterface):
         :return:
             A matrix for the approximate sampling.
         """
-        if self._hierarchy_level == 0:
-            return self._permuted_interferometer_matrix()
-
         random_phases_matrix = generate_random_phases_matrix_for_first_m_modes(
             len(self._qft_matrix) - self._hierarchy_level, len(self._qft_matrix)
         )
