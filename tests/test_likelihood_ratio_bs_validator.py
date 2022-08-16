@@ -135,6 +135,9 @@ class Test2SampleKSBSValidator(unittest.TestCase):
     def test_validator_for_same_hypotheses(self) -> None:
         """
         Test if validator return 0.5 for same hypotheses.
+
+        TODO:   This was not tested in the [6], but seems reasonable to check. We should
+                keep an eye on that.
         """
         exact_samples: List[Tuple[int, ...]] = self._exact_sampler.simulate(
             self._input_state, self._samples_number

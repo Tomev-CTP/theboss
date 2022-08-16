@@ -110,6 +110,8 @@ class Test2SampleKSBSValidator(unittest.TestCase):
     def test_validator_for_2_exact_samplers(self) -> None:
         """
         Test if KS validator distinguishes between exact and exact sampler.
+
+        TODO: This wasn't tested in the [6], but seems reasonable. We should monitor it.
         """
         exact_samples: List[Tuple[int, ...]] = self._exact_sampler.simulate(
             self._input_state, self._samples_number
