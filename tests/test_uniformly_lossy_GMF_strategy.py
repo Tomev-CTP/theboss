@@ -1,16 +1,16 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    The aim of this script is to test the BOBS strategy accuracy. This script tests
-    only simulations with uniform or no losses. Nonuniform losses have been placed
-    in another script.
+    The aim of this script is to test the accuracy of the uniformly lossy generalized
+    mean field strategy. This script tests only simulations with uniform or no losses.
+    It also tests several different hierarchy levels.
 """
 
 from tests.gcc_based_strategies_tests_base import GCCBasedStrategiesTestsBase
 from theboss.simulation_strategies.simulation_strategy_factory import StrategyType
 
 
-class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
+class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -21,7 +21,7 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_lossless_test(StrategyType.BOBS)
+        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_BOBS)
 
     def test_exact_sampling_accuracy_with_binned_input(self):
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
@@ -30,7 +30,7 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_lossless_test(StrategyType.BOBS)
+        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_BOBS)
 
     def test_exact_lossy_sampling_accuracy(self):
         self._prepare_lossy_distance_experiment_settings()
@@ -39,7 +39,7 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_test_for_uniform_losses(StrategyType.BOBS)
+        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_BOBS)
 
     def test_exact_lossy_sampling_accuracy_with_binned_input(self):
         self._prepare_lossy_distance_experiment_settings_with_binned_input()
@@ -48,13 +48,14 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_test_for_uniform_losses(StrategyType.BOBS)
+        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_BOBS)
 
-    def _compute_bobs_approximation_tvd_bound(self):
+    def _compute_gmf_approximation_tvd_bound(self):
         """
-        Compute bounds for BOBS strategy. For details check [2], formula (22).
+        Compute bounds for GMF strategy. For details check [2], formula (22).
 
-        :return: TVD bound for BOBS algorithm.
+        :return:
+            TVD upper bound for GMF algorithm.
         """
         eta_eff = self._uniform_transmissivity
         n = self._sampling_tvd_experiment_config.initial_number_of_particles
@@ -83,5 +84,6 @@ class TestBOBSStrategy(GCCBasedStrategiesTestsBase):
         )
 
         self._perform_test_for_uniform_losses(
-            StrategyType.BOBS, self._compute_bobs_approximation_tvd_bound()
+            StrategyType.UNIFORM_LOSSES_BOBS,
+            self._compute_gmf_approximation_tvd_bound(),
         )
