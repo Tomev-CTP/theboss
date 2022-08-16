@@ -73,14 +73,56 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
             self._approximated_modes_number
         )
 
-        k = self._strategies_factory.experiment_configuration.number_of_modes
-        k -= self._approximated_modes_number
+        k = (
+            self._strategies_factory.experiment_configuration.number_of_modes
+            - self._approximated_modes_number
+        )
         self._strategies_factory.experiment_configuration.hierarchy_level = k
 
-        self._strategy_initial_state = self._nonuniform_strategy_initial_state
+        self._perform_test_for_uniform_losses(
+            StrategyType.UNIFORM_LOSSES_BOBS,
+            self._compute_gmf_approximation_tvd_bound(),
+        )
 
-        self._sampling_tvd_experiment_config.initial_state = (
-            self._nonuniform_strategy_initial_state
+    def test_approximate_sampling_accuracy_with_low_hierarchy_level(self) -> None:
+        self._prepare_lossy_distance_experiment_settings()
+
+        self._strategies_factory.experiment_configuration.hierarchy_level = 1
+
+        self._sampling_tvd_experiment_config.approximated_modes_number = (
+            self._sampling_tvd_experiment_config.number_of_modes
+            - self._sampling_tvd_experiment_config.hierarchy_level
+        )
+
+        self._perform_test_for_uniform_losses(
+            StrategyType.UNIFORM_LOSSES_BOBS,
+            self._compute_gmf_approximation_tvd_bound(),
+        )
+
+    def test_approximate_sampling_accuracy_with_medium_hierarchy_level(self) -> None:
+        self._prepare_lossy_distance_experiment_settings()
+
+        self._strategies_factory.experiment_configuration.hierarchy_level = (
+            self._sampling_tvd_experiment_config.number_of_modes // 2
+        )
+
+        self._sampling_tvd_experiment_config.approximated_modes_number = (
+            self._sampling_tvd_experiment_config.number_of_modes
+            - self._sampling_tvd_experiment_config.hierarchy_level
+        )
+
+        self._perform_test_for_uniform_losses(
+            StrategyType.UNIFORM_LOSSES_BOBS,
+            self._compute_gmf_approximation_tvd_bound(),
+        )
+
+    def test_approximate_sampling_accuracy_with_all_approximate_modes(self) -> None:
+        self._prepare_lossy_distance_experiment_settings()
+
+        self._strategies_factory.experiment_configuration.hierarchy_level = 0
+
+        self._sampling_tvd_experiment_config.approximated_modes_number = (
+            self._sampling_tvd_experiment_config.number_of_modes
         )
 
         self._perform_test_for_uniform_losses(
