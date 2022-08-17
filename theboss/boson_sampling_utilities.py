@@ -60,14 +60,14 @@ def mode_assignment_to_mode_occupation(
 
 def mode_occupation_to_mode_assignment(mode_occupation: Sequence[int]) -> Tuple[int]:
     """
-        Return the state (given in mode occupation representation) in the mode
-        assignment representation.
+    Return the state (given in mode occupation representation) in the mode
+    assignment representation.
 
-        :param mode_occupation:
-            Input state in mode-basis.
+    :param mode_occupation:
+        Input state in mode-basis.
 
-        :return:
-            Given mode-basis state in particle basis (as a tuple).
+    :return:
+        Given mode-basis state in particle basis (as a tuple).
     """
     mode_assignment = tuple()
 
@@ -84,7 +84,7 @@ def generate_possible_states(
     """
     This method generates all possible :math:`m`-mode states. By default, it's
     restricted to only :math:`n`-particle states, but it can also return lossy states.
-    
+
     :param particles_number:
         The maximal number :math:`n` of particles.
     :param modes_number:
@@ -159,18 +159,18 @@ def generate_lossy_n_particle_input_states(
     initial_state: Sequence[int], number_of_particles_left: int
 ) -> List[Tuple[int]]:
     """
-        From initial state generate all possible input states, with required number of
-        particles after losses application.
+    From initial state generate all possible input states, with required number of
+    particles after losses application.
 
-        Notice that it can also be done using the Guan Codes!
+    Notice that it can also be done using the Guan Codes!
 
-        :param initial_state:
-            The state we start with.
-        :param number_of_particles_left:
-            Number of particles after losses application.
+    :param initial_state:
+        The state we start with.
+    :param number_of_particles_left:
+        Number of particles after losses application.
 
-        :return:
-            A list of tuples of ints representing initial states after losses.
+    :return:
+        A list of tuples of ints representing initial states after losses.
     """
     x0 = []
     number_of_modes = len(initial_state)
@@ -207,23 +207,23 @@ def bosonic_space_dimension(
     particles_number: int, modes_number: int, losses: bool = False
 ) -> int:
     """
-        Calculates the number of possible states with specified number of modes and
+    Calculates the number of possible states with specified number of modes and
+    maximal number of particles.
+
+    This is basically the same answer as to in how many possible combinations can we
+    put :math:`n` objects in :math:`m` bins. It's also a dimension of :math:`m`-mode
+    bosonic space with at most :math:`n` particles, or exactly :math:`n` if we don't
+    consider losses. Stars-and-bars argument applies here.
+
+    :param particles_number:
+        Number :math:`n` of particles. If lossy states are considered, this is the
         maximal number of particles.
+    :param modes_number:
+        Number :math:`m` of considered modes.
 
-        This is basically the same answer as to in how many possible combinations can we
-        put :math:`n` objects in :math:`m` bins. It's also a dimension of :math:`m`-mode
-        bosonic space with at most :math:`n` particles, or exactly :math:`n` if we don't
-        consider losses. Stars-and-bars argument applies here.
-
-        :param particles_number:
-            Number :math:`n` of particles. If lossy states are considered, this is the
-            maximal number of particles.
-        :param modes_number:
-            Number :math:`m` of considered modes.
-
-        :return:
-            Dimension of (possibly lossy) :math:`m`-mode bosonic space with at most
-            :math:`n` particles.
+    :return:
+        Dimension of (possibly lossy) :math:`m`-mode bosonic space with at most
+        :math:`n` particles.
     """
 
     dimension: int = round(binom(particles_number + modes_number - 1, particles_number))
@@ -261,7 +261,9 @@ def get_modes_transmissivity_values_from_matrix(
     return square(flip(singular_values))
 
 
-def _compute_loss_transfer_matrix_expansion(transmissivities: ndarray,) -> ndarray:
+def _compute_loss_transfer_matrix_expansion(
+    transmissivities: ndarray,
+) -> ndarray:
     """
     Returns extension part of the singular values' matrix resulting from the SVD
     decomposition of the (presumably lossy) interferometer.
@@ -327,7 +329,7 @@ def prepare_interferometer_matrix_in_expanded_space(
         ]
     )
 
-    transmissivities = array([s ** 2 for s in singular_values])
+    transmissivities = array([s**2 for s in singular_values])
     loss_transfer_extension_matrix = _compute_loss_transfer_matrix_expansion(
         transmissivities
     )
@@ -597,14 +599,34 @@ def compute_binomial_weights(
     return weights
 
 
+def generate_standard_state(
+    modes_number: int, particles_number: int
+) -> Tuple[int, ...]:
+    """
+    Creates a :math:`m`-mode :math:`n`-particle standard Fock input state, which is
+    in form [1, 1, ..., 1, 0, 0, ... 0].
+
+    :param modes_number:
+        The number of modes :math:`m` of the resultant state.
+    :param particles_number:
+        The number of particles :math:`n`
+
+    :return:
+        An :math:`m`-mode :math:`n`-particle standard Fock input state.
+    """
+    standard_state: List[int] = [0 for _ in range(modes_number)]
+    standard_state[0:particles_number] = [1 for _ in range(particles_number)]
+    return tuple(standard_state)
+
+
 class EffectiveScatteringMatrixCalculator:
     """
-        In many methods of Boson Sampling simulations an effective scattering matrix has
-        to be calculated. Therefore, I decided to implement a calculator that'd be used
-        in every single one of these methods.
+    In many methods of Boson Sampling simulations an effective scattering matrix has
+    to be calculated. Therefore, I decided to implement a calculator that'd be used
+    in every single one of these methods.
 
-        For the method to work properly the input and the output states should both
-        be provided in the 2nd quantization representation (mode occupation).
+    For the method to work properly the input and the output states should both
+    be provided in the 2nd quantization representation (mode occupation).
     """
 
     def __init__(
