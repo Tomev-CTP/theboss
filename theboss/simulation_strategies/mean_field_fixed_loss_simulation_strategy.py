@@ -17,9 +17,9 @@ from theboss.network_simulation_strategy.network_simulation_strategy import (
 )
 
 
-class FixedLossSimulationStrategy(SimulationStrategyInterface):
+class MeanFieldFixedLossSimulationStrategy(SimulationStrategyInterface):
     """
-    A class implementing the approximated simulation strategy for fixed losses.
+    A class implementing the mean-field simulation strategy for fixed losses.
     """
 
     def __init__(
@@ -42,17 +42,17 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
         self, input_state: Sequence[int], samples_number: int = 1
     ) -> List[Tuple[int, ...]]:
         """
-        Returns a sample from the approximate distribution in fixed losses regime.
+        Returns a sample from the mean-field distribution in fixed losses regime.
 
         :param samples_number:
             Number of samples one wants to simulate.
         :param input_state:
-            Usually n-particle Fock state in m modes.
+            Usually :math:`n`-particle Fock state with :math:`m` modes.
 
         :return:
-            A sample from the approximation.
+            A list of samples from the mean-field distribution with fixed losses.
         """
-        samples = []
+        samples: List[Tuple[int, ...]] = []
         while len(samples) < samples_number:
             phi_0 = self._prepare_initial_state(input_state)
             evolved_state = self._network_simulation_strategy.simulate(
@@ -70,14 +70,14 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
 
     def _prepare_initial_state(self, input_state: Sequence[int]) -> ndarray:
         """
-        This method is used to prepare psi_0 state (formula 23 from ref. [1]).
+        This method is used to prepare math:`\\psi_0` state (formula 23 from ref. [1]).
 
         :param input_state:
-            Initial lossy bosonic state.
+            Initial (lossy) Fock state.
 
         :return:
             Returns the initial state of the formula, which is an equal superposition
-            of n photons 'smeared' on the first n modes.
+            of :math:`n` photons 'smeared' on the first :math:`n` modes.
         """
         initial_number_of_photons = int(sum(input_state))
         prepared_state = ones(self.number_of_observed_modes, dtype=float)
@@ -129,7 +129,7 @@ class FixedLossSimulationStrategy(SimulationStrategyInterface):
             A lossy boson state after traversing through interferometer. The state is
             described in first quantization (mode assignment representation).
         """
-        output = zeros(self.number_of_observed_modes)
+        output = zeros(self.number_of_observed_modes, dtype=int)
         for photon in range(self.number_of_photons_left):
             x = random()
             i = 0

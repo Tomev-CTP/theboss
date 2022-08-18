@@ -16,7 +16,7 @@ from numpy.random import randint
 
 class UniformSamplingStrategy(SimulationStrategyInterface):
     """
-        A class for uniform sampling from the proper BS output states.
+    A class for uniform sampling from the proper BS output states.
     """
 
     def __init__(self) -> None:

@@ -1,7 +1,7 @@
 __author__ = "Tomasz Rybotycki"
 
 """
-    This file contains the implementation of approximate boson sampling strategy subject
+    This file contains the implementation of mean field boson sampling strategy subject
     to non-uniform losses. This can be used to approximate boson sampling experiments
     with non-balanced networks. More details can be found in [2].
 """
@@ -14,55 +14,27 @@ from multiprocessing import cpu_count
 from typing import List, Sequence, Dict, Tuple
 
 from numpy import ndarray, diag, isclose
-from numpy.random import random, randint
+from numpy.random import randint
+from theboss.math_utilities import choice
 from numpy.linalg import svd
 from scipy.special import binom
 
-from .lossy_networks_generalized_cliffords_simulation_strategy import (
+from .generalized_cliffords_nonuniform_losses_simulation_strategy import (
     BSPermanentCalculatorInterface,
-    LossyNetworksGeneralizedCliffordsSimulationStrategy,
+    GeneralizedCliffordsNonuniformLossesSimulationStrategy,
 )
 from theboss.boson_sampling_utilities import (
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
 )
+from theboss.simulation_strategies.simulation_strategy_interface import (
+    SimulationStrategyInterface,
+)
 
 
-# I implement my version of choice, as it seems that numpy.random.choice is very slow.
-def choice(values: Sequence[int], weights: Sequence[float] = None) -> int:
-    """
-    Returns one of the values according to specified weights. If weights aren't
-    specified properly, the method samples value uniformly at random.
-
-    Notice that in this scenario I only want to get the number of particles left after
-    application of uniform losses, hence the values are of type int and weights of
-    type float.
-
-    :param values:
-        Values to sample from.
-
-    :param weights:
-        Weights according to which the sampling will be performed.
-
-    :return:
-        Sampled value.
-    """
-    if weights is None:
-        weights = list()
-
-    if len(values) != len(weights):
-        return values[randint(0, len(values))]
-
-    weights_sum: float = 0
-    random_number: float = random()
-
-    for i in range(len(values)):
-        weights_sum += weights[i]
-        if weights_sum > random_number:
-            return values[i]
-
-
-class NonuniformLossesApproximationStrategy:
+class GeneralizedMeanFieldNonuniformLossesSimulationStrategy(
+    SimulationStrategyInterface
+):
     """
     This is an implementation of the algorithm presented by Brod and Oszmaniec in their
     2020 work [2]. Without the loss of generalization we assume that the first :math:`k`
@@ -132,7 +104,7 @@ class NonuniformLossesApproximationStrategy:
         u, s, v = svd(interferometer_matrix)
 
         # Extract uniform losses from the matrix
-        transmissivities: List[float] = [singular_value ** 2 for singular_value in s]
+        transmissivities: List[float] = [singular_value**2 for singular_value in s]
         losses: List[float] = [1 - eta for eta in transmissivities]
         self._uniform_losses = min(losses)
 
@@ -211,9 +183,9 @@ class NonuniformLossesApproximationStrategy:
         self, input_state: Sequence[int], samples_number: int = 1
     ) -> List[Sequence[int]]:
         """
-        Main method of the simulator. It samples from the approximate BS distribution
-        that is specified by the input_state and the previously given interferometer
-        matrix.
+        Main method of the simulator. It samples from the generalized mean-field BS
+        distribution that is specified by the input_state and the previously given
+        interferometer matrix.
 
         :param input_state:
             Fock state in the 2nd quantization description.
@@ -221,7 +193,7 @@ class NonuniformLossesApproximationStrategy:
             The number of samples that will be returned.
 
         :return:
-            Specified number of samples from the approximate BS distribution.
+            Specified number of samples from the generalized mean-field BS distribution.
         """
         if samples_number < 1:
             return list()
@@ -271,10 +243,12 @@ class NonuniformLossesApproximationStrategy:
         :return:
             A list of sampled output states.
         """
-        samples = []
+        samples: List[Tuple[int, ...]] = []
 
-        helper_strategy: LossyNetworksGeneralizedCliffordsSimulationStrategy = LossyNetworksGeneralizedCliffordsSimulationStrategy(
-            deepcopy(self._permanent_calculator)
+        helper_strategy: GeneralizedCliffordsNonuniformLossesSimulationStrategy = (
+            GeneralizedCliffordsNonuniformLossesSimulationStrategy(
+                deepcopy(self._permanent_calculator)
+            )
         )
 
         for _ in range(samples_number):

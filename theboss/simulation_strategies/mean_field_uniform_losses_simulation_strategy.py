@@ -2,22 +2,21 @@ __author__ = "Tomasz Rybotycki"
 
 from typing import List, Sequence, Tuple
 
-from numpy import arange, ndarray
-from numpy.random import choice
-from scipy.special import binom
+from theboss.math_utilities import choice
 
-from theboss.boson_sampling_simulator import BosonSamplingSimulator
-from theboss.simulation_strategies.fixed_loss_simulation_strategy import (
-    FixedLossSimulationStrategy,
+from theboss.simulation_strategies.mean_field_fixed_loss_simulation_strategy import (
+    MeanFieldFixedLossSimulationStrategy,
 )
 from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
+from theboss.boson_sampling_utilities import compute_binomial_weights
 
 
 class UniformLossSimulationStrategy(SimulationStrategyInterface):
     """
-    An implementation of a strategy for simulating BS experiments with uniform losses.
+    An implementation of a mean-field simulation strategy for BS experiments with
+    uniform losses.
     """
 
     def __init__(
@@ -34,39 +33,42 @@ class UniformLossSimulationStrategy(SimulationStrategyInterface):
         self, input_state: Sequence[int], samples_number: int = 1
     ) -> List[Tuple[int, ...]]:
         """
-
+        Returns a list of samples drawn from the uniformly lossy mean-field
+        distribution.
 
         :param input_state:
-
+            A Fock state at the input of the interferometer.
         :param samples_number:
+            The number of samples to draw from the uniformly lossy mean-field
+            distribution.
 
         :return:
+            A list of Fock states sampled from the uniformly lossy mean-field
+            distribution.
         """
         initial_number_of_particles = int(sum(input_state))
 
-        # Using n, eta, l notation from the paper.
-        n: int = initial_number_of_particles
-        eta: float = self.transmissivity
-
-        separable_states_weights: List[float] = [
-            pow(eta, l) * binom(n, l) * pow(1.0 - eta, n - l) for l in range(n + 1)
+        possible_number_of_particles: List[int] = [
+            i for i in range(initial_number_of_particles + 1)
         ]
+        separable_states_weights: List[float] = compute_binomial_weights(
+            initial_number_of_particles, self.transmissivity
+        )
 
         samples: List[Tuple[int, ...]] = []
 
         while len(samples) < samples_number:
+
             number_of_particles_left_in_selected_separable_state = choice(
-                arange(0, n + 1), p=separable_states_weights
+                possible_number_of_particles, separable_states_weights
             )
 
-            strategy = FixedLossSimulationStrategy(
+            strategy = MeanFieldFixedLossSimulationStrategy(
                 self.interferometer_matrix,
                 number_of_particles_left_in_selected_separable_state,
                 self.number_of_modes,
             )
 
-            simulator = BosonSamplingSimulator(strategy)
-
-            samples.append(simulator.get_classical_simulation_results(input_state)[0])
+            samples.append(strategy.simulate(input_state, 1)[0])
 
         return samples

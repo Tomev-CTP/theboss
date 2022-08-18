@@ -21,7 +21,9 @@ from theboss.boson_sampling_utilities import (
 )
 
 
-class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInterface):
+class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
+    SimulationStrategyInterface
+):
     """
     This class implements the generalized C&C algorithm for the optical networks with
     non-uniform (mode-dependent) losses. It utilizes the fact that we can interpret
@@ -39,15 +41,17 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
     """
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
-        bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(
-            bs_permanent_calculator.matrix
+        bs_permanent_calculator.matrix = (
+            prepare_interferometer_matrix_in_expanded_space(
+                bs_permanent_calculator.matrix
+            )
         )
 
         # If for whatever reason one would like to run Clifford & Clifford A algorithm
         # for non-uniformly lossy networks using the expanded dimension approach, one
         # only has to change the helper strategy here.
-        self._helper_strategy: GeneralizedCliffordsBSimulationStrategy = GeneralizedCliffordsBSimulationStrategy(
-            bs_permanent_calculator
+        self._helper_strategy: GeneralizedCliffordsBSimulationStrategy = (
+            GeneralizedCliffordsBSimulationStrategy(bs_permanent_calculator)
         )
 
     def simulate(
@@ -67,7 +71,9 @@ class LossyNetworksGeneralizedCliffordsSimulationStrategy(SimulationStrategyInte
             Samples from the exact BS distribution.
         """
         expanded_state = vstack([input_state, zeros_like(input_state, dtype=int)])
-        expanded_state = expanded_state.reshape(2 * len(input_state),)
+        expanded_state = expanded_state.reshape(
+            2 * len(input_state),
+        )
 
         expanded_samples = self._helper_strategy.simulate(
             expanded_state, samples_number

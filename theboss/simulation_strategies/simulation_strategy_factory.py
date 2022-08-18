@@ -7,24 +7,26 @@ __author__ = "Tomasz Rybotycki"
 import enum
 from copy import deepcopy
 
-from .fixed_loss_simulation_strategy import FixedLossSimulationStrategy
+from .mean_field_fixed_loss_simulation_strategy import (
+    MeanFieldFixedLossSimulationStrategy,
+)
 from .generalized_cliffords_simulation_strategy import (
     GeneralizedCliffordsSimulationStrategy,
 )
 from .generalized_cliffords_uniform_losses_simulation_strategy import (
     GeneralizedCliffordsUniformLossesSimulationStrategy,
 )
-from .lossy_networks_generalized_cliffords_simulation_strategy import (
-    LossyNetworksGeneralizedCliffordsSimulationStrategy,
+from .generalized_cliffords_nonuniform_losses_simulation_strategy import (
+    GeneralizedCliffordsNonuniformLossesSimulationStrategy,
 )
-from .lossy_state_approximated_simulation_strategy import (
-    LossyStateApproximationSimulationStrategy,
+from .generalized_mean_field_uniform_losses_simulation_strategy import (
+    GeneralizedMeanFieldUniformLossesSimulationStrategy,
 )
-from .nonuniform_losses_approximation_strategy import (
-    NonuniformLossesApproximationStrategy,
+from .generalized_mean_field_nonuniform_losses_simulation_strategy import (
+    GeneralizedMeanFieldNonuniformLossesSimulationStrategy,
 )
 from .simulation_strategy_interface import SimulationStrategyInterface
-from .uniform_loss_simulation_strategy import UniformLossSimulationStrategy
+from .mean_field_uniform_losses_simulation_strategy import UniformLossSimulationStrategy
 from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
@@ -34,15 +36,14 @@ from ..distribution_calculators.bs_distribution_calculator_interface import (
 
 
 class StrategyType(enum.IntEnum):
-    FIXED_LOSS = enum.auto()
-    UNIFORM_LOSS = enum.auto()
+    MF_FIXED_LOSS = enum.auto()
+    MF_UNIFORM_LOSS = enum.auto()
     CLIFFORD_R = enum.auto()
     GCC = enum.auto()
-    LOSSY_NET_GCC = enum.auto()
-    LOSSLESS_MODES_STRATEGY = enum.auto()
-    UNIFORM_LOSSES_GCC = enum.auto()
-    BOBS = enum.auto()  # Brod-Oszmaniec BosonSampling
-    UNIFORM_LOSSES_BOBS = enum.auto()
+    GCC_GENERAL_LOSSES = enum.auto()
+    GCC_UNIFORM_LOSSES = enum.auto()
+    GMF_GENERAL_LOSSES = enum.auto()
+    GMF_UNIFORM_LOSSES = enum.auto()
 
 
 class SimulationStrategyFactory:
@@ -50,7 +51,7 @@ class SimulationStrategyFactory:
         self,
         experiment_configuration: BosonSamplingExperimentConfiguration,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
-        strategy_type: StrategyType = StrategyType.FIXED_LOSS,
+        strategy_type: StrategyType = StrategyType.MF_FIXED_LOSS,
     ) -> None:
 
         self._experiment_configuration = experiment_configuration
@@ -58,14 +59,14 @@ class SimulationStrategyFactory:
         self._bs_permanent_calculator = deepcopy(bs_permanent_calculator)
 
         self._strategy_mapping = {
-            StrategyType.FIXED_LOSS: self._generate_fixed_losses_strategy,
-            StrategyType.UNIFORM_LOSS: self._generate_uniform_losses_strategy,
+            StrategyType.MF_FIXED_LOSS: self._generate_mf_fixed_losses_strategy,
+            StrategyType.MF_UNIFORM_LOSS: self._generate_mf_uniform_losses_strategy,
             StrategyType.CLIFFORD_R: self._generate_r_cliffords_strategy,
             StrategyType.GCC: self._generate_gcc_strategy,
-            StrategyType.LOSSY_NET_GCC: self._generate_lossy_net_gcc_strategy,
-            StrategyType.UNIFORM_LOSSES_GCC: self._generate_uniform_losses_gcc_strategy,
-            StrategyType.BOBS: self._generate_bobs_strategy,
-            StrategyType.UNIFORM_LOSSES_BOBS: self._generate_uniform_losses_bobs_strategy,
+            StrategyType.GCC_GENERAL_LOSSES: self._generate_gcc_general_losses_strategy,
+            StrategyType.GCC_UNIFORM_LOSSES: self._generate_gcc_uniform_losses_strategy,
+            StrategyType.GMF_GENERAL_LOSSES: self._generate_gmf_general_losses_strategy,
+            StrategyType.GMF_UNIFORM_LOSSES: self._generate_gmf_uniform_losses_strategy,
         }
 
         self._available_threads_number = -1
@@ -114,24 +115,26 @@ class SimulationStrategyFactory:
         :return:    Simulation strategy of desired type.
         """
         handler = self._strategy_mapping.get(
-            self._strategy_type, self._generate_fixed_losses_strategy
+            self._strategy_type, self._generate_mf_fixed_losses_strategy
         )
         return handler()
 
-    def _generate_fixed_losses_strategy(self) -> FixedLossSimulationStrategy:
+    def _generate_mf_fixed_losses_strategy(
+        self,
+    ) -> MeanFieldFixedLossSimulationStrategy:
         """
         Generates fixed losses' strategy from [1].
 
         :return: Fixed loss strategy.
         """
-        return FixedLossSimulationStrategy(
+        return MeanFieldFixedLossSimulationStrategy(
             interferometer_matrix=self._experiment_configuration.interferometer_matrix,
             number_of_photons_left=self._experiment_configuration.number_of_particles_left,
             number_of_observed_modes=self._experiment_configuration.number_of_modes,
             network_simulation_strategy=self._experiment_configuration.network_simulation_strategy,
         )
 
-    def _generate_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
+    def _generate_mf_uniform_losses_strategy(self) -> UniformLossSimulationStrategy:
         """
         Generates uniform losses' strategy from [1].
 
@@ -186,19 +189,19 @@ class SimulationStrategyFactory:
             deepcopy(self.bs_permanent_calculator)
         )
 
-    def _generate_lossy_net_gcc_strategy(
+    def _generate_gcc_general_losses_strategy(
         self,
-    ) -> LossyNetworksGeneralizedCliffordsSimulationStrategy:
+    ) -> GeneralizedCliffordsNonuniformLossesSimulationStrategy:
         """
         Generates generalized Cliffords strategy for lossy networks from [2].
 
         :return: Generalized Cliffords strategy for lossy networks.
         """
-        return LossyNetworksGeneralizedCliffordsSimulationStrategy(
+        return GeneralizedCliffordsNonuniformLossesSimulationStrategy(
             deepcopy(self.bs_permanent_calculator)
         )
 
-    def _generate_uniform_losses_gcc_strategy(
+    def _generate_gcc_uniform_losses_strategy(
         self,
     ) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
         return GeneralizedCliffordsUniformLossesSimulationStrategy(
@@ -206,19 +209,21 @@ class SimulationStrategyFactory:
             self._experiment_configuration.uniform_transmissivity,
         )
 
-    def _generate_bobs_strategy(self) -> NonuniformLossesApproximationStrategy:
+    def _generate_gmf_general_losses_strategy(
+        self,
+    ) -> GeneralizedMeanFieldNonuniformLossesSimulationStrategy:
         approximated_modes_number = self._experiment_configuration.number_of_modes
         approximated_modes_number -= self._experiment_configuration.hierarchy_level
 
-        return NonuniformLossesApproximationStrategy(
+        return GeneralizedMeanFieldNonuniformLossesSimulationStrategy(
             bs_permanent_calculator=deepcopy(self.bs_permanent_calculator),
             approximated_modes_number=approximated_modes_number,
         )
 
-    def _generate_uniform_losses_bobs_strategy(
+    def _generate_gmf_uniform_losses_strategy(
         self,
-    ) -> LossyStateApproximationSimulationStrategy:
-        return LossyStateApproximationSimulationStrategy(
+    ) -> GeneralizedMeanFieldUniformLossesSimulationStrategy:
+        return GeneralizedMeanFieldUniformLossesSimulationStrategy(
             bs_permanent_calculator=self._bs_permanent_calculator,
             uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,
             hierarchy_level=self._experiment_configuration.hierarchy_level,

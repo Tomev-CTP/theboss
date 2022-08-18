@@ -11,7 +11,7 @@ from .generalized_cliffords_simulation_strategy import (
 )
 
 
-class ModeAssignmentGeneralizedCliffordsSimulationStrategyInterface(
+class GeneralizedCliffordsModeAssignmentSimulationStrategy(
     GeneralizedCliffordsSimulationStrategy
 ):
     """
@@ -26,15 +26,15 @@ class ModeAssignmentGeneralizedCliffordsSimulationStrategyInterface(
         self, input_state: Sequence[int], samples_number: int = 1
     ) -> List[Tuple[int, ...]]:
         """
-            Returns sample from linear optics experiments given input state.
+        Returns sample from linear optics experiments given input state.
 
-            :param input_state:
-                Input state in the mode occupation representation.
-            :param samples_number:
-                Number of samples to simulate.
+        :param input_state:
+            Input state in the mode occupation representation.
+        :param samples_number:
+            Number of samples to simulate.
 
-            :return:
-                A list of sampled output states in the mode occupation description.
+        :return:
+            A list of sampled output states in the mode occupation description.
         """
         self.input_state = input_state
         self.number_of_input_photons = sum(input_state)
