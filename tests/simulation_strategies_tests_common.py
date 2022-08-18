@@ -103,11 +103,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._sampling_tvd_experiment_config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._permutation_matrix,
             initial_state=self._distance_calculation_initial_state,
-            initial_number_of_particles=distance_calculation_initial_number_of_particles,
-            number_of_modes=len(self._distance_calculation_initial_state),
             number_of_particles_lost=self._distance_calculation_number_of_particles_lost,
-            number_of_particles_left=distance_calculation_initial_number_of_particles
-            - self._distance_calculation_number_of_particles_lost,
             uniform_transmissivity=0.8,
         )
 
@@ -132,11 +128,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             BosonSamplingExperimentConfiguration(
                 interferometer_matrix=array([], dtype=complex),
                 initial_state=self._haar_random_experiment_input_state,
-                initial_number_of_particles=haar_random_number_of_particles_lost,
-                number_of_modes=len(self._haar_random_experiment_input_state),
                 number_of_particles_lost=haar_random_number_of_particles_lost,
-                number_of_particles_left=haar_random_initial_number_of_particles
-                - haar_random_number_of_particles_lost,
             )
         )
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]

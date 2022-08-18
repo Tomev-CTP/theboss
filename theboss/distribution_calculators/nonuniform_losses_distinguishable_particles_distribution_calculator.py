@@ -92,10 +92,7 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
         config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=expanded_matrix,
             initial_state=expanded_input,
-            initial_number_of_particles=sum(self._input_state),
-            number_of_modes=len(expanded_input),
             number_of_particles_lost=0,
-            number_of_particles_left=sum(self._input_state),
             uniform_transmissivity=1,
         )
 
@@ -104,8 +101,10 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
         )
 
         helper_distribution_calculator: FixedLossesDistinguishableParticlesDistributionCalculator
-        helper_distribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
-            config, permanent_calculator
+        helper_distribution_calculator = (
+            FixedLossesDistinguishableParticlesDistributionCalculator(
+                config, permanent_calculator
+            )
         )
 
         required_expanded_outcomes: List[

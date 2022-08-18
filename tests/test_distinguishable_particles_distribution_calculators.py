@@ -51,10 +51,7 @@ class TestDistributionCalculators(unittest.TestCase):
         self._config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._matrix,
             initial_state=input_state,
-            initial_number_of_particles=sum(input_state),
-            number_of_modes=self._m,
             number_of_particles_lost=self._number_of_particles_lost,
-            number_of_particles_left=sum(input_state) - self._number_of_particles_lost,
             uniform_transmissivity=self._uniform_transmissivity,
         )
         self._permanent_calculator.input_state = input_state
@@ -114,7 +111,7 @@ class TestDistributionCalculators(unittest.TestCase):
 
     def test_nonuniform_losses_calc_for_standard_input(self) -> None:
         """
-            Test non-uniform losses calculator for standard input.
+        Test non-uniform losses calculator for standard input.
         """
         self._prepare_test_setup(self._std_input)
         calc = NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
@@ -127,7 +124,7 @@ class TestDistributionCalculators(unittest.TestCase):
 
     def test_nonuniform_losses_calc_for_binned_input(self) -> None:
         """
-            Test non-uniform losses calculator for binned input.
+        Test non-uniform losses calculator for binned input.
         """
         self._prepare_test_setup(self._binned_input)
         calc = NonUniformlyLossyDistinguishableParticlesDistributionCalculator(

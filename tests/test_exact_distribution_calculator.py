@@ -39,11 +39,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
         self.experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self.permutation_matrix,
             initial_state=self.initial_state,
-            number_of_modes=len(self.initial_state),
-            initial_number_of_particles=sum(self.initial_state),
             number_of_particles_lost=self.number_of_particles_lost,
-            number_of_particles_left=sum(self.initial_state)
-            - self.number_of_particles_lost,
             uniform_transmissivity=0.8,
         )
 

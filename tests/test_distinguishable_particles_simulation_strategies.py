@@ -85,17 +85,16 @@ class TestDistinguishableParticlesSamplingSimulationStrategies(unittest.TestCase
         self._config = BosonSamplingExperimentConfiguration(
             self._matrix,
             self._std_input,
-            self._particles_number,
-            self._modes_number,
             0,
-            self._particles_number,
             1,
         )
 
-        self._required_samples_number: int = compute_minimal_number_of_samples_for_desired_accuracy(
-            bosonic_space_dimension(self._particles_number, self._modes_number),
-            self._error_probability,
-            self._statistical_upper_bound,
+        self._required_samples_number: int = (
+            compute_minimal_number_of_samples_for_desired_accuracy(
+                bosonic_space_dimension(self._particles_number, self._modes_number),
+                self._error_probability,
+                self._statistical_upper_bound,
+            )
         )
 
         self._possible_states: List[Tuple[int, ...]] = generate_possible_states(
@@ -111,8 +110,10 @@ class TestDistinguishableParticlesSamplingSimulationStrategies(unittest.TestCase
         )
 
         self._distribution_calculator: BSDistributionCalculatorInterface
-        self._distribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
-            self._config, self._permanent_calculator
+        self._distribution_calculator = (
+            FixedLossesDistinguishableParticlesDistributionCalculator(
+                self._config, self._permanent_calculator
+            )
         )
 
     def _prepare_experiment_with_bunched_input(self) -> None:
@@ -129,14 +130,18 @@ class TestDistinguishableParticlesSamplingSimulationStrategies(unittest.TestCase
         self._possible_states = generate_possible_states(
             self._particles_number, self._modes_number, True
         )
-        self._required_samples_number = compute_minimal_number_of_samples_for_desired_accuracy(
-            len(self._possible_states),
-            self._error_probability,
-            self._statistical_upper_bound,
+        self._required_samples_number = (
+            compute_minimal_number_of_samples_for_desired_accuracy(
+                len(self._possible_states),
+                self._error_probability,
+                self._statistical_upper_bound,
+            )
         )
         self._config.uniform_transmissivity = self._uniform_transmissivity
-        self._distribution_calculator = UniformLossesDistinguishableParticlesDistributionCalculator(
-            self._config, self._permanent_calculator
+        self._distribution_calculator = (
+            UniformLossesDistinguishableParticlesDistributionCalculator(
+                self._config, self._permanent_calculator
+            )
         )
 
     def _prepare_nonuniformly_lossy_experiment(self) -> None:
@@ -148,9 +153,11 @@ class TestDistinguishableParticlesSamplingSimulationStrategies(unittest.TestCase
             array(self._matrix) @ diag(self._nonuniform_losses)
         )
 
-        self._distribution_calculator = NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
-            array(self._matrix) @ diag(self._nonuniform_losses),
-            self._config.initial_state,
+        self._distribution_calculator = (
+            NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
+                array(self._matrix) @ diag(self._nonuniform_losses),
+                self._config.initial_state,
+            )
         )
 
     def _get_frequencies(self) -> List[float]:

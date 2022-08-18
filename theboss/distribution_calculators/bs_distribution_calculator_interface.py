@@ -12,6 +12,7 @@ from theboss.network_simulation_strategy.network_simulation_strategy import (
 # TODO TR: MO doesn't approve of this class. It should be changed somehow.
 @dataclass
 class BosonSamplingExperimentConfiguration:
+
     interferometer_matrix: Sequence[
         Sequence[complex]
     ]  # A matrix describing interferometer.
@@ -22,18 +23,36 @@ class BosonSamplingExperimentConfiguration:
     number_of_particles_left: int
     uniform_transmissivity: float = 1
     network_simulation_strategy: NetworkSimulationStrategy = None
-    # TODO TR:  Previously we've used the number of approximated modes instead of the
-    #           the hierarchy level. There may be some errors after the changes, that
-    #           we should fix.
-    hierarchy_level: int = 0  # This is k from papers [1] and [2]
+    hierarchy_level: int = 0  # This is k from paper[2]
+
+    def __init__(
+        self,
+        interferometer_matrix: Sequence[Sequence[complex]],
+        initial_state: Sequence[int],
+        number_of_particles_lost: int,
+        uniform_transmissivity: float = 1,
+        network_simulation_strategy: NetworkSimulationStrategy = None,
+        hierarchy_level: int = 0,
+    ) -> None:
+        self.interferometer_matrix = interferometer_matrix
+        self.initial_state = initial_state
+        self.initial_number_of_particles = sum(initial_state)
+        self.number_of_modes = len(initial_state)
+        self.number_of_particles_lost = number_of_particles_lost
+        self.number_of_particles_left = (
+            self.initial_number_of_particles - number_of_particles_lost
+        )
+        self.uniform_transmissivity = uniform_transmissivity
+        self.network_simulation_strategy = network_simulation_strategy
+        self.hierarchy_level = hierarchy_level
 
 
 class BSDistributionCalculatorInterface(abc.ABC):
-    """ Interface for boson sampling exact distribution calculators """
+    """Interface for boson sampling exact distribution calculators"""
 
     @abc.abstractmethod
     def calculate_distribution(self) -> List[float]:
-        """ One has to be able to calculate exact distribution with it """
+        """One has to be able to calculate exact distribution with it"""
         raise NotImplementedError
 
     @abc.abstractmethod

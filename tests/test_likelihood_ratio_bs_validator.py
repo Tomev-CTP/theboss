@@ -61,10 +61,7 @@ class Test2SampleKSBSValidator(unittest.TestCase):
         config = BosonSamplingExperimentConfiguration(
             self._matrix,
             self._input_state,
-            self._particles_number,
-            self._modes_number,
             0,
-            self._particles_number,
         )
 
         self._bs_distribution_calculator: BSDistributionCalculatorWithUniformLosses
@@ -73,13 +70,17 @@ class Test2SampleKSBSValidator(unittest.TestCase):
         )
 
         self._distinguishable_distribution_calculator: UniformLossesDistinguishableParticlesDistributionCalculator
-        self._distinguishable_distribution_calculator = UniformLossesDistinguishableParticlesDistributionCalculator(
-            config, permanent_calculator
+        self._distinguishable_distribution_calculator = (
+            UniformLossesDistinguishableParticlesDistributionCalculator(
+                config, permanent_calculator
+            )
         )
 
         self._uniform_distribution_calculator: UniformDistributionCalculatorForUniformlyLossyBS
-        self._uniform_distribution_calculator = UniformDistributionCalculatorForUniformlyLossyBS(
-            self._modes_number, self._particles_number, 1
+        self._uniform_distribution_calculator = (
+            UniformDistributionCalculatorForUniformlyLossyBS(
+                self._modes_number, self._particles_number, 1
+            )
         )
 
         self._validator: LikelihoodRatioBSValidator
@@ -88,7 +89,9 @@ class Test2SampleKSBSValidator(unittest.TestCase):
             self._distinguishable_distribution_calculator,
         )
 
-        self._samples_number: int = 500  # As in [6]. Large values causes numerical errors.
+        self._samples_number: int = (
+            500  # As in [6]. Large values causes numerical errors.
+        )
 
         self._exact_sampler: GeneralizedCliffordsBSimulationStrategy
         self._exact_sampler = GeneralizedCliffordsBSimulationStrategy(

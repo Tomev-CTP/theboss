@@ -48,10 +48,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         self._experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._lossy_interferometer_matrix,
             initial_state=self._initial_state,
-            initial_number_of_particles=sum(self._initial_state),
-            number_of_modes=len(self._initial_state),
             number_of_particles_lost=0,  # Losses should only come from network.
-            number_of_particles_left=sum(self._initial_state),
             uniform_transmissivity=uniform_transmissivity,
             network_simulation_strategy=LossyNetworkSimulationStrategy(
                 self._lossy_interferometer_matrix

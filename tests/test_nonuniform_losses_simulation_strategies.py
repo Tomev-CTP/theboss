@@ -69,10 +69,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         self._config = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._interferometer_matrix,
             initial_state=self._initial_state,
-            initial_number_of_particles=self._m * 2,
-            number_of_modes=self._m * 2,
             number_of_particles_lost=0,
-            number_of_particles_left=self._m * 2,
             hierarchy_level=2 * self._m,
         )
         self._permanent_calculator: RyserPermanentCalculator = RyserPermanentCalculator(
@@ -171,10 +168,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
             config = BosonSamplingExperimentConfiguration(
                 lossless_block_matrix,
                 block_input_state,
-                self._m,
-                self._m,
                 0,
-                self._m,
                 transmissivity,
             )
 
