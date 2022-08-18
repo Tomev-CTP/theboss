@@ -19,6 +19,7 @@ from theboss.boson_sampling_utilities import (
     compute_number_of_k_element_integer_partitions_of_n,
     generate_qft_matrix_for_first_m_modes,
     generate_random_phases_matrix_for_first_m_modes,
+    generate_standard_state,
 )
 
 from theboss.quantum_computations_utilities import compute_qft_matrix
@@ -109,8 +110,8 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
 
     def test_mode_occupation_to_mode_assigment(self) -> None:
         """
-            Check if a state in the mode occupation representation is properly
-            transformed into a state in the mode assigment representation.
+        Check if a state in the mode occupation representation is properly
+        transformed into a state in the mode assigment representation.
         """
 
         transformed_state: Tuple[int, ...] = mode_occupation_to_mode_assignment(
@@ -124,8 +125,8 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
 
     def test_mode_assigment_to_mode_occupation(self) -> None:
         """
-            Check if a state in the mode assigment representation is properly
-            transformed into a state in the mode occupation representation.
+        Check if a state in the mode assigment representation is properly
+        transformed into a state in the mode occupation representation.
         """
 
         transformed_state: Tuple[int, ...] = mode_assignment_to_mode_occupation(
@@ -474,3 +475,13 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
             )
 
         self.assertTrue((generated_matrix == test_matrix).all)
+
+    def test_standard_input_state_generation(self) -> None:
+        """
+        Tests if standard input state is generated correctly.
+        """
+        correct_state: List[int] = [0 for _ in range(self._m)]
+        correct_state[0 : self._n] = [1 for _ in range(self._n)]
+        self.assertTrue(
+            generate_standard_state(self._m, self._n) == tuple(correct_state)
+        )

@@ -75,24 +75,27 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         ] = calculator.get_outcomes_in_proper_order()
         self._possible_outcomes_number: int = len(self._possible_outcomes)
 
-        self._tvd_bound_between_estimated_distributions = self._compute_statistical_bound_on_two_approximate_distributions_tvd(
-            outcomes_number=self._possible_outcomes_number
+        self._tvd_bound_between_estimated_distributions = (
+            self._compute_statistical_bound_on_two_approximate_distributions_tvd(
+                outcomes_number=self._possible_outcomes_number
+            )
         )
 
     def test_lossy_network_simulation_number_of_particles(self) -> None:
         """
         This test checks if number of particles for lossy network simulator is lower
-        than number of particles without the losses. Note that I can be pretty sure it 
+        than number of particles without the losses. Note that I can be pretty sure it
         will be lower in large losses' regime, but in case of lower losses this test may
         not hold.
         """
-        self._strategy_factory.strategy_type = StrategyType.FIXED_LOSS
+        self._strategy_factory.strategy_type = StrategyType.MF_FIXED_LOSS
 
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         lossy_average_number_of_particles = 0
         samples = simulator.get_classical_simulation_results(
-            self._initial_state, self._number_of_samples_for_experiments,
+            self._initial_state,
+            self._number_of_samples_for_experiments,
         )
         for sample in samples:
             lossy_average_number_of_particles += sum(sample)
@@ -106,7 +109,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         This test is for uniform losses. It checks if uniform losses in network
         simulations are close to the simulation with uniform losses at the input.
         """
-        self._strategy_factory.strategy_type = StrategyType.UNIFORM_LOSS
+        self._strategy_factory.strategy_type = StrategyType.MF_UNIFORM_LOSS
 
         estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
             experiment_configuration=self._experiment_configuration,
@@ -187,7 +190,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             self._calculate_gcc_distribution_with_lossy_inputs()
         )
 
-        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GCC
+        self._strategy_factory.strategy_type = StrategyType.GCC_GENERAL_LOSSES
 
         self._check_if_given_distribution_is_close_to_lossy_network_distribution(
             generalized_cliffords_distribution
@@ -268,7 +271,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         experiment_configuration.interferometer_matrix = updated_interferometer_matrix
 
-        self._strategy_factory.strategy_type = StrategyType.FIXED_LOSS
+        self._strategy_factory.strategy_type = StrategyType.MF_FIXED_LOSS
         self._strategy_factory.experiment_configuration = experiment_configuration
 
         estimated_distribution_calculator = BSSampleBasedDistributionCalculator(
@@ -315,14 +318,15 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
 
         :return: Approximate distribution.
         """
-        self._strategy_factory.strategy_type = StrategyType.LOSSY_NET_GCC
+        self._strategy_factory.strategy_type = StrategyType.GCC_GENERAL_LOSSES
         self._strategy_factory.experiment_configuration.interferometer_matrix = (
             self._lossy_interferometer_matrix
         )
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         samples = simulator.get_classical_simulation_results(
-            self._initial_state, self._number_of_samples_for_experiments,
+            self._initial_state,
+            self._number_of_samples_for_experiments,
         )
 
         return self._compute_distribution(samples, self._possible_outcomes)

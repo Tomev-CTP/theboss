@@ -21,7 +21,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_BOBS)
+        self._perform_lossless_test(StrategyType.GMF_UNIFORM_LOSSES)
 
     def test_exact_sampling_accuracy_with_binned_input(self):
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
@@ -30,7 +30,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_BOBS)
+        self._perform_lossless_test(StrategyType.GMF_UNIFORM_LOSSES)
 
     def test_exact_lossy_sampling_accuracy(self):
         self._prepare_lossy_distance_experiment_settings()
@@ -39,7 +39,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_BOBS)
+        self._perform_test_for_uniform_losses(StrategyType.GMF_UNIFORM_LOSSES)
 
     def test_exact_lossy_sampling_accuracy_with_binned_input(self):
         self._prepare_lossy_distance_experiment_settings_with_binned_input()
@@ -48,7 +48,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
             self._sampling_tvd_experiment_config.number_of_modes
         )
 
-        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_BOBS)
+        self._perform_test_for_uniform_losses(StrategyType.GMF_UNIFORM_LOSSES)
 
     def _compute_gmf_approximation_tvd_bound(self):
         """
@@ -80,7 +80,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
         self._strategies_factory.experiment_configuration.hierarchy_level = k
 
         self._perform_test_for_uniform_losses(
-            StrategyType.UNIFORM_LOSSES_BOBS,
+            StrategyType.GMF_UNIFORM_LOSSES,
             self._compute_gmf_approximation_tvd_bound(),
         )
 
@@ -95,7 +95,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
         )
 
         self._perform_test_for_uniform_losses(
-            StrategyType.UNIFORM_LOSSES_BOBS,
+            StrategyType.GMF_UNIFORM_LOSSES,
             self._compute_gmf_approximation_tvd_bound(),
         )
 
@@ -112,7 +112,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
         )
 
         self._perform_test_for_uniform_losses(
-            StrategyType.UNIFORM_LOSSES_BOBS,
+            StrategyType.GMF_UNIFORM_LOSSES,
             self._compute_gmf_approximation_tvd_bound(),
         )
 
@@ -126,6 +126,6 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
         )
 
         self._perform_test_for_uniform_losses(
-            StrategyType.UNIFORM_LOSSES_BOBS,
+            StrategyType.GMF_UNIFORM_LOSSES,
             self._compute_gmf_approximation_tvd_bound(),
         )

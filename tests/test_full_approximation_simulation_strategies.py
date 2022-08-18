@@ -52,13 +52,13 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         initial_number_of_particles: int, number_of_particles_left: int
     ) -> float:
         """
-            This is the distance bound between experimental and ideal results for
-            BosonSampling with fixed losses. Basically this is capital Delta from [1].
-            Using n and l notation from the paper [1] for readability purposes.
-            This will be used for uniform losses and fixed losses bound calculation.
+        This is the distance bound between experimental and ideal results for
+        BosonSampling with fixed losses. Basically this is capital Delta from [1].
+        Using n and l notation from the paper [1] for readability purposes.
+        This will be used for uniform losses and fixed losses bound calculation.
 
-            :return:    Distance bound between experimental and ideal results for
-                        fixed losses.
+        :return:    Distance bound between experimental and ideal results for
+                    fixed losses.
         """
         n = initial_number_of_particles
         l = number_of_particles_left
@@ -118,7 +118,7 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         """
         self._prepare_lossy_distance_experiment_settings()
 
-        self._strategies_factory.strategy_type = StrategyType.FIXED_LOSS
+        self._strategies_factory.strategy_type = StrategyType.MF_FIXED_LOSS
 
         exact_calculator = BSDistributionCalculatorWithFixedLosses(
             self._sampling_tvd_experiment_config, self._bs_permanent_calculator
@@ -147,7 +147,7 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         """
         self._prepare_lossy_distance_experiment_settings()
 
-        self._strategies_factory.strategy_type = StrategyType.UNIFORM_LOSS
+        self._strategies_factory.strategy_type = StrategyType.MF_UNIFORM_LOSS
 
         exact_calculator = BSDistributionCalculatorWithUniformLosses(
             self._sampling_tvd_experiment_config, self._bs_permanent_calculator
@@ -174,7 +174,7 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         strategy_factory = SimulationStrategyFactory(
             self._haar_random_experiment_configuration,
             self._bs_permanent_calculator,
-            StrategyType.FIXED_LOSS,
+            StrategyType.MF_FIXED_LOSS,
         )
 
         self._test_state_average_probability_for_haar_random_matrices(strategy_factory)
@@ -187,7 +187,7 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         strategy_factory = SimulationStrategyFactory(
             self._haar_random_experiment_configuration,
             self._bs_permanent_calculator,
-            StrategyType.UNIFORM_LOSS,
+            StrategyType.MF_UNIFORM_LOSS,
         )
 
         self._test_state_average_probability_for_haar_random_matrices(strategy_factory)

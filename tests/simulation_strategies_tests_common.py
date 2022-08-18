@@ -60,7 +60,6 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_number_of_particles_lost = None
         self._uniform_transmissivity = None
 
-        self._nonuniform_strategy_initial_state = None
         self._approximated_modes_number = None
 
         self._sampling_tvd_experiment_config = None
@@ -95,8 +94,6 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_number_of_particles_lost = 2
         self._uniform_transmissivity = 0.5
 
-        # self._nonuniform_strategy_initial_state = [0, 2, 1, 1, 0]
-        self._nonuniform_strategy_initial_state = [0, 0, 3, 1, 0]
         self._approximated_modes_number = 3
 
         distance_calculation_initial_number_of_particles = sum(
@@ -131,14 +128,16 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             self._haar_random_experiment_input_state
         )
         haar_random_number_of_particles_lost = 2
-        self._haar_random_experiment_configuration = BosonSamplingExperimentConfiguration(
-            interferometer_matrix=array([], dtype=complex),
-            initial_state=self._haar_random_experiment_input_state,
-            initial_number_of_particles=haar_random_number_of_particles_lost,
-            number_of_modes=len(self._haar_random_experiment_input_state),
-            number_of_particles_lost=haar_random_number_of_particles_lost,
-            number_of_particles_left=haar_random_initial_number_of_particles
-            - haar_random_number_of_particles_lost,
+        self._haar_random_experiment_configuration = (
+            BosonSamplingExperimentConfiguration(
+                interferometer_matrix=array([], dtype=complex),
+                initial_state=self._haar_random_experiment_input_state,
+                initial_number_of_particles=haar_random_number_of_particles_lost,
+                number_of_modes=len(self._haar_random_experiment_input_state),
+                number_of_particles_lost=haar_random_number_of_particles_lost,
+                number_of_particles_left=haar_random_initial_number_of_particles
+                - haar_random_number_of_particles_lost,
+            )
         )
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]
 
@@ -271,8 +270,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         )
 
         if (
-            self._strategies_factory.strategy_type == StrategyType.LOSSY_NET_GCC
-            or self._strategies_factory.strategy_type == StrategyType.BOBS
+            self._strategies_factory.strategy_type == StrategyType.GCC_GENERAL_LOSSES
+            or self._strategies_factory.strategy_type == StrategyType.GMF_GENERAL_LOSSES
         ):
             self._strategies_factory.bs_permanent_calculator.matrix *= pow(
                 self._uniform_transmissivity, 0.5

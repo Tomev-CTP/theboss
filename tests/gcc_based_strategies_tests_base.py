@@ -54,7 +54,7 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
 
     def _perform_test_for_uniform_losses(
         self,
-        strategy: StrategyType = StrategyType.UNIFORM_LOSSES_GCC,
+        strategy: StrategyType = StrategyType.GCC_UNIFORM_LOSSES,
         approximation_bound: int = 0,
     ) -> None:
         """
@@ -84,7 +84,10 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
             self._strategy_initial_state
         )
 
-        if strategy == StrategyType.LOSSY_NET_GCC or strategy == StrategyType.BOBS:
+        if (
+            strategy == StrategyType.GCC_GENERAL_LOSSES
+            or strategy == StrategyType.GMF_GENERAL_LOSSES
+        ):
             self._strategies_factory.bs_permanent_calculator.matrix *= pow(
                 self._uniform_transmissivity, 0.5
             )

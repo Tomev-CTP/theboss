@@ -36,38 +36,38 @@ class TestGCCStrategies(GCCBasedStrategiesTestsBase):
     # GCC lossy network
     def test_exact_sampling_accuracy_for_lossy_network_strategy(self) -> None:
         self._prepare_lossless_distance_experiment_settings()
-        self._perform_lossless_test(StrategyType.LOSSY_NET_GCC)
+        self._perform_lossless_test(StrategyType.GCC_GENERAL_LOSSES)
 
     def test_exact_sampling_accuracy_for_lossy_network_with_binned_input(self) -> None:
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
-        self._perform_lossless_test(StrategyType.LOSSY_NET_GCC)
+        self._perform_lossless_test(StrategyType.GCC_GENERAL_LOSSES)
 
     def test_lossy_sampling_accuracy_for_lossy_network(self) -> None:
         self._prepare_lossy_distance_experiment_settings()
-        self._perform_test_for_uniform_losses(StrategyType.LOSSY_NET_GCC)
+        self._perform_test_for_uniform_losses(StrategyType.GCC_GENERAL_LOSSES)
 
     def test_lossy_sampling_accuracy_for_lossy_network_with_binned_input(self) -> None:
         self._prepare_lossy_distance_experiment_settings_with_binned_input()
-        self._perform_test_for_uniform_losses(StrategyType.LOSSY_NET_GCC)
+        self._perform_test_for_uniform_losses(StrategyType.GCC_GENERAL_LOSSES)
 
     # Uniform lossy GCC
     def test_exact_sampling_accuracy_for_u_losses_strategy(self) -> None:
         self._prepare_lossless_distance_experiment_settings()
-        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_GCC)
+        self._perform_lossless_test(StrategyType.GCC_UNIFORM_LOSSES)
 
     def test_exact_sampling_accuracy_for_u_losses_strategy_with_binned_input(
         self,
     ) -> None:
         self._prepare_lossless_distance_experiments_settings_with_binned_inputs()
-        self._perform_lossless_test(StrategyType.UNIFORM_LOSSES_GCC)
+        self._perform_lossless_test(StrategyType.GCC_UNIFORM_LOSSES)
 
     def test_lossy_sampling_accuracy_for_u_losses_strategy(self) -> None:
         self._prepare_lossy_distance_experiment_settings()
-        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_GCC)
+        self._perform_test_for_uniform_losses(StrategyType.GCC_UNIFORM_LOSSES)
 
     def test_lossy_sampling_accuracy_for_u_losses_with_binned_input(self) -> None:
         self._prepare_lossy_distance_experiment_settings_with_binned_input()
-        self._perform_test_for_uniform_losses(StrategyType.UNIFORM_LOSSES_GCC)
+        self._perform_test_for_uniform_losses(StrategyType.GCC_UNIFORM_LOSSES)
 
     # Haar random matrices tests
     def _set_experiment_configuration_for_binned_haar_random(self) -> None:

@@ -79,7 +79,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
             self._interferometer_matrix, self._initial_state, None
         )
 
-        self._strategy_type: StrategyType = StrategyType.BOBS
+        self._strategy_type: StrategyType = StrategyType.GMF_GENERAL_LOSSES
 
     def _get_samples_number(self, modes_number: int) -> int:
         """
@@ -287,7 +287,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         Test accuracy of the non-uniform lossy net GCC Strategy in the presence of the
         non-uniform losses.
         """
-        self._strategy_type = StrategyType.LOSSY_NET_GCC
+        self._strategy_type = StrategyType.GCC_GENERAL_LOSSES
         self._perform_accuracy_test()
 
     def test_exact_bobs_accuracy(self) -> None:
