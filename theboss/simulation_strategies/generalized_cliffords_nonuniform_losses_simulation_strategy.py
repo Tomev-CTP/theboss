@@ -35,16 +35,14 @@ class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
     It expects the lossy interferometer matrix to be passed in bs_permanent_calculator.
 
     Note: Let :math:`l_i` denote the losses on the :math:`i`-th mode and
-    :math:`t_i = 1 - l_i` denote transmissivity of the :math:`i`-th mode. Then, to
-    apply losses to the lossless interferometer matrix one has to multiply it by
-    a matrix with :math:`\\sqrt{t_i}` on diagonal.
+    :math:`t_i = 1 - l_i` denote transmission probability of the :math:`i`-th mode.
+    Then, to apply losses to the lossless interferometer matrix one has to multiply it
+    by a matrix with :math:`\\sqrt{t_i}` on diagonal.
     """
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
-        bs_permanent_calculator.matrix = (
-            prepare_interferometer_matrix_in_expanded_space(
-                bs_permanent_calculator.matrix
-            )
+        bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(
+            bs_permanent_calculator.matrix
         )
 
         # If for whatever reason one would like to run Clifford & Clifford A algorithm
@@ -71,9 +69,7 @@ class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
             Samples from the exact BS distribution.
         """
         expanded_state = vstack([input_state, zeros_like(input_state, dtype=int)])
-        expanded_state = expanded_state.reshape(
-            2 * len(input_state),
-        )
+        expanded_state = expanded_state.reshape(2 * len(input_state),)
 
         expanded_samples = self._helper_strategy.simulate(
             expanded_state, samples_number

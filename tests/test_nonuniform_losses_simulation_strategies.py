@@ -51,7 +51,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         self._m: int = 2  # Block matrix modes number.
 
         # Interferometer matrix preparation.
-        self._blocks_transmissivities: List[float] = [0.5, 0.2]
+        self._blocks_transmission_probabilities: List[float] = [0.5, 0.2]
         block_matrices: List[ndarray] = [unitary_group.rvs(self._m) for _ in range(2)]
 
         self._interferometer_matrix: ndarray = self._get_interferometer_matrix(
@@ -121,12 +121,14 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         return block(
             [
                 [
-                    block_matrices[0] * sqrt(self._blocks_transmissivities[0]),
+                    block_matrices[0]
+                    * sqrt(self._blocks_transmission_probabilities[0]),
                     zeros_matrix,
                 ],
                 [
                     zeros_matrix,
-                    block_matrices[1] * sqrt(self._blocks_transmissivities[1]),
+                    block_matrices[1]
+                    * sqrt(self._blocks_transmission_probabilities[1]),
                 ],
             ]
         )
@@ -153,7 +155,9 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
         # Get partial distributions.
         for i in range(len(block_matrices)):
 
-            transmissivity: float = self._blocks_transmissivities[i]
+            transmission_probabilities: float = self._blocks_transmission_probabilities[
+                i
+            ]
 
             block_input_state: List[int] = [1 for _ in range(self._m)]
 
@@ -166,10 +170,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
 
             config: BosonSamplingExperimentConfiguration
             config = BosonSamplingExperimentConfiguration(
-                lossless_block_matrix,
-                block_input_state,
-                0,
-                transmissivity,
+                lossless_block_matrix, block_input_state, 0, transmission_probabilities,
             )
 
             permanent_calculator = RyserPermanentCalculator(
@@ -227,7 +228,7 @@ class TestNonuniformLossesStrategies(unittest.TestCase):
 
         :return: TVD bound for BOBS algorithm.
         """
-        eta_eff = max(self._blocks_transmissivities)
+        eta_eff = max(self._blocks_transmission_probabilities)
         n = 2 * self._m
 
         bound = pow(eta_eff, 2) / 2

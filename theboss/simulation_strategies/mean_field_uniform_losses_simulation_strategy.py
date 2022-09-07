@@ -23,11 +23,11 @@ class UniformLossSimulationStrategy(SimulationStrategyInterface):
         self,
         interferometer_matrix: Sequence[Sequence[complex]],
         number_of_modes: int,
-        transmissivity: float,
+        transmission_probability: float,
     ) -> None:
         self.interferometer_matrix: Sequence[Sequence[complex]] = interferometer_matrix
         self.number_of_modes: int = number_of_modes
-        self.transmissivity: float = transmissivity
+        self.transmission_probability: float = transmission_probability
 
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
@@ -52,7 +52,7 @@ class UniformLossSimulationStrategy(SimulationStrategyInterface):
             i for i in range(initial_number_of_particles + 1)
         ]
         separable_states_weights: List[float] = compute_binomial_weights(
-            initial_number_of_particles, self.transmissivity
+            initial_number_of_particles, self.transmission_probability
         )
 
         samples: List[Tuple[int, ...]] = []

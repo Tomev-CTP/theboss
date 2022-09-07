@@ -237,46 +237,44 @@ def bosonic_space_dimension(
     return dimension
 
 
-def get_modes_transmissivity_values_from_matrix(
+def get_modes_transmission_probabilities_from_matrix(
     lossy_interferometer_matrix: Sequence[Sequence[complex128]],
 ) -> List[float]:
     """
     Given a lossy interferometer matrix this method extracts from it the information
-    about the transmissivity of the modes. Given that SVD decomposition is not unique
-    the returned order of the transmissivities doesn't correspond to the order on modes
-    in general.
+    about the transmittance of the modes. Given that SVD decomposition is not unique
+    the returned order of the transmittance values doesn't correspond to the order on
+    modes in general.
 
-    It so happens that the transmissivities in the lossy interferometer matrix are
-    described by the roots of the singular values (in our case the eigenvalues of
+    It so happens that the transmission probabilities in the lossy interferometer matrix
+    are described by the roots of the singular values (in our case the eigenvalues of
     the matrix).
 
     :param lossy_interferometer_matrix:
         A lossy interferometer matrix from which the information about the
-        transmissivities will be extracted.
+        transmission probabilities will be extracted.
 
     :return:
-        Unordered list of modes transmissivities extracted from given matrix.
+        Unordered list of modes transmission probabilities extracted from given matrix.
     """
     v_matrix, singular_values, u_matrix = svd(lossy_interferometer_matrix)
     return square(flip(singular_values))
 
 
-def _compute_loss_transfer_matrix_expansion(
-    transmissivities: ndarray,
-) -> ndarray:
+def _compute_loss_transfer_matrix_expansion(transmittances: ndarray,) -> ndarray:
     """
     Returns extension part of the singular values' matrix resulting from the SVD
     decomposition of the (presumably lossy) interferometer.
 
-    :param transmissivities:
-        The values of transmissivities obtained from the squares of the singular values
+    :param transmittances:
+        The values of transmittances obtained from the squares of the singular values
         of the (presumably lossy) interferometer matrix' SVD.
 
     :return:
         One of the block matrices of singular values' matrix of the SVD of the given
         (presumably lossy) interferometer in expanded space.
     """
-    losses_vector = 1.0 - transmissivities
+    losses_vector = 1.0 - transmittances
     for i in range(len(losses_vector)):
         if losses_vector[i] < 0:
             losses_vector[i] = 0
@@ -310,7 +308,7 @@ def prepare_interferometer_matrix_in_expanded_space(
     :return:
         Given interferometer in the expanded sampling space.
     """
-    v_matrix, singular_values, u_matrix = svd(interferometer_matrix)
+    v_matrix, transmittances, u_matrix = svd(interferometer_matrix)
 
     extension_zeros_matrix = zeros_like(v_matrix)
     extension_identity_matrix = eye(len(v_matrix))
@@ -329,16 +327,16 @@ def prepare_interferometer_matrix_in_expanded_space(
         ]
     )
 
-    transmissivities = array([s**2 for s in singular_values])
+    transmission_probabilities = array([s ** 2 for s in transmittances])
     loss_transfer_extension_matrix = _compute_loss_transfer_matrix_expansion(
-        transmissivities
+        transmission_probabilities
     )
 
     # This is the most specific thing here.
     expanded_singular_values_matrix = block(
         [
-            [diag(singular_values), loss_transfer_extension_matrix],
-            [loss_transfer_extension_matrix, diag(singular_values)],
+            [diag(transmittances), loss_transfer_extension_matrix],
+            [loss_transfer_extension_matrix, diag(transmittances)],
         ]
     )
     return expanded_v @ expanded_singular_values_matrix @ expanded_u
@@ -546,15 +544,15 @@ def generate_random_phases_matrix_for_first_m_modes(
 
 # TODO TR:  Ensure that
 def apply_uniform_losses_to_the_state(
-    state: Sequence[int], transmissivity: float
+    state: Sequence[int], transmission_probability: float
 ) -> Tuple[int, ...]:
     """
     Applies uniform losses to the given state.
 
     :param state:
         State to which uniform losses will be applied.
-    :param transmissivity:
-        Uniform transmissivity.
+    :param transmission_probability:
+        Uniform probability of boson transmission.
 
     :return:
         Lossy input state.
@@ -563,7 +561,7 @@ def apply_uniform_losses_to_the_state(
 
     for mode in range(len(state)):
         for particle in range(state[mode]):
-            if random() <= transmissivity:
+            if random() <= transmission_probability:
                 lossy_input[mode] += 1
 
     return tuple(lossy_input)
@@ -572,15 +570,15 @@ def apply_uniform_losses_to_the_state(
 # TODO TR:  This is possibly use in many places. Find these places and use this method
 #           instead.
 def compute_binomial_weights(
-    total_particles_number: int, transmissivity: float
+    total_particles_number: int, transmission_probability: float
 ) -> List[float]:
     """
     Computes the binomial weights for a given, uniformly lossy, BS experiment instance.
 
     :param total_particles_number:
         The initial number of particles in the input state.
-    :param transmissivity:
-        The uniform transmissivity of the network.
+    :param transmission_probability:
+        The uniform probability of particle transmission through the network.
 
     :return:
         The binomial weights describing the probabilities of loosing a number of
@@ -593,7 +591,9 @@ def compute_binomial_weights(
 
     for particles_left in range(total_particles_number + 1):
         weights.append(
-            binomial_weight(total_particles_number, particles_left, transmissivity)
+            binomial_weight(
+                total_particles_number, particles_left, transmission_probability
+            )
         )
 
     return weights

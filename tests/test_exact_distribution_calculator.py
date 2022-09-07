@@ -40,7 +40,7 @@ class TestExactLossyBosonSamplingDistributionCalculator(unittest.TestCase):
             interferometer_matrix=self.permutation_matrix,
             initial_state=self.initial_state,
             number_of_particles_lost=self.number_of_particles_lost,
-            uniform_transmissivity=0.8,
+            uniform_transmission_probability=0.8,
         )
 
         self._calculator_type = PermanentCalculatorType.CHIN_HUH

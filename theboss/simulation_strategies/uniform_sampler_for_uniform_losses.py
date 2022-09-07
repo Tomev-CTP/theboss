@@ -23,16 +23,16 @@ class UniformSamplingWithUniformLossesStrategy(SimulationStrategyInterface):
         A class for uniformly lossy uniform sampling from the proper BS output states.
     """
 
-    def __init__(self, transmissivity: float = 1) -> None:
-        self._transmissivity: float = transmissivity
+    def __init__(self, transmission_probability: float = 1) -> None:
+        self._transmission_probability: float = transmission_probability
 
     @property
-    def transmissivity(self) -> float:
-        return self._transmissivity
+    def transmission_probability(self) -> float:
+        return self._transmission_probability
 
-    @transmissivity.setter
-    def transmissivity(self, transmissivity: float) -> None:
-        self._transmissivity = transmissivity
+    @transmission_probability.setter
+    def transmission_probability(self, transmission_probability: float) -> None:
+        self._transmission_probability = transmission_probability
 
     def simulate(
         self, input_state: Sequence[int], samples_number: int = 1
@@ -51,7 +51,7 @@ class UniformSamplingWithUniformLossesStrategy(SimulationStrategyInterface):
             Uniformly sampled required number of output states.
         """
         binomial_weights: List[float] = compute_binomial_weights(
-            sum(input_state), self._transmissivity
+            sum(input_state), self._transmission_probability
         )
 
         possible_output_states: Dict[int, List[Tuple[int, ...]]] = {}

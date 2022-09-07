@@ -21,7 +21,7 @@ class BosonSamplingExperimentConfiguration:
     number_of_modes: int
     number_of_particles_lost: int
     number_of_particles_left: int
-    uniform_transmissivity: float = 1
+    uniform_transmission_probability: float = 1
     network_simulation_strategy: NetworkSimulationStrategy = None
     hierarchy_level: int = 0  # This is k from paper[2]
 
@@ -30,7 +30,7 @@ class BosonSamplingExperimentConfiguration:
         interferometer_matrix: Sequence[Sequence[complex]],
         initial_state: Sequence[int],
         number_of_particles_lost: int,
-        uniform_transmissivity: float = 1,
+        uniform_transmission_probability: float = 1,
         network_simulation_strategy: NetworkSimulationStrategy = None,
         hierarchy_level: int = 0,
     ) -> None:
@@ -42,7 +42,7 @@ class BosonSamplingExperimentConfiguration:
         self.number_of_particles_left = (
             self.initial_number_of_particles - number_of_particles_lost
         )
-        self.uniform_transmissivity = uniform_transmissivity
+        self.uniform_transmission_probability = uniform_transmission_probability
         self.network_simulation_strategy = network_simulation_strategy
         self.hierarchy_level = hierarchy_level
 

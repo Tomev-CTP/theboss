@@ -25,11 +25,11 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
     """
 
     def __init__(
-        self, modes_number: int, particles_number: int, transmissivity: float
+        self, modes_number: int, particles_number: int, transmission_probability: float
     ) -> None:
         self._modes_number: int = modes_number
         self._particles_number: int = particles_number
-        self._transmissivity: float = transmissivity
+        self._transmission_probability: float = transmission_probability
 
     @property
     def modes_number(self) -> int:
@@ -48,12 +48,12 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
         self._particles_number = particles_number
 
     @property
-    def transmissivity(self) -> float:
-        return self._transmissivity
+    def transmission_probability(self) -> float:
+        return self._transmission_probability
 
-    @transmissivity.setter
-    def transmissivity(self, transmissivity: float) -> None:
-        self._transmissivity = transmissivity
+    @transmission_probability.setter
+    def transmission_probability(self, transmission_probability: float) -> None:
+        self._transmission_probability = transmission_probability
 
     def calculate_distribution(self) -> List[float]:
         """
@@ -83,7 +83,7 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
         )
 
         weights: List[float] = compute_binomial_weights(
-            self._particles_number, self._transmissivity
+            self._particles_number, self._transmission_probability
         )
 
         probabilities: Dict[int, float] = {}

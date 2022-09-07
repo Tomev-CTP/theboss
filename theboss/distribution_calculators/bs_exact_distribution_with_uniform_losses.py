@@ -32,7 +32,7 @@ class BSDistributionCalculatorWithUniformLosses(
         # self.weights = self._initialize_weights()
         self.weights = compute_binomial_weights(
             configuration.initial_number_of_particles,
-            configuration.uniform_transmissivity,
+            configuration.uniform_transmission_probability,
         )
         self.set_weightless(weightless)
 
@@ -42,7 +42,7 @@ class BSDistributionCalculatorWithUniformLosses(
         else:
             self.weights = compute_binomial_weights(
                 self.configuration.initial_number_of_particles,
-                self.configuration.uniform_transmissivity,
+                self.configuration.uniform_transmission_probability,
             )
         self._weightless = weightless
 

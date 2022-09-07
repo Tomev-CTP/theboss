@@ -26,7 +26,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
 ):
     """
     An implementation of a more general approach to the GCCB algorithm taking into
-    account the possible uniform losses. Notice that for transmissivity = 1 it
+    account the possible uniform losses. Notice that for transmission_probability = 1 it
     works like GCCB algorithm.
 
     TODO TR:    Write tests for this method.
@@ -38,12 +38,12 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
-        transmissivity: float = 1.0,
+        transmission_probability: float = 1.0,
     ) -> None:
         super().__init__(bs_permanent_calculator)
         self._current_input = []
         self._working_input_state = None
-        self._transmissivity: float = transmissivity
+        self._transmission_probability: float = transmission_probability
         self._binomial_weights: List[float] = []
         self._number_of_particles_in_sample: int = 0
 
@@ -57,7 +57,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
 
         # Shorthand notation.
         n = self.number_of_input_photons
-        eta = self._transmissivity
+        eta = self._transmission_probability
 
         for l in range(n + 1):
             self._binomial_weights.append(

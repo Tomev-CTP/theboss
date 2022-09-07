@@ -89,7 +89,7 @@ class GCCBasedStrategiesTestsBase(TestBSClassicalSimulationStrategies):
             or strategy == StrategyType.GMF_GENERAL_LOSSES
         ):
             self._strategies_factory.bs_permanent_calculator.matrix *= pow(
-                self._uniform_transmissivity, 0.5
+                self._uniform_transmission_probability, 0.5
             )
 
         distance_experiment_configuration = SamplingAccuracyExperimentConfiguration(

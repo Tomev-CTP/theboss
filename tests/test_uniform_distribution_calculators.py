@@ -27,7 +27,7 @@ class TestUniformDistributionCalculators(unittest.TestCase):
     def setUp(self) -> None:
         self._modes_number: int = 4
         self._particles_number: int = 4
-        self._uniform_transmissivity: float = 0.3
+        self._uniform_transmission_probability: float = 0.3
 
     def test_uniform_losses_calc_for_no_losses(self) -> None:
         """
@@ -47,7 +47,9 @@ class TestUniformDistributionCalculators(unittest.TestCase):
         Test uniformly lossy uniform distribution calculator.
         """
         calc = UniformDistributionCalculatorForUniformlyLossyBS(
-            self._modes_number, self._particles_number, self._uniform_transmissivity
+            self._modes_number,
+            self._particles_number,
+            self._uniform_transmission_probability,
         )
         distribution = calc.calculate_distribution()
         self.assertTrue(

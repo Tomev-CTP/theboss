@@ -57,7 +57,7 @@ class TestUUniformlyLossyGMFStrategy(GCCBasedStrategiesTestsBase):
         :return:
             TVD upper bound for GMF algorithm.
         """
-        eta_eff = self._uniform_transmissivity
+        eta_eff = self._uniform_transmission_probability
         n = self._sampling_tvd_experiment_config.initial_number_of_particles
 
         bound = pow(eta_eff, 2) / 2

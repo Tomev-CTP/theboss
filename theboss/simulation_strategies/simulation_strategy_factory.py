@@ -143,7 +143,7 @@ class SimulationStrategyFactory:
         return UniformLossSimulationStrategy(
             self._experiment_configuration.interferometer_matrix,
             self._experiment_configuration.number_of_modes,
-            self._experiment_configuration.uniform_transmissivity,
+            self._experiment_configuration.uniform_transmission_probability,
         )
 
     def _generate_r_cliffords_strategy(self):
@@ -206,7 +206,7 @@ class SimulationStrategyFactory:
     ) -> GeneralizedCliffordsUniformLossesSimulationStrategy:
         return GeneralizedCliffordsUniformLossesSimulationStrategy(
             deepcopy(self.bs_permanent_calculator),
-            self._experiment_configuration.uniform_transmissivity,
+            self._experiment_configuration.uniform_transmission_probability,
         )
 
     def _generate_gmf_general_losses_strategy(
@@ -225,7 +225,7 @@ class SimulationStrategyFactory:
     ) -> GeneralizedMeanFieldUniformLossesSimulationStrategy:
         return GeneralizedMeanFieldUniformLossesSimulationStrategy(
             bs_permanent_calculator=self._bs_permanent_calculator,
-            uniform_transmissivity=self._experiment_configuration.uniform_transmissivity,
+            uniform_transmission_probability=self._experiment_configuration.uniform_transmission_probability,
             hierarchy_level=self._experiment_configuration.hierarchy_level,
             threads_number=self._available_threads_number,
         )

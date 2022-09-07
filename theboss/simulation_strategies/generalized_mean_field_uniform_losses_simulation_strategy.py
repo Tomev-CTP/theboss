@@ -42,7 +42,7 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
-        uniform_transmissivity: float,
+        uniform_transmission_probability: float,
         hierarchy_level: int,
         threads_number: int = -1,
     ):
@@ -54,7 +54,7 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
 
         # Required for general simulation
         self._hierarchy_level: int = hierarchy_level
-        self._uniform_transmissivity: float = uniform_transmissivity
+        self._uniform_transmission_probability: float = uniform_transmission_probability
         self._threads_number: int = self._get_proper_threads_number(threads_number)
         self._permanent_calculator: BSPermanentCalculatorInterface = (
             bs_permanent_calculator  # Should contain a UNITARY (no losses here!)
@@ -112,8 +112,8 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
             input_state[self._hierarchy_level :]  # Approximated state part
         )
 
-        number_of_samples_for_each_thread = (
-            self._compute_number_of_samples_for_each_thread(samples_number)
+        number_of_samples_for_each_thread = self._compute_number_of_samples_for_each_thread(
+            samples_number
         )
 
         # Context is required on Linux systems, as the default (fork) produces undesired
@@ -203,10 +203,10 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
 
         # I'll use the same notation as in [1], for readability.
         n = int(sum(input_state))  # Initial number of particles.
-        eta = self._uniform_transmissivity
+        eta = self._uniform_transmission_probability
         for l in range(n + 1):
             # l denotes number of particles left in the state
-            weights.append(binom(n, l) * eta**l * (1 - eta) ** (n - l))
+            weights.append(binom(n, l) * eta ** l * (1 - eta) ** (n - l))
 
         return weights
 
@@ -250,12 +250,10 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
         Prepare the probabilities of obtaining a given number of particles in the
         approximated part of the input.
         """
-        self._approximated_input_state_part_possibilities_weights = (
-            self._get_possible_lossy_inputs_weights(
-                self._approximated_input_state_part_possibilities[
-                    -1
-                ]  # Last part contains all possible particles.
-            )
+        self._approximated_input_state_part_possibilities_weights = self._get_possible_lossy_inputs_weights(
+            self._approximated_input_state_part_possibilities[
+                -1
+            ]  # Last part contains all possible particles.
         )
 
     @staticmethod

@@ -47,7 +47,7 @@ class UniformLossesDistinguishableParticlesDistributionCalculator(
         else:
             self.weights = compute_binomial_weights(
                 sum(self.configuration.initial_state),
-                self.configuration.uniform_transmissivity,
+                self.configuration.uniform_transmission_probability,
             )
 
         self.weightless = weightless

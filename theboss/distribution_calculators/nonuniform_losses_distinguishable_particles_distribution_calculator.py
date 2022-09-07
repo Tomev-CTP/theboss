@@ -93,7 +93,7 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
             interferometer_matrix=expanded_matrix,
             initial_state=expanded_input,
             number_of_particles_lost=0,
-            uniform_transmissivity=1,
+            uniform_transmission_probability=1,
         )
 
         permanent_calculator: RyserPermanentCalculator = RyserPermanentCalculator(
@@ -101,10 +101,8 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
         )
 
         helper_distribution_calculator: FixedLossesDistinguishableParticlesDistributionCalculator
-        helper_distribution_calculator = (
-            FixedLossesDistinguishableParticlesDistributionCalculator(
-                config, permanent_calculator
-            )
+        helper_distribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
+            config, permanent_calculator
         )
 
         required_expanded_outcomes: List[

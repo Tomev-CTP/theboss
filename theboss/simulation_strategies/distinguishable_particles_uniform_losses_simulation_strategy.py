@@ -21,9 +21,11 @@ class DistinguishableParticlesUniformLossesSimulationStrategy(
     bosons and uniform losses.
     """
 
-    def __init__(self, matrix: Sequence[Sequence[complex]], transmissivity: float = 1):
+    def __init__(
+        self, matrix: Sequence[Sequence[complex]], transmission_probability: float = 1
+    ):
         super().__init__(matrix)
-        self._transmissivity: float = transmissivity
+        self._transmission_probability: float = transmission_probability
 
     def _get_new_sample(self, input_state: Sequence[int]) -> Tuple[int, ...]:
         """
@@ -36,6 +38,6 @@ class DistinguishableParticlesUniformLossesSimulationStrategy(
             An output state from the BS experiment with distinguishable photons.
         """
         lossy_input: Tuple[int, ...] = apply_uniform_losses_to_the_state(
-            input_state, self._transmissivity
+            input_state, self._transmission_probability
         )
         return super()._get_new_sample(lossy_input)

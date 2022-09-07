@@ -34,7 +34,7 @@ from theboss.simulation_strategies.simulation_strategy_factory import (
 
 class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     def setUp(self) -> None:
-        uniform_transmissivity: float = 0.5
+        uniform_transmission_probability: float = 0.5
 
         self._initial_state: List[int] = [1, 1, 1, 1, 0, 0]
         self._number_of_samples_for_experiments: int = 1000
@@ -43,13 +43,15 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         random_unitary = unitary_group.rvs(len(self._initial_state))
 
         self._interferometer_matrix = random_unitary
-        self._lossy_interferometer_matrix = uniform_transmissivity * random_unitary
+        self._lossy_interferometer_matrix = (
+            uniform_transmission_probability * random_unitary
+        )
 
         self._experiment_configuration = BosonSamplingExperimentConfiguration(
             interferometer_matrix=self._lossy_interferometer_matrix,
             initial_state=self._initial_state,
             number_of_particles_lost=0,  # Losses should only come from network.
-            uniform_transmissivity=uniform_transmissivity,
+            uniform_transmission_probability=uniform_transmission_probability,
             network_simulation_strategy=LossyNetworkSimulationStrategy(
                 self._lossy_interferometer_matrix
             ),
@@ -72,10 +74,8 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         ] = calculator.get_outcomes_in_proper_order()
         self._possible_outcomes_number: int = len(self._possible_outcomes)
 
-        self._tvd_bound_between_estimated_distributions = (
-            self._compute_statistical_bound_on_two_approximate_distributions_tvd(
-                outcomes_number=self._possible_outcomes_number
-            )
+        self._tvd_bound_between_estimated_distributions = self._compute_statistical_bound_on_two_approximate_distributions_tvd(
+            outcomes_number=self._possible_outcomes_number
         )
 
     def test_lossy_network_simulation_number_of_particles(self) -> None:
@@ -91,8 +91,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         simulator = BosonSamplingSimulator(strategy)
         lossy_average_number_of_particles = 0
         samples = simulator.get_classical_simulation_results(
-            self._initial_state,
-            self._number_of_samples_for_experiments,
+            self._initial_state, self._number_of_samples_for_experiments,
         )
         for sample in samples:
             lossy_average_number_of_particles += sum(sample)
@@ -243,7 +242,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
             for _ in range(self._initial_state[i]):
                 if (
                     uniform(0, 1)
-                    > self._experiment_configuration.uniform_transmissivity
+                    > self._experiment_configuration.uniform_transmission_probability
                 ):
                     lossy_input[i] -= 1
         return lossy_input
@@ -253,8 +252,9 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
     ) -> None:
         """
         This test checks the situation, for which losses are uniform only for
-        these modes that have any bosons in it, empty modes' transmissivity is set to 0.
-        The results should be identical (up to statistical error) for both cases.
+        these modes that have any bosons in it, empty modes' transmission probability
+        is set to 0. The results should be identical (up to statistical error) for both
+        cases.
         """
         experiment_configuration = deepcopy(self._experiment_configuration)
         updated_interferometer_matrix = experiment_configuration.interferometer_matrix
@@ -322,8 +322,7 @@ class TestBosonSamplingClassicalSimulationStrategies(unittest.TestCase):
         strategy = self._strategy_factory.generate_strategy()
         simulator = BosonSamplingSimulator(strategy)
         samples = simulator.get_classical_simulation_results(
-            self._initial_state,
-            self._number_of_samples_for_experiments,
+            self._initial_state, self._number_of_samples_for_experiments,
         )
 
         return self._compute_distribution(samples, self._possible_outcomes)

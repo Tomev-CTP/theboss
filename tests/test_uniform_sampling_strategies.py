@@ -56,7 +56,7 @@ class TestUniformSamplingSimulationStrategies(unittest.TestCase):
         self._error_probability: float = 0.01
         self._statistical_upper_bound: float = 0.1
 
-        self._uniform_transmissivity: float = 0.4
+        self._uniform_transmission_probability: float = 0.4
 
         self._possible_states = generate_possible_states(
             self._particles_number, self._modes_number, False
@@ -89,7 +89,9 @@ class TestUniformSamplingSimulationStrategies(unittest.TestCase):
             self._error_probability,
             self._statistical_upper_bound,
         )
-        self._distribution_calculator.transmissivity = self._uniform_transmissivity
+        self._distribution_calculator.transmission_probability = (
+            self._uniform_transmission_probability
+        )
 
     def _prepare_nonuniformly_lossy_experiment(self) -> None:
         """
@@ -172,7 +174,7 @@ class TestUniformSamplingSimulationStrategies(unittest.TestCase):
         """
         self._prepare_uniformly_lossy_experiment()
         self._simulator = UniformSamplingWithUniformLossesStrategy(
-            self._uniform_transmissivity
+            self._uniform_transmission_probability
         )
 
         self._check_sampler_accuracy()
@@ -195,7 +197,7 @@ class TestUniformSamplingSimulationStrategies(unittest.TestCase):
         self._test_state = self._binned_input
         self._prepare_uniformly_lossy_experiment()
         self._simulator = UniformSamplingWithUniformLossesStrategy(
-            self._uniform_transmissivity
+            self._uniform_transmission_probability
         )
 
         self._check_sampler_accuracy()

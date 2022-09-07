@@ -77,7 +77,7 @@ class TestFullApproximationBSSimulationStrategies(TestBSClassicalSimulationStrat
         #
         error_bound = 0
         n = self._sampling_tvd_experiment_config.initial_number_of_particles
-        eta = self._sampling_tvd_experiment_config.uniform_transmissivity
+        eta = self._sampling_tvd_experiment_config.uniform_transmission_probability
         for number_of_particles_left in range(n + 1):
             l = number_of_particles_left
             subdistribution_weight = pow(eta, l) * binom(n, l) * pow(1.0 - eta, n - l)

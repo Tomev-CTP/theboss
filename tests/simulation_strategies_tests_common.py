@@ -58,7 +58,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_initial_state = None
         self._distance_calculation_binned_initial_state = None
         self._distance_calculation_number_of_particles_lost = None
-        self._uniform_transmissivity = None
+        self._uniform_transmission_probability = None
 
         self._approximated_modes_number = None
 
@@ -92,7 +92,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._distance_calculation_initial_state = [1, 1, 1, 1, 0]
         self._distance_calculation_binned_initial_state = [2, 1, 1, 0, 0]
         self._distance_calculation_number_of_particles_lost = 2
-        self._uniform_transmissivity = 0.5
+        self._uniform_transmission_probability = 0.5
 
         self._approximated_modes_number = 3
 
@@ -104,7 +104,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             interferometer_matrix=self._permutation_matrix,
             initial_state=self._distance_calculation_initial_state,
             number_of_particles_lost=self._distance_calculation_number_of_particles_lost,
-            uniform_transmissivity=0.8,
+            uniform_transmission_probability=0.8,
         )
 
         permanent_calculator_factory = BSPermanentCalculatorFactory(
@@ -124,12 +124,10 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             self._haar_random_experiment_input_state
         )
         haar_random_number_of_particles_lost = 2
-        self._haar_random_experiment_configuration = (
-            BosonSamplingExperimentConfiguration(
-                interferometer_matrix=array([], dtype=complex),
-                initial_state=self._haar_random_experiment_input_state,
-                number_of_particles_lost=haar_random_number_of_particles_lost,
-            )
+        self._haar_random_experiment_configuration = BosonSamplingExperimentConfiguration(
+            interferometer_matrix=array([], dtype=complex),
+            initial_state=self._haar_random_experiment_input_state,
+            number_of_particles_lost=haar_random_number_of_particles_lost,
         )
         self._haar_random_binned_experiment_input_state = [2, 1, 1, 1, 0]
 
@@ -152,7 +150,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._sampling_tvd_experiment_config.number_of_particles_left = (
             initial_number_of_particles
         )
-        self._sampling_tvd_experiment_config.uniform_transmissivity = 1
+        self._sampling_tvd_experiment_config.uniform_transmission_probability = 1
 
     def _prepare_lossy_distance_experiment_settings_with_binned_input(self):
         self._sampling_tvd_experiment_config.initial_state = (
@@ -170,8 +168,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             initial_number_of_particles
             - self._distance_calculation_number_of_particles_lost
         )
-        self._sampling_tvd_experiment_config.uniform_transmissivity = (
-            self._uniform_transmissivity
+        self._sampling_tvd_experiment_config.uniform_transmission_probability = (
+            self._uniform_transmission_probability
         )
         self._calculator_initial_state = self._distance_calculation_binned_initial_state
 
@@ -192,8 +190,8 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             initial_number_of_particles
             - self._distance_calculation_number_of_particles_lost
         )
-        self._sampling_tvd_experiment_config.uniform_transmissivity = (
-            self._uniform_transmissivity
+        self._sampling_tvd_experiment_config.uniform_transmission_probability = (
+            self._uniform_transmission_probability
         )
 
     def _check_if_approximation_is_within_bounds(
@@ -266,7 +264,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
             or self._strategies_factory.strategy_type == StrategyType.GMF_GENERAL_LOSSES
         ):
             self._strategies_factory.bs_permanent_calculator.matrix *= pow(
-                self._uniform_transmissivity, 0.5
+                self._uniform_transmission_probability, 0.5
             )
 
         approximated_distribution = estimated_distribution_calculator.calculate_approximate_distribution(
@@ -303,7 +301,7 @@ class TestBSClassicalSimulationStrategies(unittest.TestCase):
         self._sampling_tvd_experiment_config.number_of_particles_left = (
             initial_number_of_particles
         )
-        self._sampling_tvd_experiment_config.uniform_transmissivity = 1
+        self._sampling_tvd_experiment_config.uniform_transmission_probability = 1
 
     def _test_state_average_probability_for_haar_random_matrices(
         self, strategy_factory: SimulationStrategyFactory

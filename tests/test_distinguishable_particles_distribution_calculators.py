@@ -29,7 +29,7 @@ class TestDistributionCalculators(unittest.TestCase):
     def setUp(self) -> None:
         self._m: int = 4  # Modes number
 
-        self._uniform_transmissivity: float = 0.5
+        self._uniform_transmission_probability: float = 0.5
         self._number_of_particles_lost = 2
 
         self._std_input = [1, 1, 1, 0]
@@ -52,7 +52,7 @@ class TestDistributionCalculators(unittest.TestCase):
             interferometer_matrix=self._matrix,
             initial_state=input_state,
             number_of_particles_lost=self._number_of_particles_lost,
-            uniform_transmissivity=self._uniform_transmissivity,
+            uniform_transmission_probability=self._uniform_transmission_probability,
         )
         self._permanent_calculator.input_state = input_state
 

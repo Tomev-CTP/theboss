@@ -22,9 +22,9 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
     def __init__(
         self,
         bs_permanent_calculator: BSPermanentCalculatorInterface,
-        transmissivity: float = 0,
+        transmission_probability: float = 0,
     ):
-        self._transmissivity = transmissivity
+        self._transmission_probability = transmission_probability
         self.distribution = []
         self.unweighted_distribution = []
         self._possible_outputs = []
@@ -73,11 +73,11 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
         ]
 
         n = sum(input_state)
-        eta = self._transmissivity
+        eta = self._transmission_probability
 
         # Do note that index is actually equal to number of particles left!
         self._binomial_weights = [
-            pow(self._transmissivity, left)
+            pow(self._transmission_probability, left)
             * special.binom(n, left)
             * pow(1 - eta, n - left)
             for left in range(n + 1)
@@ -131,7 +131,7 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
         self.current_sample_probability = 1
 
         for i in range(self.number_of_input_photons):
-            if random() >= self._transmissivity:
+            if random() >= self._transmission_probability:
                 continue
             if self.current_key not in self.pmfs:
                 self._calculate_new_layer_of_pmfs()

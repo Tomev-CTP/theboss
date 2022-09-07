@@ -11,7 +11,7 @@ from theboss.boson_sampling_utilities import (
     bosonic_space_dimension,
     generate_possible_states,
     generate_lossy_n_particle_input_states,
-    get_modes_transmissivity_values_from_matrix,
+    get_modes_transmission_probabilities_from_matrix,
     prepare_interferometer_matrix_in_expanded_space,
     generate_state_types,
     compute_number_of_state_types,
@@ -90,9 +90,11 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
         ]
 
         # For the lossy matrix tests.
-        self._transmissivities: List[float] = [0.1, 0.2, 0.3, 0.4, 0.5]
-        self._matrix = unitary_group.rvs(len(self._transmissivities))
-        self._matrix = self._matrix @ diag([sqrt(t) for t in self._transmissivities])
+        self._transmission_probabilities: List[float] = [0.1, 0.2, 0.3, 0.4, 0.5]
+        self._matrix = unitary_group.rvs(len(self._transmission_probabilities))
+        self._matrix = self._matrix @ diag(
+            [sqrt(t) for t in self._transmission_probabilities]
+        )
 
         # Matrix space expansion test.
         self._matrix_to_expand = eye(3) @ diag([sqrt(i / 10) for i in range(1, 4)])
@@ -276,20 +278,22 @@ class TestQuantumComputationsUtilities(unittest.TestCase):
                         f"{state} is not in the lossy input states {lossy_input_states} of {self._lossless_input} for n = {particles_left_number}!",
                     )
 
-    def test_modes_transmissivity_value_computation(self) -> None:
+    def test_modes_transmission_probabilities_computation(self) -> None:
         """
         Test if proper transmissivities are obtained from the lossy matrix.
 
         Notice that due to approximation this might not be accurate, hence the isclose
         method is used for comparison.
         """
-        transmissivities: Set[float] = set(
-            get_modes_transmissivity_values_from_matrix(self._matrix)
+        transmission_probabilities: Set[float] = set(
+            get_modes_transmission_probabilities_from_matrix(self._matrix)
         )
-        for transmissivity in self._transmissivities:
+        for transmission_probability in self._transmission_probabilities:
             self.assertTrue(
-                self._is_close_to_any(transmissivity, transmissivities),
-                f"{transmissivity} not in {transmissivities}!",
+                self._is_close_to_any(
+                    transmission_probability, transmission_probabilities
+                ),
+                f"{transmission_probability} not in {transmission_probabilities}!",
             )
 
     @staticmethod

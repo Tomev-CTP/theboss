@@ -104,7 +104,7 @@ class GeneralizedMeanFieldNonuniformLossesSimulationStrategy(
         u, s, v = svd(interferometer_matrix)
 
         # Extract uniform losses from the matrix
-        transmissivities: List[float] = [singular_value**2 for singular_value in s]
+        transmissivities: List[float] = [singular_value ** 2 for singular_value in s]
         losses: List[float] = [1 - eta for eta in transmissivities]
         self._uniform_losses = min(losses)
 
@@ -132,7 +132,7 @@ class GeneralizedMeanFieldNonuniformLossesSimulationStrategy(
             A dict of lists of binomial weights that one can use to sample the number
             of particles left after application of the uniform losses.
         """
-        eta = 1 - self._uniform_losses  # Uniform transmissivity
+        eta = 1 - self._uniform_losses  # Uniform transmission probability
 
         binomial_weights: Dict[int, List[float]] = {}
 
@@ -146,7 +146,8 @@ class GeneralizedMeanFieldNonuniformLossesSimulationStrategy(
                 Number of particles left.
             :return:
                 Probability of getting :math:`l` particles after application of uniform
-                losses to :math:`n` particles given transmissivity :math:`\\eta`.
+                losses to :math:`n` particles given transmission probability
+                :math:`\\eta`.
             """
             return (
                 pow(eta, particles_left)
