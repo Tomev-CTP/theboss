@@ -59,9 +59,7 @@ class Test2SampleKSBSValidator(unittest.TestCase):
 
         config: BosonSamplingExperimentConfiguration
         config = BosonSamplingExperimentConfiguration(
-            self._matrix,
-            self._input_state,
-            0,
+            self._matrix, self._input_state, 0,
         )
 
         self._bs_distribution_calculator: BSDistributionCalculatorWithUniformLosses
@@ -70,17 +68,13 @@ class Test2SampleKSBSValidator(unittest.TestCase):
         )
 
         self._distinguishable_distribution_calculator: UniformLossesDistinguishableParticlesDistributionCalculator
-        self._distinguishable_distribution_calculator = (
-            UniformLossesDistinguishableParticlesDistributionCalculator(
-                config, permanent_calculator
-            )
+        self._distinguishable_distribution_calculator = UniformLossesDistinguishableParticlesDistributionCalculator(
+            config, permanent_calculator
         )
 
         self._uniform_distribution_calculator: UniformDistributionCalculatorForUniformlyLossyBS
-        self._uniform_distribution_calculator = (
-            UniformDistributionCalculatorForUniformlyLossyBS(
-                self._modes_number, self._particles_number, 1
-            )
+        self._uniform_distribution_calculator = UniformDistributionCalculatorForUniformlyLossyBS(
+            self._modes_number, self._particles_number, 1
         )
 
         self._validator: LikelihoodRatioBSValidator
