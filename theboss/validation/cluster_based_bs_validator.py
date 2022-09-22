@@ -116,6 +116,7 @@ class ClusterBasedBSValidator:
         self,
         trusted_sample: Sequence[Tuple[int, ...]],
         tested_sample: Sequence[Tuple[int, ...]],
+        random_seed: int = 0,
     ) -> bool:
         """
         TODO if that's the one that we will use in the end.
@@ -124,7 +125,7 @@ class ClusterBasedBSValidator:
         :param tested_sample:
         :return:
         """
-        k_means = KMeans(n_clusters=self._clusters_number, random_state=0)
+        k_means = KMeans(n_clusters=self._clusters_number, random_state=random_seed)
         k_means.fit(array(trusted_sample))
 
         trusted_sample_assignment: List[int] = list(
@@ -189,8 +190,8 @@ class ClusterBasedBSValidator:
         repetitions: int = 11
         successes: int = 0
 
-        for _ in range(repetitions):
-            if self.validate_tr(trusted_sample, tested_sample):
+        for i in range(repetitions):
+            if self.validate_tr(trusted_sample, tested_sample, random_seed=i):
                 successes += 1
 
         return successes > repetitions // 2
