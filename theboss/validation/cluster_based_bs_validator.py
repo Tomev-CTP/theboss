@@ -115,7 +115,7 @@ class ClusterBasedBSValidator:
                 expected.append(e[i][j])
 
         statistic, p_value = chisquare(observed, expected)
-        print((statistic, p_value))
+        # print((statistic, p_value))
         return p_value > self._rejection_threshold
 
     def _expected_values(
@@ -163,10 +163,7 @@ class ClusterBasedBSValidator:
 
         return e
 
-    def validate_tr(
-        self,
-        tested_sample: Sequence[Tuple[int, ...]],
-    ) -> bool:
+    def validate_tr(self, tested_sample: Sequence[Tuple[int, ...]],) -> bool:
         """
         TODO if that's the one that we will use in the end.
 
@@ -213,7 +210,7 @@ class ClusterBasedBSValidator:
             expected.append(e[i][1])
 
         statistic, p_value = chisquare(observed, expected)
-        print((statistic, p_value))
+        # print((statistic, p_value))
         return p_value > self._rejection_threshold
 
     def validate_majority_voting(
