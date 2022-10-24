@@ -13,21 +13,20 @@ class LossyNetworkSimulationStrategy(NetworkSimulationStrategy):
     def __init__(self, matrix: Sequence[Sequence[complex]]) -> None:
         self._matrix = prepare_interferometer_matrix_in_expanded_space(matrix)
 
-    def simulate(self, input_state: Sequence[int]) -> ndarray:
+    def simulate(self, input_state: Sequence[int]) -> Sequence[Sequence[complex]]:
         """
         This method is for simulating lossy network.
 
-        Instead of using NxN matrix, what we need to do is create a 2N x 2N system, and
-        then, depending on singular values of passed matrix, we have to transfer some
-        photons into inaccessible, additional modes and then trim these additional
-        modes.
+        Instead of using :math:`N \\times N` matrix, what we need to do is create a
+        :math:`2N \\times 2N` system, and then, depending on singular values of passed
+        matrix, we have to transfer some photons into inaccessible, additional modes and
+        then trim these additional modes.
 
         :param input_state:
-            State before parsing through the interferometer. Assume mode occupation
-            representation.
+            A fock state before passing through the interferometer.
 
         :return:
-            Lossy output state.
+            An evolved (possibly) lossy output state.
         """
         # Divide by two, because we have 2N x 2N matrix
         input_state: ndarray = asarray(input_state).reshape(

@@ -15,7 +15,7 @@ class LosslessNetworkSimulationStrategy(NetworkSimulationStrategy):
     def __init__(self, matrix: Sequence[Sequence[complex]]) -> None:
         self._matrix: Sequence[Sequence[complex]] = matrix
 
-    def simulate(self, input_state: Sequence[int]) -> ndarray:
+    def simulate(self, input_state: Sequence[int]) -> Sequence[Sequence[complex]]:
         """
         Computes the dot product of matrix and the input state.
 
