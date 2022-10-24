@@ -36,6 +36,11 @@ from ..distribution_calculators.bs_distribution_calculator_interface import (
 
 
 class StrategyType(enum.IntEnum):
+    """
+    An enum class used for selecting which simulation strategy the factory should
+    produce.
+    """
+
     MF_FIXED_LOSS = enum.auto()
     MF_UNIFORM_LOSS = enum.auto()
     CLIFFORD_R = enum.auto()
@@ -47,6 +52,14 @@ class StrategyType(enum.IntEnum):
 
 
 class SimulationStrategyFactory:
+    """
+
+
+    .. note::
+        It's not used as much as expected in the actual numerical experiments.
+
+    """
+
     def __init__(
         self,
         experiment_configuration: BosonSamplingExperimentConfiguration,
@@ -73,6 +86,9 @@ class SimulationStrategyFactory:
 
     @property
     def available_threads_number(self) -> int:
+        """
+        The number of threads that the simulation strategy will use.
+        """
         return self._available_threads_number
 
     @available_threads_number.setter
@@ -81,6 +97,9 @@ class SimulationStrategyFactory:
 
     @property
     def strategy_type(self) -> StrategyType:
+        """
+        The strategy type produced by the factory.
+        """
         return self._strategy_type
 
     @strategy_type.setter
@@ -89,6 +108,9 @@ class SimulationStrategyFactory:
 
     @property
     def experiment_configuration(self) -> BosonSamplingExperimentConfiguration:
+        """
+        The configuration of the considered BS experiment.
+        """
         return self._experiment_configuration
 
     @experiment_configuration.setter
@@ -99,6 +121,9 @@ class SimulationStrategyFactory:
 
     @property
     def bs_permanent_calculator(self) -> BSPermanentCalculatorInterface:
+        """
+        A permanent calculator that will be used in the simulation strategy.
+        """
         return self._bs_permanent_calculator
 
     @bs_permanent_calculator.setter

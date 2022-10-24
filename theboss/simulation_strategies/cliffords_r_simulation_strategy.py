@@ -32,7 +32,7 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         boson_sampling_package = packages.importr("BosonSampling")
         self.cliffords_r_sampler = boson_sampling_package.bosonSampler
 
-    def set_matrix(self, interferometer_matrix: Sequence[Sequence[int]]) -> None:
+    def set_matrix(self, interferometer_matrix: Sequence[Sequence[complex]]) -> None:
         """
         Sets new interferometer matrix.
 
@@ -65,8 +65,9 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         """
         Simulate BS experiment for given input.
 
-        Note:   The results of Clifford & Clifford method are given in the first
-                quantization description (mode assignment)!
+        .. note::
+            The results of Clifford & Clifford method are given in the first
+            quantization description (mode assignment)!
 
         :param initial_state:
             Input state in the modes occupation description.
@@ -165,8 +166,9 @@ class CliffordsRSimulationStrategy(SimulationStrategyInterface):
         An additional "sanity-check" method that uses C&C strategy to compute the
         probabilities of the outcomes of interest.
 
-        Note: This method may run infinitely if the number of specified states is
-        impossible to achieve in given experiment config.
+        .. note::
+            This method may run infinitely if the number of specified states is
+            impossible to achieve in given experiment config.
 
         :param initial_state:
             Input state of the BS experiment.

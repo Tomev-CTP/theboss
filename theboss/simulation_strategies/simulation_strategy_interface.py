@@ -16,8 +16,15 @@ class SimulationStrategyInterface(abc.ABC):
         """
         Simulate the lossy boson sampling experiment.
 
-        :param input_state: Input state of the simulation.
-        :param samples_number: Number of samples one wants to simulate.
+        .. warning::
+            This is an abstract class. This method is not implemented.
+
+        :param input_state:
+            Input state of the simulation.
+        :param samples_number:
+            Number of samples one wants to simulate.
+
         :return:
+            The samples from the BS experiment.
         """
         raise NotImplementedError

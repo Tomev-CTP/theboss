@@ -35,7 +35,7 @@ from copy import deepcopy
 
 class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInterface):
     """
-    An implementation of the BOBS strategy [2] designed for the uniformly lossy
+    An implementation of the GMF strategy [2] designed for the uniformly lossy
     experiments. It applies the losses to the state before the sampling begins.
     """
 
@@ -112,8 +112,8 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
             input_state[self._hierarchy_level :]  # Approximated state part
         )
 
-        number_of_samples_for_each_thread = self._compute_number_of_samples_for_each_thread(
-            samples_number
+        number_of_samples_for_each_thread = (
+            self._compute_number_of_samples_for_each_thread(samples_number)
         )
 
         # Context is required on Linux systems, as the default (fork) produces undesired
@@ -206,7 +206,7 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
         eta = self._uniform_transmission_probability
         for l in range(n + 1):
             # l denotes number of particles left in the state
-            weights.append(binom(n, l) * eta ** l * (1 - eta) ** (n - l))
+            weights.append(binom(n, l) * eta**l * (1 - eta) ** (n - l))
 
         return weights
 
@@ -250,10 +250,12 @@ class GeneralizedMeanFieldUniformLossesSimulationStrategy(SimulationStrategyInte
         Prepare the probabilities of obtaining a given number of particles in the
         approximated part of the input.
         """
-        self._approximated_input_state_part_possibilities_weights = self._get_possible_lossy_inputs_weights(
-            self._approximated_input_state_part_possibilities[
-                -1
-            ]  # Last part contains all possible particles.
+        self._approximated_input_state_part_possibilities_weights = (
+            self._get_possible_lossy_inputs_weights(
+                self._approximated_input_state_part_possibilities[
+                    -1
+                ]  # Last part contains all possible particles.
+            )
         )
 
     @staticmethod

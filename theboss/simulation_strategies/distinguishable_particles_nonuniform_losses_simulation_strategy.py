@@ -29,6 +29,9 @@ class DistinguishableParticlesNonuniformLossesSimulationStrategy(
 
     @property
     def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        A matrix describing the interferometer in the considered BS experiment.
+        """
         return self._initial_matrix
 
     @matrix.setter

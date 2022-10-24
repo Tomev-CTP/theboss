@@ -4,7 +4,7 @@ __author__ = "Tomasz Rybotycki"
 A class for exact BS simulation using generalized C&C algorithm (version B).
 """
 
-from numpy import delete, vstack, zeros_like, complex128
+from numpy import delete, vstack, zeros_like
 from typing import Sequence, Tuple
 
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
@@ -41,8 +41,10 @@ class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
     """
 
     def __init__(self, bs_permanent_calculator: BSPermanentCalculatorInterface) -> None:
-        bs_permanent_calculator.matrix = prepare_interferometer_matrix_in_expanded_space(
-            bs_permanent_calculator.matrix
+        bs_permanent_calculator.matrix = (
+            prepare_interferometer_matrix_in_expanded_space(
+                bs_permanent_calculator.matrix
+            )
         )
 
         # If for whatever reason one would like to run Clifford & Clifford A algorithm
@@ -69,7 +71,9 @@ class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
             Samples from the exact BS distribution.
         """
         expanded_state = vstack([input_state, zeros_like(input_state, dtype=int)])
-        expanded_state = expanded_state.reshape(2 * len(input_state),)
+        expanded_state = expanded_state.reshape(
+            2 * len(input_state),
+        )
 
         expanded_samples = self._helper_strategy.simulate(
             expanded_state, samples_number
@@ -84,7 +88,13 @@ class GeneralizedCliffordsNonuniformLossesSimulationStrategy(
 
         return samples
 
-    def set_new_matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
+    def set_new_matrix(self, matrix: Sequence[Sequence[complex]]) -> None:
+        """
+        Set the new interferometer matrix.
+
+        :param matrix:
+            New interferometer matrix.
+        """
         self._helper_strategy.set_new_matrix(
             prepare_interferometer_matrix_in_expanded_space(matrix)
         )

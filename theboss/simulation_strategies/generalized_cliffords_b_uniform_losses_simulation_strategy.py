@@ -8,6 +8,12 @@ __author__ = "Tomasz Rybotycki"
             in O(k) time each.
         -   We permute the columns of the matrix at the beginning. We can then sample
             from an easier distribution and obtain the same results.
+            
+    TODO TR:    Write tests for this method.
+
+    TODO TR:    The permanent calculator should not be necessary for GCCB algorithms, as
+                they use the submatrices calculator instead.
+    
 """
 
 from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy import (
@@ -15,8 +21,8 @@ from theboss.simulation_strategies.generalized_cliffords_b_simulation_strategy i
     BSPermanentCalculatorInterface,
     mode_occupation_to_mode_assignment,
 )
-from numpy import ndarray, array, int64, zeros_like
-from typing import List
+from numpy import array, zeros_like
+from typing import List, Sequence, Tuple
 from scipy.special import binom
 from numpy.random import random
 
@@ -26,13 +32,10 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
 ):
     """
     An implementation of a more general approach to the GCCB algorithm taking into
-    account the possible uniform losses. Notice that for transmission_probability = 1 it
-    works like GCCB algorithm.
+    account the possible uniform losses.
 
-    TODO TR:    Write tests for this method.
-
-    TODO TR:    The permanent calculator should not be necessary for GCCB algorithms, as
-                they use the submatrices calculator instead.
+    .. note::
+        For ``transmission_probability = 1`` it works like GCCB algorithm.
     """
 
     def __init__(
@@ -84,7 +87,9 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
 
         return number_of_particles_left
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Tuple[int, ...]]:
         """
         Returns sample from linear optics experiments given output state.
 
@@ -105,7 +110,7 @@ class GeneralizedCliffordsBUniformLossesSimulationStrategy(
             self._current_input = zeros_like(input_state)
             self._working_input_state = particle_input_state.copy()
             self._fill_r_sample()
-            samples.append(array(self.r_sample, dtype=int64))
+            samples.append(array(self.r_sample, dtype=int))
         return samples
 
     def _fill_r_sample(self) -> None:

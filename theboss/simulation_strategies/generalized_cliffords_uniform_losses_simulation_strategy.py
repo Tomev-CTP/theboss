@@ -1,10 +1,10 @@
 __author__ = "Tomasz Rybotycki"
 
 from math import factorial
-from random import random
-from typing import List
+from numpy.random import random
+from typing import List, Tuple, Sequence
 
-from numpy import array, int64, ndarray, array_equal, isclose
+from numpy import array_equal
 from scipy import special
 
 from .generalized_cliffords_simulation_strategy import (
@@ -32,13 +32,19 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
         self.missing_values_in_distribution = False
         super().__init__(bs_permanent_calculator)
 
-    def simulate(self, input_state: ndarray, samples_number: int = 1) -> List[ndarray]:
+    def simulate(
+        self, input_state: Sequence[int], samples_number: int = 1
+    ) -> List[Tuple[int, ...]]:
         """
-            Returns sample from linear optics experiments given output state.
+        Returns sample from BS experiments given the input state.
 
-            :param input_state: Input state in particle basis.
-            :param samples_number: Number of samples to simulate.
-            :return: A resultant state after traversing through interferometer.
+        :param input_state:
+            Input state in the mode occupation description.
+        :param samples_number:
+            Number of samples to simulate.
+
+        :return:
+            A resultant state after traversing through interferometer.
         """
         self._initialize_simulation(input_state)
 
@@ -46,12 +52,12 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
 
         while len(samples) < samples_number:
             self._fill_r_sample()
-            samples.append(array(self.r_sample, dtype=int64))
+            samples.append(tuple(self.r_sample))
         return samples
 
-    def _initialize_simulation(self, input_state: ndarray) -> None:
-        """"
-            A method for algorithm initialization before each sampling.
+    def _initialize_simulation(self, input_state: Sequence[int]) -> None:
+        """
+        A method for algorithm initialization before each sampling.
         """
 
         self.input_state = input_state
@@ -84,47 +90,9 @@ class GeneralizedCliffordsUniformLossesSimulationStrategy(
         ]
         self.distribution[0] = self._binomial_weights[0]
 
-    def compute_distribution_up_to_accuracy(
-        self, input_state: ndarray, accuracy: float = 1.0
-    ) -> List[float]:
-        """
-            Returns distribution (up to given accuracy) based on given
-
-            :param input_state: Input state of the experiment.
-            :param accuracy: Accuracy up to which distribution will be computed.
-            :return:
-        """
-
-        self._initialize_simulation(input_state)
-
-        while not isclose(max(accuracy - sum(self.distribution), 0), 0):
-            self._fill_r_sample()
-
-        return self.distribution
-
-    def compute_unweighted_distribution_up_to_accuracy(
-        self, input_state: ndarray, accuracy: float = 1.0
-    ) -> List[float]:
-        """
-                    Returns distribution (up to given accuracy) based on given
-
-                    :param input_state: Input state of the experiment.
-                    :param accuracy: Accuracy up to which distribution will be computed.
-                    :return:
-                """
-
-        self._initialize_simulation(input_state)
-
-        while not isclose(
-            max(accuracy - sum(self.unweighted_distribution) / sum(input_state), 0), 0
-        ):
-            self._fill_r_sample()
-
-        return self.unweighted_distribution
-
     def _fill_r_sample(self) -> None:
         """
-            Fills the r_sample, but it's possible for the photons to be lost.
+        Fills the r_sample, but it's possible for the photons to be lost.
         """
         self.r_sample = [0 for _ in self._bs_permanent_calculator.matrix]
         self.current_key = tuple(self.r_sample)

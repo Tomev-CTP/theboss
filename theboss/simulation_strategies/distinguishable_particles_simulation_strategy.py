@@ -23,12 +23,16 @@ class DistinguishableParticlesSimulationStrategy(SimulationStrategyInterface):
     """
 
     def __init__(
-        self, matrix: Sequence[Sequence[complex]],
+        self,
+        matrix: Sequence[Sequence[complex]],
     ):
         self._matrix: Sequence[Sequence[complex]] = matrix
 
     @property
     def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        A matrix describing the interferometer in the considered BS experiment.
+        """
         return self._matrix
 
     @matrix.setter
