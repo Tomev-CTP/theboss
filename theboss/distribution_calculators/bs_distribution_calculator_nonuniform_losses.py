@@ -41,6 +41,9 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
 
     @property
     def lossy_interferometer(self) -> Sequence[Sequence[complex]]:
+        """
+        A (possibly) lossy interferometer matrix used in the experiment.
+        """
         return self._lossy_interferometer
 
     @lossy_interferometer.setter
@@ -51,6 +54,9 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
 
     @property
     def input_state(self) -> Sequence[int]:
+        """
+        A Fock input state of the simulations.
+        """
         return self._input_state
 
     @input_state.setter
@@ -61,12 +67,14 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
         self, outcomes: List[Sequence[int]]
     ) -> List[float]:
         """
+        Computes the probabilities for specified ``outcomes`` in current experiment
+        setup.
 
         :param outcomes:
             Outputs for which the probability will be returned.
 
         :return:
-            A list of probabilities of the outputs
+            A list of probabilities of the ``outcomes``.
         """
         probabilities: List[float] = []
 
@@ -156,8 +164,8 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
     def calculate_distribution(self) -> List[float]:
         """
         Computes and returns the whole non-uniformly lossy BS distribution. The order
-        in which the probabilities are returned is given by get_outcomes_in_proper_order
-        method.
+        in which the probabilities are returned is given by
+        ``get_outcomes_in_proper_order`` method.
 
         :return:
             The non-uniformly lossy BS outputs probability distribution.
@@ -169,11 +177,11 @@ class NonUniformlyLossyBSDistributionCalculator(BSDistributionCalculatorInterfac
     def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
         """
         Get the ordered output states, so that they correspond to the probabilities
-        in the calculate_distribution method.
+        in the ``calculate_distribution`` method.
 
         :return:
             Ordered list of outcomes, where the order corresponds to the probabilities
-            returned by the calculate_distribution method.
+            returned by the ``calculate_distribution`` method.
         """
         return generate_possible_states(
             sum(self._input_state), len(self._input_state), True

@@ -28,7 +28,7 @@ class BSCCCHSubmatricesPermanentCalculator(
 
     """
     The name stands for Boson Sampling Clifford & Clifford Chin-Huh submatrices
-    permanent calculator, as it uses Clifford & Clifford approach to compute
+    permanent calculator, as it uses Clifford & Clifford approach [5] to compute
     permanents of submatrices to compute sub-distribution of Boson Sampling problem
     instance. The starting point in our case is Chin-Huh permanent calculator
     iterated in Guan Codes induced order.

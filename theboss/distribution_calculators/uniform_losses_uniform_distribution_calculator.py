@@ -33,6 +33,9 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
 
     @property
     def modes_number(self) -> int:
+        """
+        The number of modes in the considered BS experiment.
+        """
         return self._modes_number
 
     @modes_number.setter
@@ -41,6 +44,9 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
 
     @property
     def particles_number(self) -> int:
+        """
+        The initial number of particles in the considered BS experiment.
+        """
         return self._particles_number
 
     @particles_number.setter
@@ -49,6 +55,9 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
 
     @property
     def transmission_probability(self) -> float:
+        """
+        The uniform probability of transmission in the considered BS experiment.
+        """
         return self._transmission_probability
 
     @transmission_probability.setter
@@ -58,6 +67,9 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
     def calculate_distribution(self) -> List[float]:
         """
         Computes the whole distribution.
+
+        .. note::
+            This will be a flat distribution over all possible output states.
 
         :return:
             The probabilities of all the output states.
@@ -102,7 +114,7 @@ class UniformDistributionCalculatorForUniformlyLossyBS(
 
         :return:
             Ordered list of outcomes where the order corresponds to the probabilities
-            in the calculate distribution method.
+            in the ``calculate_distribution`` method.
         """
         return generate_possible_states(
             self._particles_number, self._modes_number, True

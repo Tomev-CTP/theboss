@@ -1,35 +1,45 @@
 __author__ = "Tomasz Rybotycki"
 
-from typing import List, Iterable
+from typing import List, Iterable, Sequence
 
-from numpy import float64, ndarray, zeros, asarray
+from numpy import zeros, asarray
 
-from ..boson_sampling_simulator import BosonSamplingSimulator
+from theboss.boson_sampling_simulator import BosonSamplingSimulator
 from theboss.boson_sampling_utilities import generate_possible_states
-from ..distribution_calculators.bs_distribution_calculator_interface import (
+from theboss.distribution_calculators.bs_distribution_calculator_interface import (
     BosonSamplingExperimentConfiguration,
     BSDistributionCalculatorInterface,
 )
-from ..simulation_strategies.simulation_strategy_interface import (
+from theboss.simulation_strategies.simulation_strategy_interface import (
     SimulationStrategyInterface,
 )
 
 
 class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
+    """
+    A class for computing the frequencies of the specific outcomes of BS experiment.
+    It's called DistributionCalculator only to be possibly used with the same interface.
+    """
+
     def __init__(
         self,
         experiment_configuration: BosonSamplingExperimentConfiguration,
         strategy: SimulationStrategyInterface,
-        samples_number=5000,
-        outcomes=None,
+        samples_number: int = 5000,
+        outcomes: List[Sequence[int]] = None,
     ) -> None:
-        self._configuration = experiment_configuration
-        self._strategy = strategy
-        self._outcomes = outcomes
-        self._samples_number = samples_number
+        self._configuration: BosonSamplingExperimentConfiguration = (
+            experiment_configuration
+        )
+        self._strategy: SimulationStrategyInterface = strategy
+        self._outcomes: List[Sequence[int]] = outcomes
+        self._samples_number: int = samples_number
 
     @property
     def configuration(self) -> BosonSamplingExperimentConfiguration:
+        """
+        Configuration of the BS experiment.
+        """
         return self._configuration
 
     @configuration.setter
@@ -40,6 +50,9 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
 
     @property
     def strategy(self) -> SimulationStrategyInterface:
+        """
+        Strategy used for the classical BS simulation.
+        """
         return self._strategy
 
     @strategy.setter
@@ -47,15 +60,22 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
         self._strategy = new_strategy
 
     @property
-    def outcomes(self) -> List[ndarray]:
+    def outcomes(self) -> List[Sequence[int]]:
+        """
+        The outcomes of the BS experiment that will be taken into account during the
+        frequencies' computation.
+        """
         return self._outcomes
 
     @outcomes.setter
-    def outcomes(self, new_outcomes: List[ndarray]) -> None:
+    def outcomes(self, new_outcomes: List[Sequence[int]]) -> None:
         self._outcomes = new_outcomes
 
     @property
     def samples_number(self) -> int:
+        """
+        The number of samples used in frequencies computation.
+        """
         return self._samples_number
 
     @samples_number.setter
@@ -75,10 +95,16 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
         self, samples_number: int = 5000
     ) -> List[float]:
         """
-            Prepares the approximate distribution using boson sampling simulation method
-            described by Oszmaniec and Brod. Obviously higher number of samples will
-            generate better approximation.
-            :return: Approximate distribution as a list.
+        Prepares the approximate distribution using boson sampling simulation method.
+        Obviously higher number of samples will generate better approximation.
+
+        .. note::
+            Approximate distribution computes probabilities of the ``outcomes`` if
+            this variable is set. In order to compute whole distribution, all possible
+            outcomes has to be set in the ``outcomes`` variable.
+
+        :return:
+            Approximate distribution as a list of probabilities.
         """
 
         if self._outcomes is not None:
@@ -91,7 +117,7 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
 
         simulator = BosonSamplingSimulator(self._strategy)
 
-        outcomes_probabilities = zeros(len(possible_outcomes), dtype=float64)
+        outcomes_probabilities = zeros(len(possible_outcomes), dtype=float)
 
         samples = simulator.get_classical_simulation_results(
             self.configuration.initial_state, samples_number
@@ -109,5 +135,5 @@ class BSSampleBasedDistributionCalculator(BSDistributionCalculatorInterface):
 
         return list(outcomes_probabilities)
 
-    def get_outcomes_in_proper_order(self) -> List[ndarray]:
+    def get_outcomes_in_proper_order(self) -> List[Sequence[int]]:
         return self._outcomes

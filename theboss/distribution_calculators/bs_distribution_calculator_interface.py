@@ -12,18 +12,9 @@ from theboss.network_simulation_strategy.network_simulation_strategy import (
 # TODO TR: MO doesn't approve of this class. It should be changed somehow.
 @dataclass
 class BosonSamplingExperimentConfiguration:
-
-    interferometer_matrix: Sequence[
-        Sequence[complex]
-    ]  # A matrix describing interferometer.
-    initial_state: Sequence[int]
-    initial_number_of_particles: int
-    number_of_modes: int
-    number_of_particles_lost: int
-    number_of_particles_left: int
-    uniform_transmission_probability: float = 1
-    network_simulation_strategy: NetworkSimulationStrategy = None
-    hierarchy_level: int = 0  # This is k from paper[2]
+    """
+    A dataclass for storing the simulated experiment information in one place.
+    """
 
     def __init__(
         self,
@@ -52,7 +43,12 @@ class BSDistributionCalculatorInterface(abc.ABC):
 
     @abc.abstractmethod
     def calculate_distribution(self) -> List[float]:
-        """One has to be able to calculate exact distribution with it"""
+        """
+        A method for computing the whole distribution.
+
+        .. warning::
+            It's an abstract class. This method is not implemented.
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -60,14 +56,30 @@ class BSDistributionCalculatorInterface(abc.ABC):
         self, outcomes: List[Sequence[int]]
     ) -> List[float]:
         """
-        This method allows one to compute probabilities of only selected outcomes.
+        A method for computing the probability of the specified outcomes.
+
+        .. warning::
+            It's an abstract class. This method is not implemented.
+
+        :param outcomes:
+            The outcomes for which the probabilities should be computed.
+
+        :return:
+            The probabilities of the ``outcomes`` in the same order.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
         """
-        One also has to know the order of objects that returned probabilities correspond
-        to.
+        Since the ``calculate_distribution`` method has no specified ordering of the
+        results, this method should be able to return that ordering.
+
+        .. warning::
+            It's an abstract class. This method is not implemented.
+
+        :return:
+            The order of the outcomes in corresponding to the probabilities returned
+            by the ``calculate_distribution`` method.
         """
         raise NotImplementedError

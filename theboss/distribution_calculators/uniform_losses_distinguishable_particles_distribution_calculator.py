@@ -98,15 +98,15 @@ class UniformLossesDistinguishableParticlesDistributionCalculator(
         subconfiguration.number_of_particles_left = number_of_particles_left
         subconfiguration.number_of_particles_lost = n - l
 
-        subdistribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
-            subconfiguration, self._permanent_calculator
+        subdistribution_calculator = (
+            FixedLossesDistinguishableParticlesDistributionCalculator(
+                subconfiguration, self._permanent_calculator
+            )
         )
 
-        probability_of_outcome = subdistribution_calculator.calculate_probabilities_of_outcomes(
-            [outcome]
-        )[
-            0
-        ]
+        probability_of_outcome = (
+            subdistribution_calculator.calculate_probabilities_of_outcomes([outcome])[0]
+        )
 
         return probability_of_outcome * self.weights[l]
 
@@ -114,7 +114,7 @@ class UniformLossesDistinguishableParticlesDistributionCalculator(
         """
         Returns all possible outcomes of the BS experiment specified by the
         configuration. The "proper" order means only that in corresponds to the
-        order of probabilities returned by the calculate_distribution method.
+        order of probabilities returned by the ``calculate_distribution`` method.
 
         :return:
             All the possible outcomes of BS experiment specified by the configuration.

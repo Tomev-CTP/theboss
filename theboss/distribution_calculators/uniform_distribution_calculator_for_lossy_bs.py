@@ -30,6 +30,9 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
 
     @property
     def modes_number(self) -> int:
+        """
+        The number of modes in the considered BS experiment.
+        """
         return self._modes_number
 
     @modes_number.setter
@@ -38,6 +41,9 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
 
     @property
     def particles_number(self) -> int:
+        """
+        The number of initial particles in the considered BS experiment.
+        """
         return self._particles_number
 
     @particles_number.setter
@@ -47,6 +53,10 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
     def calculate_distribution(self) -> List[float]:
         """
         Computes the whole distribution.
+
+        .. note::
+            In the case of uniform sampling it's a flat distribution over all possible
+            BS states specified by the experiment configuration.
 
         :return:
             The probabilities of all the possible lossy output states.
@@ -61,6 +71,9 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
         """
         Computes probabilities for the specified outputs.
 
+        .. note::
+            In the uniform sampling case, probabilities of all outputs are the same.
+
         :param outcomes:
             The outcomes for which the probabilities should be computed.
 
@@ -71,9 +84,7 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
             self._particles_number, self._modes_number, True
         )
 
-        probability: float = 1 / outcomes_number
-
-        return [probability for _ in range(len(outcomes))]
+        return [1 / outcomes_number] * len(outcomes)
 
     def get_outcomes_in_proper_order(self) -> List[Sequence[int]]:
         """
@@ -82,7 +93,7 @@ class UniformDistributionCalculatorForLossyBS(BSDistributionCalculatorInterface)
 
         :return:
             Ordered list of outcomes where the order corresponds to the probabilities
-            in the calculate distribution method.
+            in the ``calculate_distribution`` method.
         """
         return generate_possible_states(
             self._particles_number, self._modes_number, True

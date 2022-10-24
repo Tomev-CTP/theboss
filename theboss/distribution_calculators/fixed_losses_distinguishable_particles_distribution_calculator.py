@@ -47,7 +47,7 @@ class FixedLossesDistinguishableParticlesDistributionCalculator(
         """
         Returns all possible outcomes of the BS experiment specified by the
         configuration. The "proper" order means only that in corresponds to the
-        order of probabilities returned by the calculate_distribution method.
+        order of probabilities returned by the ``calculate_distribution`` method.
 
         :return:    All the possible outcomes of BS experiment specified by the
                     configuration.
@@ -61,7 +61,7 @@ class FixedLossesDistinguishableParticlesDistributionCalculator(
         """
         This method will be used to calculate the exact distribution of lossy
         BosonSampling experiment. The results will be returned as a table of
-        probabilities of obtaining the outcome at i-th index.
+        probabilities of obtaining the outcome at :math:`i`-th index.
 
         :return:
             List of probabilities of outcomes.
@@ -98,8 +98,10 @@ class FixedLossesDistinguishableParticlesDistributionCalculator(
         :return:
             Probability of obtaining given state in current experiment configuration.
         """
-        outcome_probability = self._compute_probability_of_outcome_state_for_distinguishable_photons(
-            outcome
+        outcome_probability = (
+            self._compute_probability_of_outcome_state_for_distinguishable_photons(
+                outcome
+            )
         )
 
         # Different states in particles-basis may give the same outcome state.
@@ -125,8 +127,8 @@ class FixedLossesDistinguishableParticlesDistributionCalculator(
             A Fock state for which the probability will be computed.
 
         :return:
-            The probability of obtaining outcome_state in a BS experiment for specified
-            configuration.
+            The probability of obtaining ``outcome_state`` in a BS experiment for
+            specified configuration.
         """
         probability_of_outcome = 0
 

@@ -34,7 +34,7 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
 ):
     """
     A class that contains the calculator for computing non-uniformly lossy
-    distinguishable BS distribution.
+    distinguishable BS distribution (or outcomes probabilities).
     """
 
     def __init__(
@@ -47,6 +47,9 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
 
     @property
     def lossy_interferometer(self) -> Sequence[Sequence[complex]]:
+        """
+        A (possibly lossy) interferometer matrix.
+        """
         return self._lossy_interferometer
 
     @lossy_interferometer.setter
@@ -57,6 +60,9 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
 
     @property
     def input_state(self) -> Sequence[int]:
+        """
+        A Fock input state of the BS experiment.
+        """
         return self._input_state
 
     @input_state.setter
@@ -101,8 +107,10 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
         )
 
         helper_distribution_calculator: FixedLossesDistinguishableParticlesDistributionCalculator
-        helper_distribution_calculator = FixedLossesDistinguishableParticlesDistributionCalculator(
-            config, permanent_calculator
+        helper_distribution_calculator = (
+            FixedLossesDistinguishableParticlesDistributionCalculator(
+                config, permanent_calculator
+            )
         )
 
         required_expanded_outcomes: List[
@@ -168,8 +176,7 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
         """
         Computes and returns the whole non-uniformly lossy BS distribution with
         distinguishable particles. The order in which the probabilities are returned is
-        given by get_outcomes_in_proper_order
-        method.
+        given by ``get_outcomes_in_proper_order`` method.
 
         :return:
             The non-uniformly lossy distinguishable BS outputs probability distribution.
@@ -181,11 +188,11 @@ class NonUniformlyLossyDistinguishableParticlesDistributionCalculator(
     def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
         """
         Get the ordered output states, so that they correspond to the probabilities
-        in the calculate_distribution method.
+        in the ``calculate_distribution`` method.
 
         :return:
             Ordered list of outcomes, where the order corresponds to the probabilities
-            returned by the calculate_distribution method.
+            returned by the ``calculate_distribution`` method.
         """
         return generate_possible_states(
             sum(self._input_state), len(self._input_state), True

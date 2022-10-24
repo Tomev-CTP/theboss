@@ -22,6 +22,11 @@ from multiprocessing import cpu_count, Pool
 class BSDistributionCalculatorWithUniformLosses(
     BSDistributionCalculatorWithFixedLosses
 ):
+    """
+    A class implementing the calculator for computing the probabilities of specific
+    outcomes or whole distributions in the uniform losses' regime.
+    """
+
     def __init__(
         self,
         configuration: BosonSamplingExperimentConfiguration,
@@ -37,6 +42,15 @@ class BSDistributionCalculatorWithUniformLosses(
         self.set_weightless(weightless)
 
     def set_weightless(self, weightless: bool) -> None:
+        """
+        Normally, the probabilities of specified outcomes are computed according to the
+        binomial weights corresponding to the losses. In some cases, however, it's
+        preferable to ignore these weights and compute them later.
+
+        :param weightless:
+            Flags informing the calculator if the probabilities should consider binomial
+            weights or not.
+        """
         if weightless:
             self.weights = [1 for _ in self.weights]
         else:
@@ -49,6 +63,17 @@ class BSDistributionCalculatorWithUniformLosses(
     def calculate_probabilities_of_outcomes(
         self, outcomes: Sequence[Tuple[int, ...]]
     ) -> List[float]:
+        """
+        Computes and returns the probabilities of obtaining specified outcomes in the
+        BS experiment described by the configuration. The order of the probabilities
+        corresponds to that of the outcomes.
+
+        :param outcomes:
+            A list of Fock states for which the probabilities will be computed.
+
+        :return:
+            A list of probabilities of obtaining specified outcomes.
+        """
 
         with Pool(processes=cpu_count()) as pool:
             outcomes_probabilities = pool.map(
@@ -75,15 +100,20 @@ class BSDistributionCalculatorWithUniformLosses(
             subconfiguration, self._permanent_calculator
         )
 
-        probability_of_outcome = subdistribution_calculator.calculate_probabilities_of_outcomes(
-            [outcome]
-        )[
-            0
-        ]
+        probability_of_outcome = (
+            subdistribution_calculator.calculate_probabilities_of_outcomes([outcome])[0]
+        )
 
         return probability_of_outcome * self.weights[l]
 
     def get_outcomes_in_proper_order(self) -> List[Tuple[int, ...]]:
+        """
+        A method for computing possible outcomes of the BS experiment.
+
+        :return:
+            All possible outcomes of the experiment ordered in the same way as the
+            probabilities returned by the ``calculate_distribution`` method.
+        """
         return generate_possible_states(
             self.configuration.initial_number_of_particles,
             self.configuration.number_of_modes,
