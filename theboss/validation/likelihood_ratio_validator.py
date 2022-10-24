@@ -34,6 +34,9 @@ class LikelihoodRatioBSValidator:
 
     @property
     def hypothesis_probabilities_calculator(self) -> BSDistributionCalculatorInterface:
+        """
+        Probabilities calculator for the hypothesis.
+        """
         return self._hypothesis_probabilities_calculator
 
     @hypothesis_probabilities_calculator.setter
@@ -46,6 +49,9 @@ class LikelihoodRatioBSValidator:
     def alternative_hypothesis_probabilities_calculator(
         self,
     ) -> BSDistributionCalculatorInterface:
+        """
+        Probabilities calculator for the alternative hypothesis.
+        """
         return self._alternative_hypothesis_probabilities_calculator
 
     @alternative_hypothesis_probabilities_calculator.setter
@@ -62,6 +68,10 @@ class LikelihoodRatioBSValidator:
         Main method of the validator. It returns the probability that the samples
         were drawn according to the hypothesis, not the alternative. The returned
         probability is based on the likelihood ratio.
+
+        .. warning::
+            It may generate overflow problems for some (large) ``chi`` values. In such
+            cases the ``samples`` size should be reduced.
 
         :param samples:
             Samples to be validated. We check if they were drawn according to the

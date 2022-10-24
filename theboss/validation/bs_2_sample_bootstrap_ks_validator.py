@@ -52,6 +52,9 @@ class BS2SampleBootstrapKSValidator:
 
     @property
     def input_state(self) -> Tuple[int, ...]:
+        """
+        A Fock input state that was used in the experiments.
+        """
         return self._input_state
 
     @input_state.setter
@@ -60,6 +63,9 @@ class BS2SampleBootstrapKSValidator:
 
     @property
     def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        The interferometer matrix that was used in the experiment.
+        """
         return self._matrix
 
     @matrix.setter
@@ -68,6 +74,9 @@ class BS2SampleBootstrapKSValidator:
 
     @property
     def confidence_level(self) -> float:
+        """
+        The desired confidence level of the validator.
+        """
         return self._confidence_level
 
     @confidence_level.setter
@@ -82,7 +91,8 @@ class BS2SampleBootstrapKSValidator:
         """
         Checks if given samples were drawn from the same BS distribution.
 
-        Note: The samples can have arbitrary (different) sizes.
+        .. note::
+            The samples can have arbitrary (different) sizes.
 
         :param first_sample:
             One of the samples to compare.
@@ -90,8 +100,8 @@ class BS2SampleBootstrapKSValidator:
             One of the samples to compare.
 
         :return:
-            True if the samples were sampled from the same distribution (with specified
-            confidence). Else False.
+            ``True`` if the samples were sampled from the same distribution (with
+            specified confidence). Else ``False``.
         """
 
         distinct_samples: Set[Tuple[int, ...]] = set(first_sample)

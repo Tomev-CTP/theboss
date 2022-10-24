@@ -15,7 +15,7 @@ from scipy.stats import chisquare
 class ClusterBasedBSValidator:
     """
     This class implements the BS validator based on the clustering techniques (in this
-    case only KMeans) as presented in the [7].
+    case only k-means) as presented in the [7].
     """
 
     def __init__(self, modes_number: int, rejection_threshold: float = 0.5) -> None:
@@ -33,6 +33,10 @@ class ClusterBasedBSValidator:
 
     @property
     def modes_number(self) -> int:
+        """
+        The total number of modes considered in the experiment that will be validated.
+        It's used to determine the number of clusters, as proposed in [7].
+        """
         return self._modes_number
 
     @modes_number.setter
@@ -47,9 +51,9 @@ class ClusterBasedBSValidator:
         structure based on the trusted samples.
 
         :param trusted_sample:
-            A sample from bona-fide boson sampler.
+            A sample from bona-fide (trusted) boson sampler.
         :param seed:
-            A seed for k means initialization.
+            A seed for k-means initialization.
         """
         self._k_means = KMeans(n_clusters=self._clusters_number, random_state=seed)
         self._k_means.fit(array(trusted_sample))
@@ -66,14 +70,33 @@ class ClusterBasedBSValidator:
         validation_approach: str = "original",
     ) -> bool:
         """
+        The main method of the validator. It checks how well the clustering structure
+        of ``tested_sample`` fits the clustering structure of bona fide BosonSampling
+        used for the training.
+
+        .. note::
+            The validator should be trained before the validation.
+
+        .. note::
+            The authors of the method [7] advise to use majority voting.
+
+        .. warning::
+            The ``tr`` validation approach has very bad accuracy if ``tested_sample``
+            comes from the bona fide BosonSampler.
 
         :param tested_sample:
+            A sample from the tested BosonSampler.
+
         :param validation_approach:
-            Can be "original" or "tr".
+            Can be ``original`` or ``tr``. The ``original`` is default and preferred
+            option, since ``tr`` method is not giving satisfactory results.
+
         :return:
+            ``True`` if the ``tested_sample`` seems to be obtained from the same
+            distribution as the training sample. Else ``False``.
         """
         expected_values_function: Callable[
-            [List[int], List[List[int]]], List[List[int]]
+            [List[int], List[List[int]]], List[List[float]]
         ]
 
         if validation_approach == "tr":
@@ -122,10 +145,22 @@ class ClusterBasedBSValidator:
         self, samples_sizes: List[int], samples_cluster_occupations: List[List[int]]
     ) -> List[List[float]]:
         """
+        Computes the expected values
+
+        .. note::
+            This method is slightly different from the one proposed by the authors in
+            [7]. The denominator was fixed in such a way that the method started working
+            as expected. Compare the code and [7] for details.
 
         :param samples_sizes:
+            A list containing the size of training and tested sample, in that order.
         :param samples_cluster_occupations:
+            Occupations of the respective clusters, in the cluster structure obtained
+            during training, for both training and test samples, in that order.
+
         :return:
+            The expected occupations of the clusters if the tested sample comes from the
+            same distribution as the training sample.
         """
         e: List[List[float]] = []
 
@@ -145,10 +180,19 @@ class ClusterBasedBSValidator:
         self, samples_sizes: List[int], samples_cluster_occupations: List[List[int]]
     ) -> List[List[float]]:
         """
+        Computes the expected values for the ``tr`` validation approach. These expected
+        values are basically scaled (according to the ``samples_sizes``) clusters
+        occupations obtained during the training.
 
         :param samples_sizes:
+            The sizes of both training and test samples, in that order.
         :param samples_cluster_occupations:
+            Occupations of the respective clusters, in the cluster structure obtained
+            during training, for both training and test samples, in that order.
+
         :return:
+            The expected occupations of the clusters if the tested sample comes from the
+            same distribution as the training sample.
         """
         e: List[List[float]] = []
 
@@ -163,70 +207,36 @@ class ClusterBasedBSValidator:
 
         return e
 
-    def validate_tr(self, tested_sample: Sequence[Tuple[int, ...]],) -> bool:
-        """
-        TODO if that's the one that we will use in the end.
-
-        :param trusted_sample:
-        :param tested_sample:
-        :return:
-        """
-        tested_sample_assignment: List[int] = list(
-            self._k_means.predict(array(tested_sample))
-        )
-
-        # Additional variable names are from [7].
-        clusters_total_occupations: List[int] = []  # N_i
-        samples_sizes: List[int] = [
-            self._trusted_sample_size,
-            len(tested_sample),
-        ]  # N_j
-
-        samples_cluster_occupations: List[List[int]] = []  # N_ij
-
-        for i in range(self._clusters_number):
-            samples_cluster_occupations.append(list())
-            samples_cluster_occupations[-1].append(
-                self._trusted_samples_assignment.count(i)
-            )
-            samples_cluster_occupations[-1].append(tested_sample_assignment.count(i))
-
-        for i in range(self._clusters_number):
-            clusters_total_occupations.append(
-                self._trusted_samples_assignment.count(i)
-                + tested_sample_assignment.count(i)
-            )
-
-        e: List[List[float]] = self._expected_values_tr(
-            samples_sizes, samples_cluster_occupations
-        )
-
-        # Flatten the lists for the chi squared test
-        observed: List[int] = []
-        expected: List[float] = []
-
-        for i in range(self._clusters_number):
-            observed.append(samples_cluster_occupations[i][1])
-            expected.append(e[i][1])
-
-        statistic, p_value = chisquare(observed, expected)
-        # print((statistic, p_value))
-        return p_value > self._rejection_threshold
-
     def validate_majority_voting(
         self,
         trusted_sample: Sequence[Tuple[int, ...]],
         tested_sample: Sequence[Tuple[int, ...]],
         validation_approach: str = "original",
+        repetitions: int = 11,
     ) -> bool:
         """
-        TODO if that's the one we will use.
+        The preferred method of the validator. It runs the selected (via
+        ``validation_approach``) validation method ``repetitions`` number of time
+        and, as a result, returns the outcome that occurred the most.
+
+        .. note::
+            The ``repetitions=11`` is suggested by the authors of the method in [7]. In
+            general, it should be an odd integer.
 
         :param trusted_sample:
+            The sample from bona fide BosonSampler. It will be used for training.
         :param tested_sample:
+            The sample from tested BosonSampler.
+        :param validation_approach:
+            The validation approach used by the validator. It can be either ``original``
+            or ``tr``. The ``original`` one is preferred.
+        :param repetitions:
+            The number of the training repetitions.
+
         :return:
+            ``True`` if both samples seem to come from the same distribution. Else
+            ``False``.
         """
-        repetitions: int = 11
         successes: int = 0
 
         for i in range(repetitions):
