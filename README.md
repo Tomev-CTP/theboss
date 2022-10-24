@@ -42,6 +42,14 @@ Throughout this work PEP-8 will be used. There are several cases where this may 
 order to be more PEP-friendly I'll try to use prefix m_ instead of capital letters, e.g. m_u would be the equivalent of
 U. Alternatively explicit use of matrix is also acceptable. 
 
+### Documentation
+
+We use ``sphinx`` to document out code. In order to compile the documentation one should
+call
+``sphinx-apidoc --module-first -f -o docs/source .``
+and
+``docs\make html``.
+
 ## Running the tests
 
 Just run all test in `tests` folder with `pytest` or via `tox` command.
@@ -55,7 +63,7 @@ I'll use [SemVer](http://semver.org/) for versioning and try to keep track of th
   - [Tomasz Rybotycki](https://github.com/Tomev)
   - [Malhavok](https://github.com/Malhavok) - *These precious reviews <3*
   - [Billie Thompson](https://github.com/PurpleBooth) - *Provided README Template* 
-
+  - [Kolarovszki Zoltán](https://github.com/Kolarovszki) - output states _lexicographicalization_
 ## License
 
 This project is licensed under the [Apache License, v.2.0](LICENSE.md).
@@ -66,7 +74,6 @@ See the [LICENSE.md](LICENSE.md) file for details.
   - [CTP PAS](http://www.cft.edu.pl/new/public/pl),
   - [Michał Oszmaniec](https://www.cft.edu.pl/pracownik/moszmaniec),
   - [Poór Boldizsár](https://github.com/boldar99) - major code review,
-  - [Kolarovszki Zoltán](https://github.com/Kolarovszki) - output states _lexicographicalization_, 
   - [sisco0](https://github.com/sisco0) - some minor bugs pointed out.
   - This research was supported in part by [PL-Grid](https://www.plgrid.pl/) Infrastructure.
   
