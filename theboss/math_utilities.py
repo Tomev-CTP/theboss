@@ -15,11 +15,12 @@ def choice(values: Sequence[int], weights: Sequence[float] = None) -> int:
     Returns one of the values according to specified weights. If weights aren't
     specified properly, the method samples value uniformly at random.
 
-    Notice that in this scenario I only want to get the number of particles left after
+    Notice that in this scenario we only want to get the number of particles left after
     application of uniform losses, hence the values are of type int and weights of
     type float.
 
-    I implement my version of choice, as it seems that numpy.random.choice is very slow.
+    We implement our version of choice, as it seems that numpy.random.choice is very
+    slow.
 
     :param values:
         Values to sample from.

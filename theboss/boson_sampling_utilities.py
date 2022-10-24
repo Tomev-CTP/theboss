@@ -12,7 +12,6 @@ from numpy import (
     ndarray,
     array,
     block,
-    complex128,
     diag,
     eye,
     sqrt,
@@ -238,7 +237,7 @@ def bosonic_space_dimension(
 
 
 def get_modes_transmission_probabilities_from_matrix(
-    lossy_interferometer_matrix: Sequence[Sequence[complex128]],
+    lossy_interferometer_matrix: Sequence[Sequence[complex]],
 ) -> List[float]:
     """
     Given a lossy interferometer matrix this method extracts from it the information
@@ -261,7 +260,9 @@ def get_modes_transmission_probabilities_from_matrix(
     return square(flip(singular_values))
 
 
-def _compute_loss_transfer_matrix_expansion(transmittances: ndarray,) -> ndarray:
+def _compute_loss_transfer_matrix_expansion(
+    transmittances: ndarray,
+) -> ndarray:
     """
     Returns extension part of the singular values' matrix resulting from the SVD
     decomposition of the (presumably lossy) interferometer.
@@ -327,7 +328,7 @@ def prepare_interferometer_matrix_in_expanded_space(
         ]
     )
 
-    transmission_probabilities = array([s ** 2 for s in transmittances])
+    transmission_probabilities = array([s**2 for s in transmittances])
     loss_transfer_extension_matrix = _compute_loss_transfer_matrix_expansion(
         transmission_probabilities
     )
@@ -516,7 +517,7 @@ def generate_qft_matrix_for_first_m_modes(m: int, all_modes_number: int) -> ndar
         on the first :math:`m` modes.
     """
     small_qft_matrix = compute_qft_matrix(m)
-    qft_matrix = eye(all_modes_number, dtype=complex128)
+    qft_matrix = eye(all_modes_number, dtype=complex)
     qft_matrix[0:m, 0:m] = small_qft_matrix
     return qft_matrix
 
@@ -537,7 +538,7 @@ def generate_random_phases_matrix_for_first_m_modes(
         A matrix describing an operation of applying random phases on the first
         :math:`m` modes and the identity on all the others.
     """
-    random_phases = ones(all_modes_number, dtype=complex128)  # [1, 1, 1, 1, 1, 1]
+    random_phases = ones(all_modes_number, dtype=complex)  # [1, 1, 1, 1, 1, 1]
     random_phases[0:m] = exp(1j * 2 * pi * rand(m))
     return diag(random_phases)
 
@@ -631,7 +632,7 @@ class EffectiveScatteringMatrixCalculator:
 
     def __init__(
         self,
-        matrix: Sequence[Sequence[complex128]],
+        matrix: Sequence[Sequence[complex]],
         input_state: Optional[Sequence[int]] = None,
         output_state: Optional[Sequence[int]] = None,
     ) -> None:
@@ -639,16 +640,16 @@ class EffectiveScatteringMatrixCalculator:
             output_state = list()
         if input_state is None:
             input_state = list()
-        self._matrix: Sequence[Sequence[complex128]] = matrix
+        self._matrix: Sequence[Sequence[complex]] = matrix
         self._input_state: Sequence[int] = input_state
         self._output_state: Sequence[int] = output_state
 
     @property
-    def matrix(self) -> Sequence[Sequence[complex128]]:
+    def matrix(self) -> Sequence[Sequence[complex]]:
         return self._matrix
 
     @matrix.setter
-    def matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
+    def matrix(self, matrix: Sequence[Sequence[complex]]) -> None:
         self._matrix = matrix
 
     @property
@@ -669,7 +670,7 @@ class EffectiveScatteringMatrixCalculator:
     def output_state(self, output_state: Sequence[int]) -> None:
         self._output_state = output_state
 
-    def calculate(self) -> List[List[complex128]]:
+    def calculate(self) -> List[List[complex]]:
         """
         Calculates and returns the effective scattering matrix in the BS instance
         for previously given input state, output state and the interferometer matrix.
@@ -691,7 +692,7 @@ class EffectiveScatteringMatrixCalculator:
                 self._input_state[index_of_column_to_insert]
             )
 
-        helper_mtx = transpose(array(helper_mtx, dtype=complex128))
+        helper_mtx = transpose(array(helper_mtx, dtype=complex))
 
         effective_scattering_matrix = []
 
