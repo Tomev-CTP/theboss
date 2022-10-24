@@ -47,7 +47,7 @@ class BSCCRyserSubmatricesPermanentCalculator(
         (-1)^k \\sum^{s_1}_{r_1} ... \\sum^{s_m}_{r_m} (-1)^{r_1 + ... r_m}
         \\prod^m_{\\nu = 1} \\binom{s_\\nu}{r_\\nu}
         \\prod_{j: t_j > 0} \\left (
-            \\sum^m_{\\nu = 1} r_\\nu u{j, \\nu}
+            \\sum^m_{\\nu = 1} r_\\nu u_{j, \\nu}
         \\right )^{t_j}.
 
     """

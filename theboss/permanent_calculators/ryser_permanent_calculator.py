@@ -7,11 +7,9 @@ __author__ = "Tomasz Rybotycki"
     not-continuous (like [1, 1, 0, 1, 0]) inputs.
 """
 
-from typing import Optional, Dict, Sequence, Union
+from typing import Optional, Dict, Sequence
 
-from numpy import complex128
-
-from ..permanent_calculators.bs_permanent_calculator_base import (
+from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSGuanCodeBasedPermanentCalculatorBase,
 )
 
@@ -19,28 +17,28 @@ from ..permanent_calculators.bs_permanent_calculator_base import (
 class RyserPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
     """
     This class is designed to calculate permanent of effective scattering matrix of
-    a boson sampling instance. Note, that it can be used to calculate permanent of
+    a BosonSampling instance. Note, that it can be used to calculate permanent of
     a given matrix. All that is required that input and output states are correct
     representations of Fock states with proper dimensions.
 
     An important thing to note is that in order to use general approach provided by
-    the boilerplate code in BSGuanCodeBasedPermanentCalculatorBase, we've got to
+    the boilerplate code in ``BSGuanCodeBasedPermanentCalculatorBase``, we've got to
     change the role of input and output states. This can be done if we transpose the
-    matrix. Look into BSCCRyserSubmatricesPermanentCalculator class description
+    matrix. Look into ``BSCCRyserSubmatricesPermanentCalculator`` class description
     for more details.
     """
 
     def __init__(
         self,
-        matrix: Sequence[Sequence[Union[complex128, complex]]],
+        matrix: Sequence[Sequence[complex]],
         input_state: Optional[Sequence[int]] = None,
         output_state: Optional[Sequence[int]] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
         self._multiplier: int
         self._considered_columns_indices: Sequence[int]
-        self.permanent: complex128
-        self._sums: Dict[int, complex128]
+        self.permanent: complex
+        self._sums: Dict[int, complex]
 
     def _initialize_permanent_computation(self) -> None:
         """Prepares the calculator for permanent computation."""

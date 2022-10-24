@@ -18,12 +18,23 @@ from typing import Sequence
 class BSPermanentCalculatorInterface(abc.ABC):
     @abc.abstractmethod
     def compute_permanent(self) -> complex:
-        """Computes permanent of a matrix given before."""
+        """
+        Computes permanent of the previously specified matrix.
+
+        .. warning::
+            This is an abstract class. This method is not implemented.
+
+        :return:
+            The permanent of the specified (possibly reduced) matrix.
+        """
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        A matrix describing the interferometer in the considered BS experiment.
+        """
         raise NotImplementedError
 
     @matrix.setter
@@ -34,6 +45,9 @@ class BSPermanentCalculatorInterface(abc.ABC):
     @property
     @abc.abstractmethod
     def input_state(self) -> Sequence[int]:
+        """
+        A Fock input state in the considered BS experiment.
+        """
         raise NotImplementedError
 
     @input_state.setter
@@ -44,6 +58,9 @@ class BSPermanentCalculatorInterface(abc.ABC):
     @property
     @abc.abstractmethod
     def output_state(self) -> Sequence[int]:
+        """
+        A Fock output state in the considered BS experiment.
+        """
         raise NotImplementedError
 
     @output_state.setter

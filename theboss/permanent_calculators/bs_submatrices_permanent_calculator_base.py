@@ -10,7 +10,7 @@ from theboss.permanent_calculators.bs_submatrices_permanent_calculator_interface
     BSSubmatricesPermanentCalculatorInterface,
 )
 from typing import Optional, List, Sequence
-from numpy import ndarray, zeros, ones, complex128, nonzero
+from numpy import zeros, ones, nonzero
 import abc
 
 
@@ -18,12 +18,8 @@ class BSSubmatricesPermanentCalculatorBase(
     BSSubmatricesPermanentCalculatorInterface, abc.ABC
 ):
     """
-    Base class for BSSubmatricesPermanentCalculator classes. It takes care of some
+    Base class for ``BSSubmatricesPermanentCalculator`` classes. It takes care of some
     boilerplate code.
-
-    Again, it should be put into separate file were the
-    BSCCCHSubmatricesPermanentCalculator cease to be the only submatrices
-    permanent calculator.
     """
 
     def __init__(
@@ -42,6 +38,9 @@ class BSSubmatricesPermanentCalculatorBase(
 
     @property
     def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        A matrix describing the interferometer in the considered BS experiment.
+        """
         return self._matrix
 
     @matrix.setter
@@ -50,6 +49,9 @@ class BSSubmatricesPermanentCalculatorBase(
 
     @property
     def input_state(self) -> Sequence[int]:
+        """
+        A Fock input state in the considered BS experiment.
+        """
         return self._input_state
 
     @input_state.setter
@@ -58,6 +60,9 @@ class BSSubmatricesPermanentCalculatorBase(
 
     @property
     def output_state(self) -> Sequence[int]:
+        """
+        A Fock output state in the considered BS experiment.
+        """
         return self._output_state
 
     @output_state.setter
@@ -70,8 +75,11 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
 ):
     """
     This is a base class for BS submatrices permanents calculators that use Guan code
-    iterations for computations. Submatrices permanents computations are usually some
-    variations of C&C idea, so it's pretty common.
+    iterations for computations.
+
+    .. note::
+        Submatrices permanents computations are usually some variations of C&C idea,
+        at least in the context of BS, so it's pretty common.
     """
 
     def __init__(
@@ -89,12 +97,12 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
         self._last_value_at_index: int = 0
 
         self._position_limits: List[int]
-        self._r_vector: ndarray
-        self._code_update_information: ndarray
+        self._r_vector: Sequence[int]
+        self._code_update_information: Sequence[int]
 
         self._binomials_product: int = 1
 
-        self.permanent: complex128
+        self.permanent: complex
 
     def _initialize_guan_codes_variables(self) -> None:
         """
@@ -147,15 +155,18 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
                 - self._r_vector[self._index_to_update]
             )
 
-    def compute_permanents(self) -> List[complex128]:
+    def compute_permanents(self) -> List[complex]:
         """
         The main method of the class. Computes the permanents of the submatrices by
         using Ryser's formula, the input-output exchange trick and the Guan codes.
+
+        :return:
+            A list of permanents of the sub-matrices.
         """
 
         # Take care of the edge-case, where only 1 sub-matrix is valid (and empty).
         if sum(self.input_state) == 1:
-            return [complex128(v) for v in self.input_state]
+            return [complex(v) for v in self.input_state]
 
         self._initialize_permanents_computation()
 
@@ -179,7 +190,7 @@ class BSGuanBasedSubmatricesPermanentCalculatorBase(
         A method initializing all the class fields. Should be called prior to
         the permanents computation.
         """
-        self.permanents = [complex128(0) for _ in range(len(self.input_state))]
+        self.permanents = [complex(0) for _ in range(len(self.input_state))]
 
         self._sums = dict()
         self._multiplier = pow(-1, sum(self.output_state))

@@ -12,10 +12,10 @@ __author__ = "Tomasz Rybotycki"
     (or rather can be interpreted as that). 
 """
 
-from numpy import complex128, ndarray, array
+from numpy import array
 import operator
 from functools import reduce
-from typing import List, Optional
+from typing import List, Optional, Sequence, Dict
 
 from theboss.permanent_calculators.bs_submatrices_permanent_calculator_base import (
     BSGuanBasedSubmatricesPermanentCalculatorBase,
@@ -36,15 +36,15 @@ class BSCCCHSubmatricesPermanentCalculator(
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[complex]] = None,
+        output_state: Optional[Sequence[complex]] = None,
     ) -> None:
 
-        self._sums: dict = dict()
-        self.permanents: List[complex128] = []
+        self._sums: Dict[int, complex] = dict()
+        self.permanents: List[complex] = []
         self._multiplier: int = 1
-        self._considered_columns_indices = array(0)
+        self._considered_columns_indices: Sequence[int] = array(0)
 
         super().__init__(matrix, input_state, output_state)
 

@@ -10,9 +10,9 @@ __author__ = "Tomasz Rybotycki"
 from operator import mul
 from functools import reduce
 
-from typing import Optional, List
+from typing import Optional, List, Sequence
 
-from numpy import ndarray, complex128, ones
+from numpy import ones
 
 from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSPermanentCalculatorBase,
@@ -23,23 +23,33 @@ from guancodes.GrayCode import get_gray_code_update_indices
 
 
 class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
+    """
+    A matrix permanent calculator that uses the Glynn formula. It first computes the
+    effective scattering (reduced) matrix and then iterates through the sum in the
+    Glynn formula using the Gray code.
+    """
+
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
-        self._delta: ndarray
+        self._delta: Sequence[int]
         self._multiplier: int
-        self._sums: List[complex128]
-        self.permanent: complex128
-        self._scattering_matrix: ndarray
+        self._sums: List[complex]
+        self.permanent: complex
+        self._scattering_matrix: Sequence[Sequence[complex]]
 
-    def compute_permanent(self) -> complex128:
+    def compute_permanent(self) -> complex:
         """
         This is the method for computing the permanent. It will work as described
-        in [0], meaning implement formula (1) and iterate over deltas in Gray code.
+        in [0], formula (1), and iterates over deltas in Gray code.
+
+        :return:
+            Permanent of the sub-matrix corresponding to the specified input and
+            output states.
         """
 
         # Prepare the matrix.
@@ -48,7 +58,7 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
         ).calculate()
 
         if len(self._scattering_matrix) == 0:
-            return complex128(1)
+            return complex(1)
 
         self._initialize_permanent_computation()
 
@@ -75,7 +85,7 @@ class GlynnGrayPermanentCalculator(BSPermanentCalculatorBase):
         self._sums = []
 
         for j in range(len(self._scattering_matrix)):
-            self._sums.append(complex128(0))
+            self._sums.append(complex(0))
             for i in range(len(self._delta)):
                 self._sums[-1] += self._delta[i] * self._scattering_matrix[i][j]
 

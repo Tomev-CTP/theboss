@@ -11,18 +11,23 @@ from typing import Optional, List, Sequence
 import operator
 from functools import reduce
 
-from numpy import complex128, nonzero
+from numpy import nonzero
 
-from ..permanent_calculators.bs_permanent_calculator_interface import (
+from theboss.permanent_calculators.bs_permanent_calculator_interface import (
     BSPermanentCalculatorInterface,
 )
 import abc
 
 
 class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
+    """
+    A base class for all permanent calculators. Takes care of the boilerplate code that
+    all permanent calculators share.
+    """
+
     def __init__(
         self,
-        matrix: Sequence[Sequence[complex128]],
+        matrix: Sequence[Sequence[complex]],
         input_state: Optional[Sequence[int]] = None,
         output_state: Optional[Sequence[int]] = None,
     ) -> None:
@@ -30,20 +35,26 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
             output_state = list()
         if input_state is None:
             input_state = list()
-        self._matrix: Sequence[Sequence[complex128]] = matrix
+        self._matrix: Sequence[Sequence[complex]] = matrix
         self._input_state: Sequence[int] = input_state
         self._output_state: Sequence[int] = output_state
 
     @property
-    def matrix(self) -> Sequence[Sequence[complex128]]:
+    def matrix(self) -> Sequence[Sequence[complex]]:
+        """
+        A matrix representing the interferometer in the considered BS experiment.
+        """
         return self._matrix
 
     @matrix.setter
-    def matrix(self, matrix: Sequence[Sequence[complex128]]) -> None:
+    def matrix(self, matrix: Sequence[Sequence[complex]]) -> None:
         self._matrix = matrix
 
     @property
     def input_state(self) -> Sequence[int]:
+        """
+        A Fock input state in the considered BS experiment.
+        """
         return self._input_state
 
     @input_state.setter
@@ -52,6 +63,9 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 
     @property
     def output_state(self) -> Sequence[int]:
+        """
+        A Fock output state in the considered BS experiment.
+        """
         return self._output_state
 
     @output_state.setter
@@ -63,7 +77,8 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
         Checks if calculation can be performed. For this to happen sizes of given
         matrix and states have to match.
 
-        :return: Information if the calculation can be performed.
+        :return:
+            Information if the calculation can be performed.
         """
         return (
             len(self._matrix) == len(self._matrix[0])
@@ -75,12 +90,12 @@ class BSPermanentCalculatorBase(BSPermanentCalculatorInterface, abc.ABC):
 class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC):
     """
     This is a base class for those permanent calculators that use Guan codes iterations.
-    It contains boilerplate code related to Guan codes iterations.
+    It contains implementation of  boilerplate code related to Guan codes iterations.
     """
 
     def __init__(
         self,
-        matrix: Sequence[Sequence[complex128]],
+        matrix: Sequence[Sequence[complex]],
         input_state: Optional[Sequence[int]] = None,
         output_state: Optional[Sequence[int]] = None,
     ) -> None:
@@ -98,14 +113,14 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
 
         self._binomials_product: int = 1
         self._multiplier: int = 1
-        self.permanent: complex128
+        self.permanent: complex
 
     def _initialize_permanent_computation(self) -> None:
         """Prepares the calculator for permanent computation."""
 
         self._multiplier = 1
         self._considered_columns_indices = nonzero(self._output_state)[0]
-        self.permanent = complex128(0)
+        self.permanent = complex(0)
 
         self._sums = dict()
 
@@ -163,16 +178,17 @@ class BSGuanCodeBasedPermanentCalculatorBase(BSPermanentCalculatorBase, abc.ABC)
                 - self._r_vector[self._index_to_update]
             )
 
-    def compute_permanent(self) -> complex128:
+    def compute_permanent(self) -> complex:
         """
         This is the main method of the calculator. Assuming that input state,
-        output state and the matrix are defined correctly (that is we've got m x m
-        matrix, and vectors of with length m) this calculates the permanent of an
-        effective scattering matrix related to probability of obtaining output state
-        from a given input state.
+        output state and the matrix are defined correctly (that is we've got
+        :math:`m \\times m` matrix, and vectors of with length m) this calculates the
+        permanent of an effective scattering matrix related to probability of obtaining
+        output state from a given input state.
 
-        Most of the Guan code-related have essentially the same structure, up to some
-        minor differences.
+        .. note::
+            Most of the Guan code-related have essentially the same structure, up to
+            some minor differences.
 
         :return: Permanent of effective scattering matrix.
         """

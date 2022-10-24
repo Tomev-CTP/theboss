@@ -6,9 +6,7 @@ __author__ = "Tomasz Rybotycki"
 """
 
 
-from typing import Optional, Dict
-
-from numpy import complex128, ndarray
+from typing import Optional, Dict, Sequence
 
 from theboss.permanent_calculators.bs_permanent_calculator_base import (
     BSGuanCodeBasedPermanentCalculatorBase,
@@ -18,22 +16,25 @@ from theboss.permanent_calculators.bs_permanent_calculator_base import (
 class ChinHuhPermanentCalculator(BSGuanCodeBasedPermanentCalculatorBase):
     """
     This class is designed to compute the permanent of the effective scattering matrix
-    of a BosonSampling instance. Note, that it can be used to compute the permanent of
-    any given matrix. All that is required that input and output states are set to
-    [1, 1, ..., 1] with proper dimensions.
+    in a BosonSampling experiment instance using Chin & Huh's method.
+
+    .. note::
+        It can be used to compute the permanent of any given matrix. All that is
+        required that input and output states are set to :math:`[1, 1, ..., 1]` with
+        proper dimensions.
     """
 
     def __init__(
         self,
-        matrix: ndarray,
-        input_state: Optional[ndarray] = None,
-        output_state: Optional[ndarray] = None,
+        matrix: Sequence[Sequence[complex]],
+        input_state: Optional[Sequence[int]] = None,
+        output_state: Optional[Sequence[int]] = None,
     ) -> None:
         super().__init__(matrix, input_state, output_state)
         self._multiplier: int
-        self._considered_columns_indices: ndarray
-        self.permanent: complex128
-        self._sums: Dict[int, complex128]
+        self._considered_columns_indices: Sequence[int]
+        self.permanent: complex
+        self._sums: Dict[int, complex]
 
     def _initialize_permanent_computation(self) -> None:
 
